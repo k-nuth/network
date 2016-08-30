@@ -25,3 +25,5 @@ obj
 /configure
 /libtool
 .dirstamp
+
+/build
