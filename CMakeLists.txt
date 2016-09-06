@@ -1,8 +1,8 @@
 cmake_policy(VERSION 3.4)
 
-# libbitcoin-network
+# bitprim-network
 #==============================================================================
-project(libbitcoin-network
+project(bitprim-network
   VERSION 3.0.0
   LANGUAGES CXX C)
 cmake_minimum_required(VERSION 3.4)
@@ -33,10 +33,10 @@ find_package(
   Boost 1.56.0 REQUIRED
   COMPONENTS unit_test_framework)
 
-# Require bitcoin of at least version 3.0.0 and output ${bitcoin_CPPFLAGS/LIBS/PKG}.
+# Require bitprim-core of at least version 3.0.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
 #------------------------------------------------------------------------------
-if (NOT TARGET libbitcoin)
-  find_package(libbitcoin 3.0.0 REQUIRED)
+if (NOT TARGET bitprim)
+  find_package(bitprim 3.0.0 REQUIRED)
 endif()
 
 # Set flags.
@@ -118,14 +118,14 @@ _add_cxx_compile_flag(-fvisibility-inlines-hidden _has_visibility_inlines_hidden
 
 # Build
 #==============================================================================
-# src/libbitcoin-network.la => ${libdir}
+# src/bitprim-network.la => ${libdir}
 #------------------------------------------------------------------------------
 set(MODE STATIC)
 if (ENABLE_SHARED)
   set(MODE SHARED)
 endif()
 
-add_library(libbitcoin-network ${MODE}
+add_library(bitprim-network ${MODE}
   src/acceptor.cpp
   src/channel.cpp
   src/connections.cpp
@@ -154,21 +154,21 @@ add_library(libbitcoin-network ${MODE}
   src/sessions/session_manual.cpp
   src/sessions/session_outbound.cpp
   src/sessions/session_seed.cpp)
-target_include_directories(libbitcoin-network PUBLIC
+target_include_directories(bitprim-network PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-target_compile_definitions(libbitcoin-network PUBLIC -DBCT_STATIC)
+target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC)
 
-target_link_libraries(libbitcoin-network libbitcoin)
+target_link_libraries(bitprim-network bitprim)
 
 # Group sources
 file(GLOB_RECURSE headers
   RELATIVE ${CMAKE_CURRENT_LIST_DIR}
   include/*.h include/*.hpp)
-target_sources(libbitcoin-network PRIVATE "${headers}")
+target_sources(bitprim-network PRIVATE "${headers}")
 
-get_target_property(sources libbitcoin-network SOURCES)
+get_target_property(sources bitprim-network SOURCES)
 foreach (source ${sources})
   get_filename_component(group ${source} DIRECTORY)
   if (MSVC)
@@ -177,27 +177,27 @@ foreach (source ${sources})
   source_group("${group}" FILES ${source})
 endforeach()
 
-# local: test/libbitcoin_network_test
+# local: test/bitprim_network_test
 #------------------------------------------------------------------------------
 if (WITH_TESTS)
-  add_executable(libbitcoin_network_test
+  add_executable(bitprim_network_test
     test/main.cpp
     test/p2p.cpp)
   if (ENABLE_SHARED)
-    target_compile_definitions(libbitcoin_network_test PRIVATE -DBOOST_TEST_DYN_LINK)
+    target_compile_definitions(bitprim_network_test PRIVATE -DBOOST_TEST_DYN_LINK)
   endif()
-  target_link_libraries(libbitcoin_network_test libbitcoin-network)
+  target_link_libraries(bitprim_network_test bitprim-network)
 
-  target_include_directories(libbitcoin_network_test SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-  target_link_libraries(libbitcoin_network_test
+  target_include_directories(bitprim_network_test SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
+  target_link_libraries(bitprim_network_test
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
   enable_testing()
-  set(_libbitcoin_tests empty_tests)
-  foreach (_test_name ${_libbitcoin_tests})
+  set(_bitprim_tests empty_tests)
+  foreach (_test_name ${_bitprim_tests})
     add_test(
       NAME test.${_test_name}
-      COMMAND libbitcoin_network_test
+      COMMAND bitprim_network_test
         --run_test=${_test_name}
         --show_progress=no
         --detect_memory_leak=0
@@ -208,11 +208,11 @@ endif()
 
 # Install
 #==============================================================================
-install(TARGETS libbitcoin-network
-  EXPORT libbitcoin-network
+install(TARGETS bitprim-network
+  EXPORT bitprim-network
   ARCHIVE DESTINATION lib)
 
-set(_libbitcoin_headers
+set(_bitprim_headers
   # include_bitcoin_HEADERS =
   bitcoin/network.hpp
   # include_bitcoin_network_HEADERS =
@@ -248,7 +248,7 @@ set(_libbitcoin_headers
   bitcoin/network/sessions/session_manual.hpp
   bitcoin/network/sessions/session_outbound.hpp
   bitcoin/network/sessions/session_seed.hpp)
-foreach (_header ${_libbitcoin_headers})
+foreach (_header ${_bitprim_headers})
   get_filename_component(_directory "${_header}" DIRECTORY)
   install(FILES "include/${_header}" DESTINATION "include/${_directory}")
 endforeach()
@@ -257,9 +257,9 @@ endforeach()
 #==============================================================================
 include(CMakePackageConfigHelpers)
 
-export(EXPORT libbitcoin-network
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-networkTargets.cmake")
-export(PACKAGE libbitcoin-network)
+export(EXPORT bitprim-network
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkTargets.cmake")
+export(PACKAGE bitprim-network)
 
 if (UNIX)
   set(_config_package_location "lib/cmake")
@@ -267,21 +267,21 @@ elseif (WIN32)
   set(_config_package_location "cmake")
 endif()
 
-install(EXPORT libbitcoin-network
-  FILE libbitcoin-networkTargets.cmake
+install(EXPORT bitprim-network
+  FILE bitprim-networkTargets.cmake
   DESTINATION ${_config_package_location})
 
-configure_file(libbitcoin-networkConfig.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-networkConfig.cmake"
+configure_file(bitprim-networkConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfig.cmake"
   @ONLY)
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-networkConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfigVersion.cmake"
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion)
 
 install(
   FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-networkConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-networkConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfigVersion.cmake"
   DESTINATION ${_config_package_location})

@@ -1,0 +1,12 @@
+# - Config file for the BITPRIM_NETWORK package
+#
+#  BITPRIM_NETWORK_INCLUDE_DIRS - include directories for BITPRIM_NETWORK
+#  BITPRIM_NETWORK_LIBRARIES    - libraries to link against
+
+get_filename_component(BITPRIM_NETWORK_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(BITPRIM_NETWORK_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+include("${BITPRIM_NETWORK_CMAKE_DIR}/bitprim-networkTargets.cmake")
+set(BITPRIM_NETWORK_LIBRARIES bitprim-network)
+
+find_package(bitprim 3.0.0 REQUIRED)
