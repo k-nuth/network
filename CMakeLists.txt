@@ -141,15 +141,15 @@ add_library(bitprim-network ${MODE}
   src/proxy.cpp
   src/settings.cpp
   src/socket.cpp
-  src/protocols/protocol.cpp \
-  src/protocols/protocol_address_31402.cpp \
-  src/protocols/protocol_events.cpp \
-  src/protocols/protocol_ping_31402.cpp \
-  src/protocols/protocol_ping_60001.cpp \
-  src/protocols/protocol_seed_31402.cpp \
-  src/protocols/protocol_timer.cpp \
-  src/protocols/protocol_version_31402.cpp \
-  src/protocols/protocol_version_70002.cpp \
+  src/protocols/protocol.cpp
+  src/protocols/protocol_address_31402.cpp
+  src/protocols/protocol_events.cpp
+  src/protocols/protocol_ping_31402.cpp
+  src/protocols/protocol_ping_60001.cpp
+  src/protocols/protocol_seed_31402.cpp
+  src/protocols/protocol_timer.cpp
+  src/protocols/protocol_version_31402.cpp
+  src/protocols/protocol_version_70002.cpp
   src/sessions/session.cpp
   src/sessions/session_batch.cpp
   src/sessions/session_inbound.cpp
