@@ -17,14 +17,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LIBBITCOIN_NETWORK_PROTOCOL_ADDRESS_HPP
-#define LIBBITCOIN_NETWORK_PROTOCOL_ADDRESS_HPP
+#ifndef LIBBITCOIN_NETWORK_PROTOCOL_PING_60001_HPP
+#define LIBBITCOIN_NETWORK_PROTOCOL_PING_60001_HPP
 
+#include <cstdint>
 #include <memory>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
 #include <bitcoin/network/define.hpp>
-#include <bitcoin/network/protocols/protocol_events.hpp>
+#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
+#include <bitcoin/network/protocols/protocol_timer.hpp>
+#include <bitcoin/network/settings.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -32,37 +35,29 @@ namespace network {
 class p2p;
 
 /**
- * Address protocol.
+ * Ping-pong protocol.
  * Attach this to a channel immediately following handshake completion.
  */
-class BCT_API protocol_address
-  : public protocol_events, track<protocol_address>
+class BCT_API protocol_ping_60001
+  : public protocol_ping_31402, track<protocol_ping_60001>
 {
 public:
-    typedef std::shared_ptr<protocol_address> ptr;
+    typedef std::shared_ptr<protocol_ping_60001> ptr;
 
     /**
-     * Construct an address protocol instance.
+     * Construct a ping protocol instance.
      * @param[in]  network   The network interface.
      * @param[in]  channel   The channel on which to start the protocol.
      */
-    protocol_address(p2p& network, channel::ptr channel);
+    protocol_ping_60001(p2p& network, channel::ptr channel);
 
-    /**
-     * Start the protocol.
-     */
-    virtual void start();
+protected:
+    void send_ping(const code& ec) override;
 
-private:
-    void handle_stop(const code& ec);
-    void handle_store_addresses(const code& ec);
-
-    bool handle_receive_address(const code& ec, message::address::ptr address);
-    bool handle_receive_get_address(const code& ec,
-        message::get_address::ptr message);
-
-    p2p& network_;
-    message::address self_;
+    bool handle_receive_ping(const code& ec,
+        message::ping::ptr message) override;
+    virtual bool handle_receive_pong(const code& ec,
+        message::pong::ptr message, uint64_t nonce);
 };
 
 } // namespace network

@@ -23,8 +23,9 @@
 #include <functional>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/protocols/protocol_address.hpp>
-#include <bitcoin/network/protocols/protocol_ping.hpp>
+#include <bitcoin/network/protocols/protocol_address_31402.hpp>
+#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
+#include <bitcoin/network/protocols/protocol_ping_60001.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -33,8 +34,8 @@ namespace network {
 
 using namespace std::placeholders;
 
-session_outbound::session_outbound(p2p& network)
-  : session_batch(network, true),
+session_outbound::session_outbound(p2p& network, bool notify_on_connect)
+  : session_batch(network, notify_on_connect),
     CONSTRUCT_TRACK(session_outbound)
 {
 }
@@ -108,14 +109,12 @@ void session_outbound::handle_connect(const code& ec, channel::ptr channel,
 void session_outbound::handle_channel_start(const code& ec,
     connector::ptr connect, channel::ptr channel)
 {
-    // Treat a start failure just like a stop.
+    // The start failure is also caught by handle_channel_stop. 
     if (ec)
     {
         log::debug(LOG_NETWORK)
             << "Outbound channel failed to start ["
             << channel->authority() << "] " << ec.message();
-
-        new_connection(connect);
         return;
     }
 
@@ -124,8 +123,12 @@ void session_outbound::handle_channel_start(const code& ec,
 
 void session_outbound::attach_protocols(channel::ptr channel)
 {
-    attach<protocol_ping>(channel)->start();
-    attach<protocol_address>(channel)->start();
+    if (channel->negotiated_version() >= message::version::level::bip31)
+        attach<protocol_ping_60001>(channel)->start();
+    else
+        attach<protocol_ping_31402>(channel)->start();
+
+    attach<protocol_address_31402>(channel)->start();
 }
 
 void session_outbound::handle_channel_stop(const code& ec,
@@ -136,6 +139,45 @@ void session_outbound::handle_channel_stop(const code& ec,
         << ec.message();
 
     new_connection(connect);
+}
+
+// Channel start sequence.
+// ----------------------------------------------------------------------------
+// Pend outgoing connections so we can detect connection to self.
+
+void session_outbound::start_channel(channel::ptr channel,
+    result_handler handle_started)
+{
+    result_handler unpend_handler =
+        BIND3(do_unpend, _1, channel, handle_started);
+
+    pend(channel, BIND3(handle_pend, _1, channel, unpend_handler));
+}
+
+void session_outbound::handle_pend(const code& ec, channel::ptr channel,
+    result_handler handle_started)
+{
+    if (ec)
+    {
+        handle_started(ec);
+        return;
+    }
+
+    session::start_channel(channel, handle_started);
+}
+
+void session_outbound::do_unpend(const code& ec, channel::ptr channel,
+    result_handler handle_started)
+{
+    unpend(channel, BIND1(handle_unpend, _1));
+    handle_started(ec);
+}
+
+void session_outbound::handle_unpend(const code& ec)
+{
+    if (ec)
+        log::debug(LOG_NETWORK)
+            << "Failed to unpend a channel: " << ec.message();
 }
 
 } // namespace network

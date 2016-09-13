@@ -24,8 +24,11 @@
 #include <functional>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/protocols/protocol_ping.hpp>
-#include <bitcoin/network/protocols/protocol_seed.hpp>
+#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
+#include <bitcoin/network/protocols/protocol_ping_60001.hpp>
+#include <bitcoin/network/protocols/protocol_seed_31402.hpp>
+#include <bitcoin/network/protocols/protocol_version_31402.hpp>
+#include <bitcoin/network/protocols/protocol_version_70002.hpp>
 #include <bitcoin/network/proxy.hpp>
 
 namespace libbitcoin {
@@ -36,7 +39,7 @@ namespace network {
 
 using namespace std::placeholders;
 session_seed::session_seed(p2p& network)
-  : session(network, true, false),
+  : session(network, false),
     CONSTRUCT_TRACK(session_seed)
 {
 }
@@ -66,6 +69,25 @@ void session_seed::handle_started(const code& ec, result_handler handler)
     }
 
     address_count(BIND2(handle_count, _1, handler));
+}
+
+void session_seed::attach_handshake_protocols(channel::ptr channel,
+    result_handler handle_started)
+{
+    // Don't use configured services or relay for seeding.
+    const auto relay = false;
+    const auto own_version = settings_.protocol_maximum;
+    const auto own_services = message::version::service::none;
+    const auto minimum_version = settings_.protocol_minimum;
+    const auto minimum_services = message::version::service::none;
+
+    // The negotiated_version is initialized to the configured maximum.
+    if (channel->negotiated_version() >= message::version::level::bip61)
+        attach<protocol_version_70002>(channel, own_version, own_services,
+            minimum_version, minimum_services, relay)->start(handle_started);
+    else
+        attach<protocol_version_31402>(channel, own_version, own_services,
+            minimum_version, minimum_services)->start(handle_started);
 }
 
 void session_seed::handle_count(size_t start_size, result_handler handler)
@@ -170,8 +192,12 @@ void session_seed::handle_channel_start(const code& ec, channel::ptr channel,
 void session_seed::attach_protocols(channel::ptr channel,
     result_handler handler)
 {
-    attach<protocol_ping>(channel)->start();
-    attach<protocol_seed>(channel)->start(handler);
+    if (channel->negotiated_version() >= message::version::level::bip31)
+        attach<protocol_ping_60001>(channel)->start();
+    else
+        attach<protocol_ping_31402>(channel)->start();
+
+    attach<protocol_seed_31402>(channel)->start(handler);
 }
 
 void session_seed::handle_channel_stop(const code& ec)

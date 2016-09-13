@@ -24,8 +24,9 @@
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/connector.hpp>
 #include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/protocols/protocol_address.hpp>
-#include <bitcoin/network/protocols/protocol_ping.hpp>
+#include <bitcoin/network/protocols/protocol_address_31402.hpp>
+#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
+#include <bitcoin/network/protocols/protocol_ping_60001.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -34,8 +35,8 @@ namespace network {
 
 using namespace std::placeholders;
 
-session_inbound::session_inbound(p2p& network)
-  : session(network, true, true),
+session_inbound::session_inbound(p2p& network, bool notify_on_connect)
+  : session(network, notify_on_connect),
     CONSTRUCT_TRACK(session_inbound)
 {
 }
@@ -165,14 +166,44 @@ void session_inbound::handle_channel_start(const code& ec,
 
 void session_inbound::attach_protocols(channel::ptr channel)
 {
-    attach<protocol_ping>(channel)->start();
-    attach<protocol_address>(channel)->start();
+    if (channel->negotiated_version() >= message::version::level::bip31)
+        attach<protocol_ping_60001>(channel)->start();
+    else
+        attach<protocol_ping_31402>(channel)->start();
+
+    attach<protocol_address_31402>(channel)->start();
 }
 
 void session_inbound::handle_channel_stop(const code& ec)
 {
     log::debug(LOG_NETWORK)
         << "Inbound channel stopped: " << ec.message();
+}
+
+// Channel start sequence.
+// ----------------------------------------------------------------------------
+// Loopback test required for incoming connections.
+
+void session_inbound::start_channel(channel::ptr channel,
+    result_handler handle_started)
+{
+    pending(channel->peer_version().nonce,
+        BIND3(handle_is_pending, _1, channel, handle_started));
+}
+
+void session_inbound::handle_is_pending(bool pending, channel::ptr channel,
+    result_handler handle_started)
+{
+    if (pending)
+    {
+        log::debug(LOG_NETWORK)
+            << "Rejected connection from [" << channel->authority()
+            << "] as loopback.";
+        handle_started(error::accept_failed);
+        return;
+    }
+
+    session::start_channel(channel, handle_started);
 }
 
 } // namespace network

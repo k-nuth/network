@@ -30,10 +30,12 @@
 #include <bitcoin/network/connections.hpp>
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/hosts.hpp>
-#include <bitcoin/network/protocols/protocol_address.hpp>
-#include <bitcoin/network/protocols/protocol_ping.hpp>
-#include <bitcoin/network/protocols/protocol_seed.hpp>
-#include <bitcoin/network/protocols/protocol_version.hpp>
+#include <bitcoin/network/protocols/protocol_address_31402.hpp>
+#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
+#include <bitcoin/network/protocols/protocol_ping_60001.hpp>
+#include <bitcoin/network/protocols/protocol_seed_31402.hpp>
+#include <bitcoin/network/protocols/protocol_version_31402.hpp>
+#include <bitcoin/network/protocols/protocol_version_70002.hpp>
 #include <bitcoin/network/sessions/session_inbound.hpp>
 #include <bitcoin/network/sessions/session_manual.hpp>
 #include <bitcoin/network/sessions/session_outbound.hpp>
@@ -223,17 +225,17 @@ session_seed::ptr p2p::attach_seed_session()
 
 session_manual::ptr p2p::attach_manual_session()
 {
-    return attach<session_manual>();
+    return attach<session_manual>(true);
 }
 
 session_inbound::ptr p2p::attach_inbound_session()
 {
-    return attach<session_inbound>();
+    return attach<session_inbound>(true);
 }
 
 session_outbound::ptr p2p::attach_outbound_session()
 {
-    return attach<session_outbound>();
+    return attach<session_outbound>(true);
 }
 
 // Shutdown.
@@ -357,6 +359,24 @@ void p2p::connect(const std::string& hostname, uint16_t port,
         // Connect is invoked on a new thread.
         manual->connect(hostname, port, handler);
     }
+}
+
+// Pending connections collection.
+// ----------------------------------------------------------------------------
+
+void p2p::pend(channel::ptr channel, result_handler handler)
+{
+    pending_.store(channel, handler);
+}
+
+void p2p::unpend(channel::ptr channel, result_handler handler)
+{
+    pending_.remove(channel, handler);
+}
+
+void p2p::pending(uint64_t version_nonce, truth_handler handler) const
+{
+    pending_.exists(version_nonce, handler);
 }
 
 // Connections collection.

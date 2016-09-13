@@ -45,7 +45,7 @@ public:
     typedef std::function<void(const code&, channel::ptr)> channel_handler;
 
     /// Construct an instance.
-    session_manual(p2p& network);
+    session_manual(p2p& network, bool notify_on_connect);
 
     /// Start the manual session.
     void start(result_handler handler) override;
@@ -62,9 +62,10 @@ protected:
     virtual void attach_protocols(channel::ptr channel);
 
 private:
-    void handle_started(const code& ec, result_handler handler);
     void start_connect(const std::string& hostname, uint16_t port,
         channel_handler handler, uint32_t retries);
+
+    void handle_started(const code& ec, result_handler handler);
     void handle_connect(const code& ec, channel::ptr channel,
         const std::string& hostname, uint16_t port,
         channel_handler handler, uint32_t retries);

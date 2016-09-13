@@ -43,20 +43,26 @@ public:
     typedef std::shared_ptr<session_inbound> ptr;
 
     /// Construct an instance.
-    session_inbound(p2p& network);
+    session_inbound(p2p& network, bool notify_on_connect);
 
     /// Start the session.
     void start(result_handler handler) override;
 
 protected:
+    /// Overridden to implement pending test for inbound channels.
+    void start_channel(channel::ptr channel,
+        result_handler handle_started) override;
+
     /// Override to attach specialized protocols upon channel start.
     virtual void attach_protocols(channel::ptr channel);
 
 private:
     void start_accept(const code& ec, acceptor::ptr accept);
+
     void handle_started(const code& ec, result_handler handler);
-    void handle_is_loopback(bool loopback, channel::ptr channel);
     void handle_connection_count(size_t connections, channel::ptr channel);
+    void handle_is_pending(bool pending, channel::ptr channel,
+        result_handler handle_started);
     void handle_accept(const code& ec, channel::ptr channel,
         acceptor::ptr accept);
 
