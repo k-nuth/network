@@ -237,12 +237,14 @@ set(_bitprim_headers
   bitcoin/network/version.hpp
   # include_bitcoin_network_protocols_HEADERS =
   bitcoin/network/protocols/protocol.hpp
-  bitcoin/network/protocols/protocol_address.hpp
+  bitcoin/network/protocols/protocol_address_31402.hpp
   bitcoin/network/protocols/protocol_events.hpp
-  bitcoin/network/protocols/protocol_ping.hpp
-  bitcoin/network/protocols/protocol_seed.hpp
+  bitcoin/network/protocols/protocol_ping_31402.hpp
+  bitcoin/network/protocols/protocol_ping_60001.hpp
+  bitcoin/network/protocols/protocol_seed_31402.hpp
   bitcoin/network/protocols/protocol_timer.hpp
-  bitcoin/network/protocols/protocol_version.hpp
+  bitcoin/network/protocols/protocol_version_31402.hpp
+  bitcoin/network/protocols/protocol_version_70002.hpp
   # include_bitcoin_network_sessions_HEADERS =
   bitcoin/network/sessions/session.hpp
   bitcoin/network/sessions/session_batch.hpp
