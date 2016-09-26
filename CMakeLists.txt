@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.4)
 project(bitprim-network
   VERSION 3.0.0
   LANGUAGES CXX C)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Check for baseline language coverage in the compiler for the C++11 standard.
 #------------------------------------------------------------------------------
@@ -163,6 +164,8 @@ target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC)
 
 target_link_libraries(bitprim-network bitprim-core)
 
+set_target_properties(bitprim-network PROPERTIES FOLDER "network")
+
 # Group sources
 file(GLOB_RECURSE headers
   RELATIVE ${CMAKE_CURRENT_LIST_DIR}
@@ -178,6 +181,8 @@ foreach (source ${sources})
   source_group("${group}" FILES ${source})
 endforeach()
 
+# Tests
+#==============================================================================
 # local: test/bitprim_network_test
 #------------------------------------------------------------------------------
 if (WITH_TESTS)
@@ -192,6 +197,8 @@ if (WITH_TESTS)
   target_include_directories(bitprim_network_test SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
   target_link_libraries(bitprim_network_test
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
+  set_target_properties(bitprim_network_test PROPERTIES FOLDER "network")
 
   enable_testing()
   set(_bitprim_tests empty_tests)
