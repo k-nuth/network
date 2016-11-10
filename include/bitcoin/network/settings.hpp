@@ -20,6 +20,7 @@
 #ifndef LIBBITCOIN_NETWORK_SETTINGS_HPP
 #define LIBBITCOIN_NETWORK_SETTINGS_HPP
 
+#include <cstddef>
 #include <cstdint>
 #include <boost/filesystem.hpp>
 #include <bitcoin/bitcoin.hpp>
@@ -33,7 +34,7 @@ class BCT_API settings
 {
 public:
     settings();
-    settings(bc::settings context);
+    settings(config::settings context);
 
     /// Properties.
     uint32_t threads;
@@ -55,12 +56,19 @@ public:
     uint32_t host_pool_capacity;
     bool relay_transactions;
     boost::filesystem::path hosts_file;
-    boost::filesystem::path debug_file;
-    boost::filesystem::path error_file;
     config::authority self;
     config::authority::list blacklists;
     config::endpoint::list peers;
     config::endpoint::list seeds;
+
+    // [log]
+    boost::filesystem::path debug_file;
+    boost::filesystem::path error_file;
+    boost::filesystem::path archive_directory;
+    size_t rotation_size;
+    size_t maximum_archive_size;
+    size_t minimum_free_space;
+    size_t maximum_archive_files;
 
     /// Helpers.
     asio::duration connect_timeout() const;

@@ -29,16 +29,16 @@
 #include <vector>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/connections.hpp>
+#include <bitcoin/network/collections/connections.hpp>
+#include <bitcoin/network/collections/hosts.hpp>
+#include <bitcoin/network/collections/pending_channels.hpp>
 #include <bitcoin/network/define.hpp>
-#include <bitcoin/network/hosts.hpp>
-#include <bitcoin/network/message_subscriber.hpp>
-#include <bitcoin/network/pending_channels.hpp>
 #include <bitcoin/network/sessions/session_inbound.hpp>
 #include <bitcoin/network/sessions/session_manual.hpp>
 #include <bitcoin/network/sessions/session_outbound.hpp>
 #include <bitcoin/network/sessions/session_seed.hpp>
 #include <bitcoin/network/settings.hpp>
+#include <bitcoin/network/utility/message_subscriber.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -68,14 +68,14 @@ public:
     void broadcast(Message&& message, channel_handler handle_channel,
         result_handler handle_complete)
     {
-        connections_->broadcast(message, handle_channel, handle_complete);
+        connections_.broadcast(message, handle_channel, handle_complete);
     }
 
     /// Subscribe to all incoming messages of a type.
     template <class Message>
     void subscribe(message_handler<Message>&& handler)
     {
-        connections_->subscribe(
+        connections_.subscribe(
             std::forward<message_handler<Message>>(handler));
     }
 
@@ -120,11 +120,14 @@ public:
     /// Network configuration settings.
     virtual const settings& network_settings() const;
 
-    /// Return the current block height.
-    virtual size_t height() const;
+    /// Return the current top block identity.
+    config::checkpoint top_block() const;
 
-    /// Set the current block height, for use in version messages.
-    virtual void set_height(size_t value);
+    /// Set the current top block identity.
+    void set_top_block(config::checkpoint&& top);
+
+    /// Set the current top block identity.
+    void set_top_block(const config::checkpoint& top);
 
     /// Determine if the network is stopped.
     virtual bool stopped() const;
@@ -171,7 +174,8 @@ public:
     // ------------------------------------------------------------------------
 
     /// Determine if there exists a connection to the address.
-    virtual void connected(const address& address, truth_handler handler);
+    virtual void connected(const address& address,
+        truth_handler handler) const;
 
     /// Store a connection.
     virtual void store(channel::ptr channel, result_handler handler);
@@ -180,13 +184,13 @@ public:
     virtual void remove(channel::ptr channel, result_handler handler);
 
     /// Get the number of connections.
-    virtual void connected_count(count_handler handler);
+    virtual void connected_count(count_handler handler) const;
 
     // Hosts collection.
     // ------------------------------------------------------------------------
 
     /// Get a randomly-selected address.
-    virtual void fetch_address(address_handler handler);
+    virtual void fetch_address(address_handler handler) const;
 
     /// Store an address.
     virtual void store(const address& address, result_handler handler);
@@ -198,7 +202,7 @@ public:
     virtual void remove(const address& address, result_handler handler);
 
     /// Get the number of addresses.
-    virtual void address_count(count_handler handler);
+    virtual void address_count(count_handler handler) const;
 
 protected:
 
@@ -230,12 +234,12 @@ private:
 
     // These are thread safe.
     std::atomic<bool> stopped_;
-    std::atomic<size_t> height_;
+    bc::atomic<config::checkpoint> top_block_;
     bc::atomic<session_manual::ptr> manual_;
     threadpool threadpool_;
-    hosts::ptr hosts_;
     pending_channels pending_;
-    connections::ptr connections_;
+    connections connections_;
+    hosts hosts_;
     stop_subscriber::ptr stop_subscriber_;
     channel_subscriber::ptr channel_subscriber_;
 };

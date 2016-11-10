@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include <bitcoin/network/connector.hpp>
+#include <bitcoin/network/utility/connector.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -27,7 +27,7 @@
 #include <bitcoin/network/channel.hpp>
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/socket.hpp>
+#include <bitcoin/network/utility/socket.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -43,6 +43,7 @@ connector::connector(threadpool& pool, const settings& settings)
   : stopped_(false),
     pool_(pool),
     settings_(settings),
+    pending_(settings_),
     dispatch_(pool, NAME),
     resolver_(std::make_shared<asio::resolver>(pool.service())),
     CONSTRUCT_TRACK(connector)
@@ -83,7 +84,7 @@ void connector::safe_stop()
     ///////////////////////////////////////////////////////////////////////////
 }
 
-bool connector::stopped()
+bool connector::stopped() const
 {
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
@@ -143,6 +144,8 @@ void connector::connect(const std::string& hostname, uint16_t port,
 void connector::handle_resolve(const boost_code& ec, asio::iterator iterator,
     connect_handler handler)
 {
+    static const auto mode = synchronizer_terminate::on_error;
+
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_shared();
@@ -170,8 +173,8 @@ void connector::handle_resolve(const boost_code& ec, asio::iterator iterator,
     // Retain a socket reference until connected, allowing connect cancelation.
     pending_.store(socket);
 
-    // Manage the socket-timer race.
-    const auto handle_connect = synchronize(handler, 1, NAME, false);
+    // Manage the socket-timer race, terminating if either fails.
+    const auto handle_connect = synchronize(handler, 1, NAME, mode);
 
     // This is branch #1 of the connnect sequence.
     timer->start(

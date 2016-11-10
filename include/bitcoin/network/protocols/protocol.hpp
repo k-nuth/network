@@ -52,7 +52,6 @@ class BCT_API protocol
   : public enable_shared_from_base<protocol>
 {
 protected:
-    typedef std::shared_ptr<protocol> ptr;
     typedef std::function<void()> completion_handler;
     typedef std::function<void(const code&)> event_handler;
     typedef std::function<void(const code&, size_t)> count_handler;
@@ -67,7 +66,7 @@ protected:
     /// Bind a method in the derived class.
     template <class Protocol, typename Handler, typename... Args>
     auto bind(Handler&& handler, Args&&... args) ->
-        decltype(BOUND_PROTOCOL_TYPE(handler, args))
+        decltype(BOUND_PROTOCOL_TYPE(handler, args)) const
     {
         return BOUND_PROTOCOL(handler, args);
     }
@@ -104,10 +103,10 @@ protected:
     virtual uint64_t nonce() const;
 
     /// Get the peer version message.
-    virtual message::version peer_version() const;
+    virtual version_const_ptr peer_version() const;
 
     /// Set the peer version message.
-    virtual void set_peer_version(message::version::ptr value);
+    virtual void set_peer_version(version_const_ptr value);
 
     /// Get the negotiated protocol version.
     virtual uint32_t negotiated_version() const;

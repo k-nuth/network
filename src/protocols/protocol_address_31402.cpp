@@ -22,6 +22,7 @@
 #include <functional>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
+#include <bitcoin/network/define.hpp>
 #include <bitcoin/network/p2p.hpp>
 #include <bitcoin/network/protocols/protocol.hpp>
 #include <bitcoin/network/protocols/protocol_events.hpp>
@@ -35,10 +36,19 @@ namespace network {
 using namespace bc::message;
 using namespace std::placeholders;
 
+static message::address configured_self(const network::settings& settings)
+{
+    if (settings.self.port() == 0)
+        return address{};
+
+    return address{ { settings.self.to_network_address() } };
+}
+
 protocol_address_31402::protocol_address_31402(p2p& network,
     channel::ptr channel)
   : protocol_events(network, channel, NAME),
     network_(network),
+    self_(configured_self(network_.network_settings())),
     CONSTRUCT_TRACK(protocol_address_31402)
 {
 }
@@ -53,9 +63,8 @@ void protocol_address_31402::start()
     // Must have a handler to capture a shared self pointer in stop subscriber.
     protocol_events::start(BIND1(handle_stop, _1));
 
-    if (settings.self.port() != 0)
+    if (!self_.addresses().empty())
     {
-        self_ = address({ { settings.self.to_network_address() } });
         SEND2(self_, handle_send, _1, self_.command);
     }
 
@@ -72,40 +81,40 @@ void protocol_address_31402::start()
 // ----------------------------------------------------------------------------
 
 bool protocol_address_31402::handle_receive_address(const code& ec,
-    address::ptr message)
+    address_const_ptr message)
 {
     if (stopped())
         return false;
 
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure receiving address message from ["
             << authority() << "] " << ec.message();
         stop(ec);
         return false;
     }
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Storing addresses from [" << authority() << "] ("
-        << message->addresses.size() << ")";
+        << message->addresses().size() << ")";
 
     // TODO: manage timestamps (active channels are connected < 3 hours ago).
-    network_.store(message->addresses, BIND1(handle_store_addresses, _1));
+    network_.store(message->addresses(), BIND1(handle_store_addresses, _1));
 
     // RESUBSCRIBE
     return true;
 }
 
 bool protocol_address_31402::handle_receive_get_address(const code& ec,
-    get_address::ptr message)
+    get_address_const_ptr message)
 {
     if (stopped())
         return false;
 
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure receiving get_address message from ["
             << authority() << "] " << ec.message();
         stop(ec);
@@ -116,12 +125,12 @@ bool protocol_address_31402::handle_receive_get_address(const code& ec,
     // TODO: pull active hosts from host cache (currently just resending self).
     // TODO: need to distort for privacy, don't send currently-connected peers.
 
-    if (self_.addresses.empty())
+    if (self_.addresses().empty())
         return false;
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Sending addresses to [" << authority() << "] ("
-        << self_.addresses.size() << ")";
+        << self_.addresses().size() << ")";
 
     SEND2(self_, handle_send, _1, self_.command);
 
@@ -134,18 +143,18 @@ void protocol_address_31402::handle_store_addresses(const code& ec)
     if (stopped())
         return;
 
+    if (ec && ec != error::service_stopped)
+        LOG_ERROR(LOG_NETWORK)
+        << "Failure storing addresses from [" << authority() << "] "
+        << ec.message();
+
     if (ec)
-    {
-        log::error(LOG_NETWORK)
-            << "Failure storing addresses from [" << authority() << "] "
-            << ec.message();
         stop(ec);
-    }
 }
 
 void protocol_address_31402::handle_stop(const code&)
 {
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Stopped address protocol";
 }
 

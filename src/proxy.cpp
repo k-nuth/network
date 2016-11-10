@@ -27,9 +27,9 @@
 #include <functional>
 #include <memory>
 #include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/const_buffer.hpp>
 #include <bitcoin/network/define.hpp>
-#include <bitcoin/network/socket.hpp>
+#include <bitcoin/network/utility/const_buffer.hpp>
+#include <bitcoin/network/utility/socket.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -136,7 +136,7 @@ void proxy::handle_read_heading(const boost_code& ec, size_t)
     // TODO: verify client quick disconnect.
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Heading read failure [" << authority() << "] "
             << code(error::boost_to_error_code(ec)).message();
         stop(ec);
@@ -147,27 +147,27 @@ void proxy::handle_read_heading(const boost_code& ec, size_t)
 
     if (!head.is_valid())
     {
-        log::warning(LOG_NETWORK) 
+        LOG_WARNING(LOG_NETWORK)
             << "Invalid heading from [" << authority() << "]";
         stop(error::bad_stream);
         return;
     }
 
-    if (head.magic != protocol_magic_)
+    if (head.magic() != protocol_magic_)
     {
-        log::warning(LOG_NETWORK)
-            << "Invalid heading magic (" << head.magic << ") from ["
+        LOG_WARNING(LOG_NETWORK)
+            << "Invalid heading magic (" << head.magic() << ") from ["
             << authority() << "]";
         stop(error::bad_stream);
         return;
     }
 
-    if (head.payload_size > payload_buffer_.capacity())
+    if (head.payload_size() > payload_buffer_.capacity())
     {
-        log::warning(LOG_NETWORK)
-            << "Oversized payload indicated by " << head.command
+        LOG_DEBUG(LOG_NETWORK)
+            << "Oversized payload indicated by " << head.command()
             << " heading from [" << authority() << "] ("
-            << head.payload_size << " bytes)";
+            << head.payload_size() << " bytes)";
         stop(error::bad_stream);
         return;
     }
@@ -182,7 +182,7 @@ void proxy::read_payload(const heading& head)
         return;
 
     // This does not cause a reallocation.
-    payload_buffer_.resize(head.payload_size);
+    payload_buffer_.resize(head.payload_size());
 
     // The payload buffer is protected by ordering, not the critial section.
 
@@ -191,7 +191,7 @@ void proxy::read_payload(const heading& head)
     const auto socket = socket_->get_socket();
 
     using namespace boost::asio;
-    async_read(socket->get(), buffer(payload_buffer_, head.payload_size),
+    async_read(socket->get(), buffer(payload_buffer_, head.payload_size()),
         std::bind(&proxy::handle_read_payload,
             shared_from_this(), _1, _2, head));
     ///////////////////////////////////////////////////////////////////////////
@@ -206,17 +206,17 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
     // TODO: verify client quick disconnect.
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Payload read failure [" << authority() << "] "
             << code(error::boost_to_error_code(ec)).message();
         stop(ec);
         return;
     }
 
-    if (head.checksum != bitcoin_checksum(payload_buffer_))
+    if (head.checksum() != bitcoin_checksum(payload_buffer_))
     {
-        log::warning(LOG_NETWORK) 
-            << "Invalid " << head.command << " payload from [" << authority()
+        LOG_WARNING(LOG_NETWORK)
+            << "Invalid " << head.command() << " payload from [" << authority()
             << "] bad checksum.";
         stop(error::bad_stream);
         return;
@@ -240,8 +240,8 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
 
     if (code)
     {
-        log::warning(LOG_NETWORK)
-            << "Invalid " << head.command << " payload from [" << authority()
+        LOG_WARNING(LOG_NETWORK)
+            << "Invalid " << head.command() << " payload from [" << authority()
             << "] " << code.message();
         stop(code);
         return;
@@ -249,15 +249,15 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
 
     if (!consumed)
     {
-        log::warning(LOG_NETWORK)
-            << "Invalid " << head.command << " payload from [" << authority()
+        LOG_WARNING(LOG_NETWORK)
+            << "Invalid " << head.command() << " payload from [" << authority()
             << "] trailing bytes.";
         stop(error::bad_stream);
         return;
     }
 
-    log::debug(LOG_NETWORK)
-        << "Valid " << head.command << " payload from [" << authority()
+    LOG_DEBUG(LOG_NETWORK)
+        << "Valid " << head.command() << " payload from [" << authority()
         << "] (" << payload_size << " bytes)";
 
     handle_activity();
@@ -276,7 +276,7 @@ void proxy::do_send(const std::string& command, const_buffer buffer,
         return;
     }
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Sending " << command << " to [" << authority() << "] ("
         << buffer.size() << " bytes)";
 
@@ -299,7 +299,7 @@ void proxy::handle_send(const boost_code& ec, const_buffer buffer,
     const auto error = code(error::boost_to_error_code(ec));
 
     if (error)
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure sending " << buffer.size() << " byte message to ["
             << authority() << "] " << error.message();
 

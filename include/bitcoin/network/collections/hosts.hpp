@@ -22,8 +22,6 @@
 
 #include <atomic>
 #include <cstddef>
-#include <cstdint>
-#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -40,12 +38,11 @@ namespace network {
 /// The file is a line-oriented set of config::authority serializations.
 /// Duplicate addresses and those with zero-valued ports are disacarded.
 class BCT_API hosts
-  : public enable_shared_from_base<hosts>
 {
 public:
     typedef std::shared_ptr<hosts> ptr;
     typedef message::network_address address;
-    typedef std::function<void(const code&)> result_handler;
+    typedef handle0 result_handler;
 
     /// Construct an instance.
     hosts(threadpool& pool, const settings& settings);
@@ -61,7 +58,7 @@ public:
     virtual code stop();
 
     virtual size_t count() const;
-    virtual code fetch(address& out);
+    virtual code fetch(address& out) const;
     virtual code remove(const address& host);
     virtual code store(const address& host);
     virtual void store(const address::list& hosts, result_handler handler);
@@ -71,15 +68,11 @@ private:
     typedef list::iterator iterator;
 
     iterator find(const address& host);
-    void do_store(const address& host, result_handler handler);
 
     // These are protected by a mutex.
     list buffer_;
     std::atomic<bool> stopped_;
     mutable upgrade_mutex mutex_;
-
-    // This is thread safe.
-    dispatcher dispatch_;
 
     // HACK: we use this because the buffer capacity cannot be set to zero.
     const bool disabled_;

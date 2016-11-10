@@ -25,13 +25,13 @@
 #include <functional>
 #include <memory>
 #include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/acceptor.hpp>
 #include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/connections.hpp>
-#include <bitcoin/network/connector.hpp>
+#include <bitcoin/network/collections/connections.hpp>
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
+#include <bitcoin/network/utility/acceptor.hpp>
+#include <bitcoin/network/utility/connector.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -75,7 +75,6 @@ class BCT_API session
   : public enable_shared_from_base<session>
 {
 public:
-    typedef std::shared_ptr<session> ptr;
     typedef config::authority authority;
     typedef std::function<void(bool)> truth_handler;
     typedef std::function<void(size_t)> count_handler;
@@ -113,14 +112,14 @@ protected:
     /// Bind a method in the derived class.
     template <class Session, typename Handler, typename... Args>
     auto bind(Handler&& handler, Args&&... args) ->
-        decltype(BOUND_SESSION_TYPE(handler, args))
+        decltype(BOUND_SESSION_TYPE(handler, args)) const
     {
         return BOUND_SESSION(handler, args);
     }
 
     /////// Dispatch a concurrent method in the derived class.
     ////template <class Session, typename Handler, typename... Args>
-    ////void concurrent(Handler&& handler, Args&&... args)
+    ////void concurrent(Handler&& handler, Args&&... args) const
     ////{
     ////    return dispatch_.concurrent(SESSION_ARGS(handler, args));
     ////}
@@ -128,15 +127,15 @@ protected:
     /// Bind a concurrent delegate to a method in the derived class.
     template <class Session, typename Handler, typename... Args>
     auto concurrent_delegate(Handler&& handler, Args&&... args) ->
-        delegates::concurrent<decltype(BOUND_SESSION_TYPE(handler, args))>
+        delegates::concurrent<decltype(BOUND_SESSION_TYPE(handler, args))> const
     {
         return dispatch_.concurrent_delegate(SESSION_ARGS(handler, args));
     }
 
     /// Properties.
-    virtual void address_count(count_handler handler);
-    virtual void fetch_address(host_handler handler);
-    virtual void connection_count(count_handler handler);
+    virtual void address_count(count_handler handler) const;
+    virtual void fetch_address(host_handler handler) const;
+    virtual void connection_count(count_handler handler) const;
     virtual bool blacklisted(const authority& authority) const;
     virtual bool stopped() const;
 
@@ -199,12 +198,11 @@ private:
         result_handler handle_started, result_handler handle_stopped);
     void handle_remove(const code& ec, channel::ptr channel);
 
+    // These are thread safe.
     std::atomic<bool> stopped_;
     const bool notify_on_connect_;
-
-    // These are thread safe.
     p2p& network_;
-    dispatcher dispatch_;
+    mutable dispatcher dispatch_;
 };
 
 // Base session type.

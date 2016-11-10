@@ -17,11 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include <bitcoin/network/connections.hpp>
+#include <bitcoin/network/collections/connections.hpp>
 
 #include <algorithm>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
+#include <bitcoin/network/settings.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -30,9 +31,11 @@ using namespace bc::config;
 
 #define NAME "connections"
 
-connections::connections()
+connections::connections(const settings& settings)
   : stopped_(false)
 {
+    channels_.reserve(settings.outbound_connections + 
+        settings.inbound_connections + settings.peers.size());
 }
 
 connections::~connections()

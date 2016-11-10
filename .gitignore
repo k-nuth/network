@@ -6,7 +6,7 @@
 *.pyc
 Makefile
 Makefile.in
-libbitcoin.pc
+libbitcoin-network.pc
 
 bin
 obj
@@ -25,5 +25,3 @@ obj
 /configure
 /libtool
 .dirstamp
-
-/build

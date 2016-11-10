@@ -19,6 +19,7 @@
  */
 #include <cstdio>
 #include <future>
+#include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/test/unit_test.hpp>
@@ -51,25 +52,25 @@ using namespace bc::network;
       { "[2600:3c01::f03c:91ff:fe98:68bb]:18333" } \
     }
 
-#define SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(config) \
-    auto config = network::settings(bc::settings::testnet); \
-    config.threads = 1; \
-    config.outbound_connections = 0; \
-    config.manual_attempt_limit = 2
+#define SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(name) \
+    auto name = network::settings(bc::config::settings::testnet); \
+    name.threads = 1; \
+    name.outbound_connections = 0; \
+    name.manual_attempt_limit = 2
 
-#define SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(config) \
-    SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(config); \
-    config.host_pool_capacity = 42; \
-    config.seeds = { { SEED1 } }; \
-    config.hosts_file = get_log_path(TEST_NAME, "hosts")
+#define SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(name) \
+    SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(name); \
+    name.host_pool_capacity = 42; \
+    name.seeds = { { SEED1 } }; \
+    name.hosts_file = get_log_path(TEST_NAME, "hosts")
 
-#define SETTINGS_TESTNET_THREE_THREADS_ONE_SEED_FIVE_OUTBOUND(config) \
-    auto config = network::settings(bc::settings::testnet); \
-    config.threads = 3; \
-    config.host_pool_capacity = 42; \
-    config.outbound_connections = 5; \
-    config.seeds = { { SEED1 } }; \
-    config.hosts_file = get_log_path(TEST_NAME, "hosts")
+#define SETTINGS_TESTNET_THREE_THREADS_ONE_SEED_FIVE_OUTBOUND(name) \
+    auto name = network::settings(bc::config::settings::testnet); \
+    name.threads = 3; \
+    name.host_pool_capacity = 42; \
+    name.outbound_connections = 5; \
+    name.seeds = { { SEED1 } }; \
+    name.hosts_file = get_log_path(TEST_NAME, "hosts")
 
 std::string get_log_path(const std::string& test, const std::string& file)
 {
@@ -78,31 +79,10 @@ std::string get_log_path(const std::string& test, const std::string& file)
     return path;
 }
 
-class log_setup_fixture
-{
-public:
-    log_setup_fixture()
-      : debug_log_(get_log_path(TEST_SET_NAME, "debug"), log_open_mode),
-        error_log_(get_log_path(TEST_SET_NAME, "error"), log_open_mode)
-    {
-        initialize_logging(debug_log_, error_log_, std::cout, std::cerr);
-    }
-
-    ~log_setup_fixture()
-    {
-        log::clear();
-    }
-
-private:
-    std::ofstream debug_log_;
-    std::ofstream error_log_;
-};
-
 static void print_headers(const std::string& test)
 {
     const auto header = "=========== " + test + " ==========";
-    log::debug(TEST_SET_NAME) << header;
-    log::info(TEST_SET_NAME) << header;
+    LOG_INFO(TEST_SET_NAME) << header;
 }
 
 static int start_result(p2p& network)
@@ -208,24 +188,39 @@ BOOST_AUTO_TEST_CASE(empty_test)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_FIXTURE_TEST_SUITE(p2p_tests, log_setup_fixture)
+BOOST_AUTO_TEST_SUITE(p2p_tests)
 
-BOOST_AUTO_TEST_CASE(p2p__height__default__zero)
+BOOST_AUTO_TEST_CASE(p2p__top_block__default__zero_null_hash)
 {
     print_headers(TEST_NAME);
     const network::settings configuration;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(network.height(), 0);
+    BOOST_REQUIRE_EQUAL(network.top_block().height(), 0);
+    BOOST_REQUIRE(network.top_block().hash() == null_hash);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__set_height__value__expected)
+BOOST_AUTO_TEST_CASE(p2p__set_top_block1__values__expected)
 {
     print_headers(TEST_NAME);
     const network::settings configuration;
     p2p network(configuration);
     const size_t expected_height = 42;
-    network.set_height(expected_height);
-    BOOST_REQUIRE_EQUAL(network.height(), expected_height);
+    const auto& expected_hash = null_hash;
+    network.set_top_block({ expected_hash, expected_height });
+    BOOST_REQUIRE(network.top_block().hash() == expected_hash);
+    BOOST_REQUIRE_EQUAL(network.top_block().height(), expected_height);
+}
+
+BOOST_AUTO_TEST_CASE(p2p__set_top_block2__values__expected)
+{
+    print_headers(TEST_NAME);
+    const network::settings configuration;
+    p2p network(configuration);
+    const size_t expected_height = 42;
+    const config::checkpoint expected{ null_hash, expected_height };
+    network.set_top_block(expected);
+    BOOST_REQUIRE(network.top_block().hash() == expected.hash());
+    BOOST_REQUIRE_EQUAL(network.top_block().height(), expected.height());
 }
 
 BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success)

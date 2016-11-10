@@ -25,14 +25,14 @@
 #include <functional>
 #include <memory>
 #include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/acceptor.hpp>
 #include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/connector.hpp>
 #include <bitcoin/network/p2p.hpp>
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/protocols/protocol_version_31402.hpp>
 #include <bitcoin/network/protocols/protocol_version_70002.hpp>
 #include <bitcoin/network/settings.hpp>
+#include <bitcoin/network/utility/acceptor.hpp>
+#include <bitcoin/network/utility/connector.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -72,19 +72,19 @@ session::~session()
 // ----------------------------------------------------------------------------
 
 // protected:
-void session::address_count(count_handler handler)
+void session::address_count(count_handler handler) const
 {
     network_.address_count(handler);
 }
 
 // protected:
-void session::fetch_address(host_handler handler)
+void session::fetch_address(host_handler handler) const
 {
     network_.fetch_address(handler);
 }
 
 // protected:
-void session::connection_count(count_handler handler)
+void session::connection_count(count_handler handler) const
 {
     network_.connected_count(handler);
 }
@@ -208,7 +208,7 @@ void session::start_channel(channel::ptr channel,
     result_handler handle_started)
 {
     channel->set_notify(notify_on_connect_);
-    channel->set_nonce(nonzero_pseudo_random());
+    channel->set_nonce(pseudo_random(1, max_uint64));
 
     // The channel starts, invokes the handler, then starts the read cycle.
     channel->start(
@@ -220,7 +220,7 @@ void session::handle_starting(const code& ec, channel::ptr channel,
 {
     if (ec)
     {
-        log::info(LOG_NETWORK)
+        LOG_INFO(LOG_NETWORK)
             << "Channel failed to start [" << channel->authority() << "] "
             << ec.message();
         handle_started(ec);
@@ -247,7 +247,7 @@ void session::handle_handshake(const code& ec, channel::ptr channel,
 {
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure in handshake with [" << channel->authority()
             << "] " << ec.message();
 
@@ -290,7 +290,7 @@ void session::do_remove(const code& ec, channel::ptr channel,
 void session::handle_remove(const code& ec, channel::ptr channel)
 {
     if (ec)
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failed to remove channel [" << channel->authority() << "] "
             << ec.message();
 }

@@ -19,12 +19,9 @@
  */
 #include <bitcoin/network/sessions/session_batch.hpp>
 
-#include <atomic>
-#include <cstdint>
-#include <memory>
 #include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/connector.hpp>
 #include <bitcoin/network/p2p.hpp>
+#include <bitcoin/network/utility/connector.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -41,86 +38,53 @@ session_batch::session_batch(p2p& network, bool notify_on_connect)
 {
 }
 
-void session_batch::converge(const code& ec, channel::ptr channel,
-     atomic_counter_ptr counter, upgrade_mutex_ptr mutex,
-     channel_handler handler)
-{
-    ///////////////////////////////////////////////////////////////////////////
-    // Critical Section
-    mutex->lock_upgrade();
-
-    const auto initial_count = counter->load();
-    BITCOIN_ASSERT(initial_count <= batch_size_);
-
-    // Already completed, don't call handler.
-    if (initial_count == batch_size_)
-    {
-        mutex->unlock_upgrade();
-        //-----------------------------------------------------------------
-        if (!ec)
-            channel->stop(error::channel_stopped);
-
-        return;
-    }
-
-    const auto count = !ec ? batch_size_ : initial_count + 1;
-    const auto cleared = count == batch_size_;
-
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    mutex->unlock_upgrade_and_lock();
-    counter->store(count);
-    mutex->unlock();
-    ///////////////////////////////////////////////////////////////////////
-
-    if (cleared)
-    {
-        // If the last connection attempt is an error, normalize the code.
-        const auto result = ec ? error::operation_failed : error::success;
-        handler(result, channel);
-    }
-}
-
 // Connect sequence.
 // ----------------------------------------------------------------------------
 
 // protected:
 void session_batch::connect(connector::ptr connect, channel_handler handler)
 {
-    // synchronizer state.
-    const auto mutex = std::make_shared<upgrade_mutex>();
-    const auto counter = std::make_shared<atomic_counter>(0);
-    const auto singular = BIND5(converge, _1, _2, counter, mutex, handler);
+    static const auto mode = synchronizer_terminate::on_success;
+
+    const channel_handler complete_handler =
+        BIND3(handle_connect, _1, _2, handler);
+
+    const channel_handler join_handler =
+        synchronize(complete_handler, batch_size_, NAME "_join", mode);
 
     for (uint32_t host = 0; host < batch_size_; ++host)
-        new_connect(connect, counter, singular);
+        new_connect(connect, join_handler);
 }
 
 void session_batch::new_connect(connector::ptr connect,
-    atomic_counter_ptr counter, channel_handler handler)
+    channel_handler handler)
 {
     if (stopped())
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Suspended batch connection.";
+        handler(error::channel_stopped, nullptr);
         return;
     }
 
-    if (counter->load() == batch_size_)
-        return;
-
-    fetch_address(BIND5(start_connect, _1, _2, connect, counter, handler));
+    fetch_address(BIND4(start_connect, _1, _2, connect, handler));
 }
 
 void session_batch::start_connect(const code& ec, const authority& host,
-    connector::ptr connect, atomic_counter_ptr counter, channel_handler handler)
+    connector::ptr connect, channel_handler handler)
 {
-    if (counter->load() == batch_size_ || ec == error::service_stopped)
+    if (stopped() || ec == error::service_stopped)
+    {
+        LOG_DEBUG(LOG_NETWORK)
+            << "Batch session stopped while starting.";
+        handler(error::service_stopped, nullptr);
         return;
+    }
 
     // This termination prevents a tight loop in the empty address pool case.
     if (ec)
     {
-        log::warning(LOG_NETWORK)
+        LOG_WARNING(LOG_NETWORK)
             << "Failure fetching new address: " << ec.message();
         handler(ec, nullptr);
         return;
@@ -129,37 +93,35 @@ void session_batch::start_connect(const code& ec, const authority& host,
     // This creates a tight loop in the case of a small address pool.
     if (blacklisted(host))
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Fetched blacklisted address [" << host << "] ";
         handler(error::address_blocked, nullptr);
         return;
     }
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Connecting to [" << host << "]";
 
     // CONNECT
-    connect->connect(host, BIND6(handle_connect, _1, _2, host, connect,
-        counter, handler));
+    connect->connect(host, handler);
 }
 
+// It is common for no connections, one connection or multiple connections to
+// succeed, but only zero or one will reach this point. Other connections that
+// succeed fall out of scope causing the socket to close on destruct.
 void session_batch::handle_connect(const code& ec, channel::ptr channel,
-    const authority& host, connector::ptr connect, atomic_counter_ptr counter,
     channel_handler handler)
 {
-    if (counter->load() == batch_size_)
-        return;
-
     if (ec)
     {
-        log::debug(LOG_NETWORK)
-            << "Failure connecting to [" << host << "] "
-            << ec.message();
+        LOG_DEBUG(LOG_NETWORK)
+            << "Failed to connect after (" << batch_size_
+            << ") concurrent attempts: " << ec.message();
         handler(ec, nullptr);
         return;
     }
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Connected to [" << channel->authority() << "]";
 
     // This is the end of the connect sequence.

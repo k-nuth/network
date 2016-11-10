@@ -27,12 +27,12 @@
 #include <utility>
 #include <string>
 #include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/const_buffer.hpp>
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/proxy.hpp>
-#include <bitcoin/network/message_subscriber.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/socket.hpp>
+#include <bitcoin/network/utility/const_buffer.hpp>
+#include <bitcoin/network/utility/message_subscriber.hpp>
+#include <bitcoin/network/utility/socket.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -57,8 +57,8 @@ public:
     virtual uint64_t nonce() const;
     virtual void set_nonce(uint64_t value);
 
-    virtual message::version peer_version() const;
-    virtual void set_peer_version(message::version::ptr value);
+    virtual version_const_ptr peer_version() const;
+    virtual void set_peer_version(version_const_ptr value);
 
 protected:
     virtual void handle_activity() override;
@@ -75,7 +75,7 @@ private:
 
     std::atomic<bool> notify_;
     std::atomic<uint64_t> nonce_;
-    bc::atomic<message::version::ptr> peer_version_;
+    bc::atomic<version_const_ptr> peer_version_;
     deadline::ptr expiration_;
     deadline::ptr inactivity_;
 };

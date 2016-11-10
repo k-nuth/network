@@ -19,6 +19,7 @@
  */
 #include <bitcoin/network/settings.hpp>
 
+#include <limits>
 #include <bitcoin/bitcoin.hpp>
 
 namespace libbitcoin {
@@ -46,28 +47,35 @@ settings::settings()
     host_pool_capacity(0),
     relay_transactions(false),
     hosts_file("hosts.cache"),
+    self(unspecified_network_address),
+
+    // [log]
     debug_file("debug.log"),
     error_file("error.log"),
-    self(unspecified_network_address)
+    archive_directory("archive"),
+    rotation_size(0),
+    maximum_archive_size(max_uint32),
+    minimum_free_space(0),
+    maximum_archive_files(max_uint32)
 {
 }
 
 // Use push_back due to initializer_list bug:
 // stackoverflow.com/a/20168627/1172329
-settings::settings(bc::settings context)
+settings::settings(config::settings context)
   : settings()
 {
     // Handle deviations from common defaults.
     switch (context)
     {
-        case bc::settings::mainnet:
+        case config::settings::mainnet:
         {
             identifier = 3652501241;
             inbound_port = 8333;
 
             // Seeds based on bitcoinstats.com/network/dns-servers
             seeds.reserve(6);
-            seeds.push_back({ "seed.bitchannels.io", 8333 });
+            seeds.push_back({ "seed.bitnodes.io", 8333 });
             seeds.push_back({ "seed.bitcoinstats.com", 8333 });
             seeds.push_back({ "seed.bitcoin.sipa.be", 8333 });
             seeds.push_back({ "dnsseed.bluematt.me", 8333 });
@@ -76,7 +84,7 @@ settings::settings(bc::settings context)
             break;
         }
 
-        case bc::settings::testnet:
+        case config::settings::testnet:
         {
             identifier = 118034699;
             inbound_port = 18333;
@@ -89,7 +97,7 @@ settings::settings(bc::settings context)
         }
 
         default:
-        case bc::settings::none:
+        case config::settings::none:
         {
         }
     }

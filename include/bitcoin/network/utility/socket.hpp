@@ -17,45 +17,41 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LIBBITCOIN_NETWORK_PENDING_CHANNELS_HPP
-#define LIBBITCOIN_NETWORK_PENDING_CHANNELS_HPP
+#ifndef LIBBITCOIN_NETWORK_SOCKET_HPP
+#define LIBBITCOIN_NETWORK_SOCKET_HPP
 
-#include <cstdint>
-#include <functional>
-#include <vector>
 #include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
 #include <bitcoin/network/define.hpp>
+#include <bitcoin/network/utility/locked_socket.hpp>
 
 namespace libbitcoin {
 namespace network {
 
-/// Class to manage a pending channel pool, thread and lock safe.
-class BCT_API pending_channels
+/// A thread safe asio socket.
+class BCT_API socket
+  : public track<socket>
 {
 public:
-    typedef std::function<void(bool)> truth_handler;
-    typedef std::function<void(const code&)> result_handler;
-    
-    pending_channels();
-    ~pending_channels();
+    typedef std::shared_ptr<socket> ptr;
+
+    /// Construct an instance.
+    socket(threadpool& pool);
 
     /// This class is not copyable.
-    pending_channels(const pending_channels&) = delete;
-    void operator=(const pending_channels&) = delete;
+    socket(const socket&) = delete;
+    void operator=(const socket&) = delete;
 
-    virtual void store(channel::ptr channel, result_handler handler);
-    virtual void remove(channel::ptr channel, result_handler handler);
-    virtual void exists(uint64_t version_nonce, truth_handler handler) const;
+    /// Obtain an exclusive reference to the socket.
+    locked_socket::ptr get_socket();
+
+    /// Obtain the authority of the remote endpoint.
+    config::authority get_authority() const;
+
+    /// Close the contained socket.
+    virtual void close();
 
 private:
-    typedef std::vector<channel::ptr> list;
-
-    bool safe_store(channel::ptr channel);
-    bool safe_remove(channel::ptr channel);
-    bool safe_exists(uint64_t version_nonce) const;
-
-    list channels_;
+    asio::socket socket_;
     mutable upgrade_mutex mutex_;
 };
 
@@ -63,4 +59,3 @@ private:
 } // namespace libbitcoin
 
 #endif
-

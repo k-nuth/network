@@ -22,6 +22,7 @@
 #include <functional>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
+#include <bitcoin/network/define.hpp>
 #include <bitcoin/network/p2p.hpp>
 #include <bitcoin/network/protocols/protocol_timer.hpp>
 
@@ -47,6 +48,7 @@ protocol_seed_31402::protocol_seed_31402(p2p& network, channel::ptr channel)
 
 void protocol_seed_31402::start(event_handler handler)
 {
+    static const auto mode = synchronizer_terminate::on_error;
     const auto& settings = network_.network_settings();
 
     auto complete = BIND2(handle_seeding_complete, _1, handler);
@@ -58,7 +60,7 @@ void protocol_seed_31402::start(event_handler handler)
     }
 
     protocol_timer::start(settings.channel_germination(),
-        synchronize(complete, 3, NAME, false));
+        synchronize(complete, 3, NAME, mode));
 
     SUBSCRIBE2(address, handle_receive_address, _1, _2);
     send_own_address(settings);
@@ -76,7 +78,9 @@ void protocol_seed_31402::send_own_address(const settings& settings)
         return;
     }
 
-    const address self({ { settings.self.to_network_address() } });
+    const address self(network_address::list{
+        network_address{ settings.self.to_network_address() } });
+
     SEND1(self, handle_send_address, _1);
 }
 
@@ -88,26 +92,26 @@ void protocol_seed_31402::handle_seeding_complete(const code& ec,
 }
 
 bool protocol_seed_31402::handle_receive_address(const code& ec,
-    address::ptr message)
+    address_const_ptr message)
 {
     if (stopped())
         return false;
 
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure receiving addresses from seed [" << authority() << "] "
             << ec.message();
         set_event(ec);
         return false;
     }
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Storing addresses from seed [" << authority() << "] ("
-        << message->addresses.size() << ")";
+        << message->addresses().size() << ")";
 
     // TODO: manage timestamps (active channels are connected < 3 hours ago).
-    network_.store(message->addresses, BIND1(handle_store_addresses, _1));
+    network_.store(message->addresses(), BIND1(handle_store_addresses, _1));
 
     return false;
 }
@@ -119,7 +123,7 @@ void protocol_seed_31402::handle_send_address(const code& ec)
 
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure sending address to seed [" << authority() << "] "
             << ec.message();
         set_event(ec);
@@ -137,7 +141,7 @@ void protocol_seed_31402::handle_send_get_address(const code& ec)
 
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure sending get_address to seed [" << authority() << "] "
             << ec.message();
         set_event(ec);
@@ -153,16 +157,18 @@ void protocol_seed_31402::handle_store_addresses(const code& ec)
     if (stopped())
         return;
 
-    if (ec)
-    {
-        log::error(LOG_NETWORK)
+    if (ec && ec != error::service_stopped)
+        LOG_ERROR(LOG_NETWORK)
             << "Failure storing addresses from seed [" << authority() << "] "
             << ec.message();
+
+    if (ec)
+    {
         set_event(ec);
         return;
     }
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Stopping completed seed [" << authority() << "] ";
 
     // 3 of 3

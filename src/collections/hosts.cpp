@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include <bitcoin/network/hosts.hpp>
+#include <bitcoin/network/collections/hosts.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -34,7 +34,6 @@ namespace network {
 hosts::hosts(threadpool& pool, const settings& settings)
   : buffer_(std::max(settings.host_pool_capacity, 1u)),
     stopped_(true),
-    dispatch_(pool, NAME),
     file_path_(settings.hosts_file),
     disabled_(settings.host_pool_capacity == 0)
 {
@@ -45,7 +44,7 @@ hosts::iterator hosts::find(const address& host)
 {
     const auto found = [&host](const address& entry)
     {
-        return entry.port == host.port && entry.ip == host.ip;
+        return entry.port() == host.port() && entry.ip() == host.ip();
     };
 
     return std::find_if(buffer_.begin(), buffer_.end(), found);
@@ -61,7 +60,7 @@ size_t hosts::count() const
     ///////////////////////////////////////////////////////////////////////////
 }
 
-code hosts::fetch(address& out)
+code hosts::fetch(address& out) const
 {
     ///////////////////////////////////////////////////////////////////////////
     // Critical Section
@@ -74,7 +73,8 @@ code hosts::fetch(address& out)
         return error::not_found;
 
     // Randomly select an address from the buffer.
-    const auto index = static_cast<size_t>(pseudo_random() % buffer_.size());
+    const auto random = pseudo_random(0, buffer_.size() - 1);
+    const auto index = static_cast<size_t>(random);
     out = buffer_[index];
     return error::success;
     ///////////////////////////////////////////////////////////////////////////
@@ -121,7 +121,7 @@ code hosts::start()
 
     if (file_error)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failed to save hosts file.";
         return error::file_system;
     }
@@ -165,7 +165,7 @@ code hosts::stop()
 
     if (file_error)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failed to load hosts file.";
         return error::file_system;
     }
@@ -209,7 +209,7 @@ code hosts::store(const address& host)
 {
     if (!host.is_valid())
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Invalid host address from peer";
 
         // We don't treat invalid address as an error, just log it.
@@ -241,28 +241,31 @@ code hosts::store(const address& host)
     mutex_.unlock_upgrade();
     ///////////////////////////////////////////////////////////////////////////
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Redundant host address from peer";
 
     // We don't treat redundant address as an error, just log it.
     return error::success;
 }
 
-// private
-void hosts::do_store(const address& host, result_handler handler)
-{
-    handler(store(host));
-}
-
 // The handler is invoked once all calls to do_store are completed.
-// We disperse here to allow other addresses messages to interleave hosts.
 void hosts::store(const address::list& hosts, result_handler handler)
 {
     if (stopped_)
         return;
 
-    dispatch_.parallel(hosts, "hosts", handler,
-        &hosts::do_store, shared_from_this());
+    code last_error(error::success);
+
+    const auto storer = [this, &last_error](const address& host)
+    {
+        const auto result = store(host);
+
+        if (result)
+            last_error = result;
+    };
+
+    std::for_each(hosts.begin(), hosts.end(), storer);
+    handler(last_error);
 }
 
 } // namespace network

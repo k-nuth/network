@@ -28,7 +28,7 @@
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/socket.hpp>
+#include <bitcoin/network/utility/socket.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -95,14 +95,14 @@ void channel::set_nonce(uint64_t value)
     nonce_.store(value);
 }
 
-message::version channel::peer_version() const
+version_const_ptr channel::peer_version() const
 {
     const auto version = peer_version_.load();
     BITCOIN_ASSERT_MSG(version, "Read peer version before set.");
-    return *version;
+    return version;
 }
 
-void channel::set_peer_version(message::version::ptr value)
+void channel::set_peer_version(version_const_ptr value)
 {
     peer_version_.store(value);
 }
@@ -140,7 +140,7 @@ void channel::handle_expiration(const code& ec)
     if (stopped())
         return;
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Channel lifetime expired [" << authority() << "]";
 
     stop(error::channel_timeout);
@@ -161,7 +161,7 @@ void channel::handle_inactivity(const code& ec)
     if (stopped())
         return;
 
-    log::debug(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Channel inactivity timeout [" << authority() << "]";
 
     stop(error::channel_timeout);

@@ -24,6 +24,7 @@
 #include <string>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
+#include <bitcoin/network/define.hpp>
 #include <bitcoin/network/p2p.hpp>
 #include <bitcoin/network/protocols/protocol_ping_31402.hpp>
 #include <bitcoin/network/protocols/protocol_timer.hpp>
@@ -50,7 +51,7 @@ void protocol_ping_60001::send_ping(const code& ec)
 
     if (ec && ec != error::channel_timeout)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure in ping timer for [" << authority() << "] "
             << ec.message();
         stop(ec);
@@ -63,47 +64,47 @@ void protocol_ping_60001::send_ping(const code& ec)
 }
 
 bool protocol_ping_60001::handle_receive_ping(const code& ec,
-    message::ping::ptr message)
+    ping_const_ptr message)
 {
     if (stopped())
         return false;
 
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure getting ping from [" << authority() << "] "
             << ec.message();
         stop(ec);
         return false;
     }
 
-    SEND2(pong{ message->nonce }, handle_send, _1, pong::command);
+    SEND2(pong{ message->nonce() }, handle_send, _1, pong::command);
     return true;
 }
 
 bool protocol_ping_60001::handle_receive_pong(const code& ec,
-    message::pong::ptr message, uint64_t nonce)
+    pong_const_ptr message, uint64_t nonce)
 {
     if (stopped())
         return false;
 
     if (ec)
     {
-        log::debug(LOG_NETWORK)
+        LOG_DEBUG(LOG_NETWORK)
             << "Failure getting pong from [" << authority() << "] "
             << ec.message();
         stop(ec);
         return false;
     }
 
-    if (message->nonce != nonce)
+    if (message->nonce() != nonce)
     {
-        log::warning(LOG_NETWORK)
+        LOG_WARNING(LOG_NETWORK)
             << "Invalid or overlapped pong nonce from [" << authority() << "]";
 
-        // This could result from message overlap due to a short period,
-        // but we assume the response is not as expected and terminate.
-        stop(error::bad_stream);
+        // This could result from message overlap due to a short period.
+        // It seems to happen more frequently than expected, so not stopping.
+        ////stop(error::bad_stream);
     }
 
     return false;

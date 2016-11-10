@@ -50,12 +50,12 @@ protocol_version_70002::protocol_version_70002(p2p& network,
 {
 }
 
-message::version protocol_version_70002::version_factory()
+message::version protocol_version_70002::version_factory() const
 {
     auto version = protocol_version_31402::version_factory();
 
     // This is the only difference at protocol level 70001.
-    version.relay = relay_;
+    version.set_relay(relay_);
     return version;
 }
 

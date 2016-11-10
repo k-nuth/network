@@ -17,41 +17,47 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LIBBITCOIN_NETWORK_PENDING_SOCKETS_HPP
-#define LIBBITCOIN_NETWORK_PENDING_SOCKETS_HPP
+#ifndef LIBBITCOIN_NETWORK_PENDING_CHANNELS_HPP
+#define LIBBITCOIN_NETWORK_PENDING_CHANNELS_HPP
 
+#include <cstdint>
+#include <functional>
 #include <vector>
 #include <bitcoin/bitcoin.hpp>
+#include <bitcoin/network/channel.hpp>
 #include <bitcoin/network/define.hpp>
-#include <bitcoin/network/socket.hpp>
+#include <bitcoin/network/settings.hpp>
 
 namespace libbitcoin {
 namespace network {
 
-/// Class to manage a pending socket pool, thread and lock safe.
-class BCT_API pending_sockets
+/// Class to manage a pending channel pool, thread and lock safe.
+class BCT_API pending_channels
 {
-public:    
-    pending_sockets();
-    ~pending_sockets();
+public:
+    typedef std::function<void(bool)> truth_handler;
+    typedef std::function<void(const code&)> result_handler;
+    
+    pending_channels(const settings& settings);
+    ~pending_channels();
 
     /// This class is not copyable.
-    pending_sockets(const pending_sockets&) = delete;
-    void operator=(const pending_sockets&) = delete;
+    pending_channels(const pending_channels&) = delete;
+    void operator=(const pending_channels&) = delete;
 
-    virtual void clear();
-    virtual void store(socket::ptr socket);
-    virtual void remove(socket::ptr socket);
+    virtual void store(channel::ptr channel, result_handler handler);
+    virtual void remove(channel::ptr channel, result_handler handler);
+    virtual void exists(uint64_t version_nonce, truth_handler handler) const;
 
 private:
-    typedef std::vector<socket::ptr> list;
+    typedef std::vector<channel::ptr> list;
 
-    bool safe_clear();
-    bool safe_store(socket::ptr socket);
-    bool safe_remove(socket::ptr socket);
+    bool safe_store(channel::ptr channel);
+    bool safe_remove(channel::ptr channel);
+    bool safe_exists(uint64_t version_nonce) const;
 
-    list sockets_;
-    mutable shared_mutex mutex_;
+    list channels_;
+    mutable upgrade_mutex mutex_;
 };
 
 } // namespace network
