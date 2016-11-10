@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.4)
 # bitprim-network
 #==============================================================================
 project(bitprim-network
-  VERSION 3.0.0
-  LANGUAGES CXX C)
+        VERSION 3.0.0
+        LANGUAGES CXX C)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Check for baseline language coverage in the compiler for the C++11 standard.
@@ -30,8 +30,8 @@ if (NOT ENABLE_SHARED)
   set(Boost_USE_STATIC_LIBS ON)
 endif()
 find_package(
-  Boost 1.54.0 REQUIRED
-  COMPONENTS unit_test_framework)
+        Boost 1.54.0 REQUIRED
+        COMPONENTS unit_test_framework)
 
 # Require bitprim-core of at least version 3.0.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
 #------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ _add_cxx_compile_flag(-fvisibility-inlines-hidden _has_visibility_inlines_hidden
 #==============================================================================
 function(_group_sources target sources_dir)
   file(GLOB_RECURSE _headers
-    ${sources_dir}/include/*.h ${sources_dir}/include/*.hpp)
+          ${sources_dir}/include/*.h ${sources_dir}/include/*.hpp)
   target_sources(${target} PRIVATE ${_headers})
 
   get_target_property(sources ${target} SOURCES)
@@ -146,40 +146,72 @@ if (ENABLE_SHARED)
   set(MODE SHARED)
 endif()
 
+#add_library(bitprim-network ${MODE}
+#  src/acceptor.cpp
+#  src/channel.cpp
+#  src/connections.cpp
+#  src/connector.cpp
+#  src/const_buffer.cpp
+#  src/hosts.cpp
+#  src/locked_socket.cpp
+#  src/logging.cpp
+#  src/message_subscriber.cpp
+#  src/p2p.cpp
+#  src/pending_channels.cpp
+#  src/pending_sockets.cpp
+#  src/proxy.cpp
+#  src/settings.cpp
+#  src/socket.cpp
+#  src/protocols/protocol.cpp
+#  src/protocols/protocol_address_31402.cpp
+#  src/protocols/protocol_events.cpp
+#  src/protocols/protocol_ping_31402.cpp
+#  src/protocols/protocol_ping_60001.cpp
+#  src/protocols/protocol_seed_31402.cpp
+#  src/protocols/protocol_timer.cpp
+#  src/protocols/protocol_version_31402.cpp
+#  src/protocols/protocol_version_70002.cpp
+#  src/sessions/session.cpp
+#  src/sessions/session_batch.cpp
+#  src/sessions/session_inbound.cpp
+#  src/sessions/session_manual.cpp
+#  src/sessions/session_outbound.cpp
+#  src/sessions/session_seed.cpp)
+
 add_library(bitprim-network ${MODE}
-  src/acceptor.cpp
-  src/channel.cpp
-  src/connections.cpp
-  src/connector.cpp
-  src/const_buffer.cpp
-  src/hosts.cpp
-  src/locked_socket.cpp
-  src/logging.cpp
-  src/message_subscriber.cpp
-  src/p2p.cpp
-  src/pending_channels.cpp
-  src/pending_sockets.cpp
-  src/proxy.cpp
-  src/settings.cpp
-  src/socket.cpp
-  src/protocols/protocol.cpp
-  src/protocols/protocol_address_31402.cpp
-  src/protocols/protocol_events.cpp
-  src/protocols/protocol_ping_31402.cpp
-  src/protocols/protocol_ping_60001.cpp
-  src/protocols/protocol_seed_31402.cpp
-  src/protocols/protocol_timer.cpp
-  src/protocols/protocol_version_31402.cpp
-  src/protocols/protocol_version_70002.cpp
-  src/sessions/session.cpp
-  src/sessions/session_batch.cpp
-  src/sessions/session_inbound.cpp
-  src/sessions/session_manual.cpp
-  src/sessions/session_outbound.cpp
-  src/sessions/session_seed.cpp)
+        src/channel.cpp
+        src/collections/connections.cpp
+        src/collections/hosts.cpp
+        src/collections/pending_channels.cpp
+        src/collections/pending_sockets.cpp
+        src/p2p.cpp
+        src/protocols/protocol.cpp
+        src/protocols/protocol_address_31402.cpp
+        src/protocols/protocol_events.cpp
+        src/protocols/protocol_ping_31402.cpp
+        src/protocols/protocol_ping_60001.cpp
+        src/protocols/protocol_seed_31402.cpp
+        src/protocols/protocol_timer.cpp
+        src/protocols/protocol_version_31402.cpp
+        src/protocols/protocol_version_70002.cpp
+        src/proxy.cpp
+        src/sessions/session.cpp
+        src/sessions/session_batch.cpp
+        src/sessions/session_inbound.cpp
+        src/sessions/session_manual.cpp
+        src/sessions/session_outbound.cpp
+        src/sessions/session_seed.cpp
+        src/settings.cpp
+        src/utility/acceptor.cpp
+        src/utility/connector.cpp
+        src/utility/const_buffer.cpp
+        src/utility/locked_socket.cpp
+        src/utility/message_subscriber.cpp
+        src/utility/socket.cpp)
+
 target_include_directories(bitprim-network PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
 
 target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC)
 
@@ -198,13 +230,13 @@ function(_add_tests target)
 
   foreach (_test_name ${ARGN})
     add_test(
-      NAME test.network.${_test_name}
-      COMMAND ${target}
-        --run_test=${_test_name}
-        --show_progress=no
-        --detect_memory_leak=0
-        --report_level=no
-        --build_info=yes)
+            NAME test.network.${_test_name}
+            COMMAND ${target}
+            --run_test=${_test_name}
+            --show_progress=no
+            --detect_memory_leak=0
+            --report_level=no
+            --build_info=yes)
   endforeach()
 endfunction()
 
@@ -216,59 +248,94 @@ endif()
 #------------------------------------------------------------------------------
 if (WITH_TESTS)
   add_executable(bitprim_network_test
-    test/main.cpp
-    test/p2p.cpp)
+          test/main.cpp
+          test/p2p.cpp)
   target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
   _group_sources(bitprim_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
   _add_tests(bitprim_network_test
-    empty_tests)
+          empty_tests)
 endif()
 
 # Install
 #==============================================================================
 install(TARGETS bitprim-network
-  EXPORT bitprim-network
-  ARCHIVE DESTINATION lib)
+        EXPORT bitprim-network
+        ARCHIVE DESTINATION lib)
+
+#set(_bitprim_headers
+#  # include_bitcoin_HEADERS =
+#  bitcoin/network.hpp
+#  # include_bitcoin_network_HEADERS =
+#  bitcoin/network/acceptor.hpp
+#  bitcoin/network/channel.hpp
+#  bitcoin/network/connections.hpp
+#  bitcoin/network/connector.hpp
+#  bitcoin/network/const_buffer.hpp
+#  bitcoin/network/define.hpp
+#  bitcoin/network/hosts.hpp
+#  bitcoin/network/locked_socket.hpp
+#  bitcoin/network/logging.hpp
+#  bitcoin/network/message_subscriber.hpp
+#  bitcoin/network/p2p.hpp
+#  bitcoin/network/pending_channels.hpp
+#  bitcoin/network/pending_sockets.hpp
+#  bitcoin/network/proxy.hpp
+#  bitcoin/network/settings.hpp
+#  bitcoin/network/socket.hpp
+#  bitcoin/network/version.hpp
+#  # include_bitcoin_network_protocols_HEADERS =
+#  bitcoin/network/protocols/protocol.hpp
+#  bitcoin/network/protocols/protocol_address_31402.hpp
+#  bitcoin/network/protocols/protocol_events.hpp
+#  bitcoin/network/protocols/protocol_ping_31402.hpp
+#  bitcoin/network/protocols/protocol_ping_60001.hpp
+#  bitcoin/network/protocols/protocol_seed_31402.hpp
+#  bitcoin/network/protocols/protocol_timer.hpp
+#  bitcoin/network/protocols/protocol_version_31402.hpp
+#  bitcoin/network/protocols/protocol_version_70002.hpp
+#  # include_bitcoin_network_sessions_HEADERS =
+#  bitcoin/network/sessions/session.hpp
+#  bitcoin/network/sessions/session_batch.hpp
+#  bitcoin/network/sessions/session_inbound.hpp
+#  bitcoin/network/sessions/session_manual.hpp
+#  bitcoin/network/sessions/session_outbound.hpp
+#  bitcoin/network/sessions/session_seed.hpp)
 
 set(_bitprim_headers
-  # include_bitcoin_HEADERS =
-  bitcoin/network.hpp
-  # include_bitcoin_network_HEADERS =
-  bitcoin/network/acceptor.hpp
-  bitcoin/network/channel.hpp
-  bitcoin/network/connections.hpp
-  bitcoin/network/connector.hpp
-  bitcoin/network/const_buffer.hpp
-  bitcoin/network/define.hpp
-  bitcoin/network/hosts.hpp
-  bitcoin/network/locked_socket.hpp
-  bitcoin/network/logging.hpp
-  bitcoin/network/message_subscriber.hpp
-  bitcoin/network/p2p.hpp
-  bitcoin/network/pending_channels.hpp
-  bitcoin/network/pending_sockets.hpp
-  bitcoin/network/proxy.hpp
-  bitcoin/network/settings.hpp
-  bitcoin/network/socket.hpp
-  bitcoin/network/version.hpp
-  # include_bitcoin_network_protocols_HEADERS =
-  bitcoin/network/protocols/protocol.hpp
-  bitcoin/network/protocols/protocol_address_31402.hpp
-  bitcoin/network/protocols/protocol_events.hpp
-  bitcoin/network/protocols/protocol_ping_31402.hpp
-  bitcoin/network/protocols/protocol_ping_60001.hpp
-  bitcoin/network/protocols/protocol_seed_31402.hpp
-  bitcoin/network/protocols/protocol_timer.hpp
-  bitcoin/network/protocols/protocol_version_31402.hpp
-  bitcoin/network/protocols/protocol_version_70002.hpp
-  # include_bitcoin_network_sessions_HEADERS =
-  bitcoin/network/sessions/session.hpp
-  bitcoin/network/sessions/session_batch.hpp
-  bitcoin/network/sessions/session_inbound.hpp
-  bitcoin/network/sessions/session_manual.hpp
-  bitcoin/network/sessions/session_outbound.hpp
-  bitcoin/network/sessions/session_seed.hpp)
+        bitcoin/network/channel.hpp
+        bitcoin/network/collections/connections.hpp
+        bitcoin/network/collections/hosts.hpp
+        bitcoin/network/collections/pending_channels.hpp
+        bitcoin/network/collections/pending_sockets.hpp
+        bitcoin/network/define.hpp
+        bitcoin/network/p2p.hpp
+        bitcoin/network/protocols/protocol.hpp
+        bitcoin/network/protocols/protocol_address_31402.hpp
+        bitcoin/network/protocols/protocol_events.hpp
+        bitcoin/network/protocols/protocol_ping_31402.hpp
+        bitcoin/network/protocols/protocol_ping_60001.hpp
+        bitcoin/network/protocols/protocol_seed_31402.hpp
+        bitcoin/network/protocols/protocol_timer.hpp
+        bitcoin/network/protocols/protocol_version_31402.hpp
+        bitcoin/network/protocols/protocol_version_70002.hpp
+        bitcoin/network/proxy.hpp
+        bitcoin/network/sessions/session.hpp
+        bitcoin/network/sessions/session_batch.hpp
+        bitcoin/network/sessions/session_inbound.hpp
+        bitcoin/network/sessions/session_manual.hpp
+        bitcoin/network/sessions/session_outbound.hpp
+        bitcoin/network/sessions/session_seed.hpp
+        bitcoin/network/settings.hpp
+        bitcoin/network/utility/acceptor.hpp
+        bitcoin/network/utility/connector.hpp
+        bitcoin/network/utility/const_buffer.hpp
+        bitcoin/network/utility/locked_socket.hpp
+        bitcoin/network/utility/message_subscriber.hpp
+        bitcoin/network/utility/socket.hpp
+        bitcoin/network/version.hpp
+        bitcoin/network.hpp)
+
 foreach (_header ${_bitprim_headers})
   get_filename_component(_directory "${_header}" DIRECTORY)
   install(FILES "include/${_header}" DESTINATION "include/${_directory}")
@@ -279,7 +346,7 @@ endforeach()
 include(CMakePackageConfigHelpers)
 
 export(EXPORT bitprim-network
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkTargets.cmake")
+        FILE "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkTargets.cmake")
 export(PACKAGE bitprim-network)
 
 if (UNIX)
@@ -289,20 +356,20 @@ elseif (WIN32)
 endif()
 
 install(EXPORT bitprim-network
-  FILE bitprim-networkTargets.cmake
-  DESTINATION ${_config_package_location})
+        FILE bitprim-networkTargets.cmake
+        DESTINATION ${_config_package_location})
 
 configure_file(bitprim-networkConfig.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfig.cmake"
-  @ONLY)
+        "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfig.cmake"
+        @ONLY)
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfigVersion.cmake"
-  VERSION ${PROJECT_VERSION}
-  COMPATIBILITY AnyNewerVersion)
+        "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfigVersion.cmake"
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY AnyNewerVersion)
 
 install(
-  FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfigVersion.cmake"
-  DESTINATION ${_config_package_location})
+        FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfigVersion.cmake"
+        DESTINATION ${_config_package_location})
