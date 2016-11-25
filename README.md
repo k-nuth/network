@@ -6,12 +6,14 @@
 
 Make sure you have installed [bitprim-core](https://github.com/bitprim/bitprim-core) beforehand according to its build instructions. 
 
-```sh
-$ ./autogen.sh
-$ ./configure
-$ make
+```
+$ git clone https://github.com/bitprim/bitprim-network.git
+$ cd bitprim-network
+$ mkdir build
+$ cd build
+$ cmake .. -DWITH_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-std=c++11" 
+$ make -j2
 $ sudo make install
-$ sudo ldconfig
 ```
 
 bitprim-network is now installed in `/usr/local/`.
