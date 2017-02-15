@@ -22,6 +22,13 @@ option(WITH_TESTS "Compile with unit tests." ON)
 #------------------------------------------------------------------------------
 option(ENABLE_SHARED "" OFF)
 
+# Implement --with-litecoin.
+#------------------------------------------------------------------------------
+option(WITH_LITECOIN "Compile with Litecoin support." OFF)
+if (WITH_LITECOIN)
+  add_definitions(-DLITECOIN)
+endif()
+
 # Check dependencies.
 #==============================================================================
 # Require Boost of at least version 1.56.0 and output ${boost_CPPFLAGS/LDFLAGS}.

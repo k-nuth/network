@@ -70,9 +70,18 @@ settings::settings(config::settings context)
     {
         case config::settings::mainnet:
         {
+          #ifdef LITECOIN
+            identifier = 0xdbb6c0fb; 
+            inbound_port = 9333;
+            seeds.reserve(5);
+            seeds.push_back({ "seed-a.litecoin.loshan.co.uk", 9333 });
+            seeds.push_back({ "dnsseed.thrasher.io", 9333 });
+            seeds.push_back({ "dnsseed.litecointools.com", 9333 });
+            seeds.push_back({ "dnsseed.litecoinpool.org", 9333 });
+            seeds.push_back({ "dnsseed.koin-project.com", 9333 });        
+           #else
             identifier = 3652501241;
             inbound_port = 8333;
-
             // Seeds based on bitcoinstats.com/network/dns-servers
             seeds.reserve(6);
             seeds.push_back({ "seed.bitnodes.io", 8333 });
@@ -81,19 +90,27 @@ settings::settings(config::settings context)
             seeds.push_back({ "dnsseed.bluematt.me", 8333 });
             seeds.push_back({ "seed.bitcoin.jonasschnelli.ch", 8333 });
             seeds.push_back({ "dnsseed.bitcoin.dashjr.org", 8333 });
-            break;
+          #endif
+          break;
         }
 
         case config::settings::testnet:
         {
+          #ifdef LITECOIN
+            identifier = 0xdcb7c1fc;
+            inbound_port = 19333;
+            seeds.reserve(2);
+            seeds.push_back({ "testnet-seed.litecointools.com", 19333 });
+            seeds.push_back({ "seed-b.litecoin.loshan.co.uk", 19333 });
+          #else
             identifier = 118034699;
             inbound_port = 18333;
-
             seeds.reserve(3);
             seeds.push_back({ "testnet-seed.bitcoin.petertodd.org", 18333 });
             seeds.push_back({ "testnet-seed.bitcoin.schildbach.de", 18333 });
             seeds.push_back({ "testnet-seed.bluematt.me", 18333 });
-            break;
+          #endif
+          break;
         }
 
         default:
