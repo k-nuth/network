@@ -192,35 +192,32 @@ endif()
 #  src/sessions/session_seed.cpp)
 
 add_library(bitprim-network ${MODE}
-        src/channel.cpp
-        src/collections/connections.cpp
-        src/collections/hosts.cpp
-        src/collections/pending_channels.cpp
-        src/collections/pending_sockets.cpp
-        src/p2p.cpp
         src/protocols/protocol.cpp
         src/protocols/protocol_address_31402.cpp
         src/protocols/protocol_events.cpp
         src/protocols/protocol_ping_31402.cpp
         src/protocols/protocol_ping_60001.cpp
+        src/protocols/protocol_reject_70002.cpp
         src/protocols/protocol_seed_31402.cpp
         src/protocols/protocol_timer.cpp
         src/protocols/protocol_version_31402.cpp
         src/protocols/protocol_version_70002.cpp
-        src/proxy.cpp
+
         src/sessions/session.cpp
         src/sessions/session_batch.cpp
         src/sessions/session_inbound.cpp
         src/sessions/session_manual.cpp
         src/sessions/session_outbound.cpp
         src/sessions/session_seed.cpp
-        src/settings.cpp
-        src/utility/acceptor.cpp
-        src/utility/connector.cpp
-        src/utility/const_buffer.cpp
-        src/utility/locked_socket.cpp
-        src/utility/message_subscriber.cpp
-        src/utility/socket.cpp)
+
+        src/acceptor.cpp
+        src/channel.cpp
+        src/connector.cpp
+        src/hosts.cpp
+        src/message_subscriber.cpp
+        src/p2p.cpp
+        src/proxy.cpp
+        src/settings.cpp)
 
 target_include_directories(bitprim-network PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -316,36 +313,33 @@ install(TARGETS bitprim-network
 #  bitcoin/network/sessions/session_seed.hpp)
 
 set(_bitprim_headers
-        bitcoin/network/channel.hpp
-        bitcoin/network/collections/connections.hpp
-        bitcoin/network/collections/hosts.hpp
-        bitcoin/network/collections/pending_channels.hpp
-        bitcoin/network/collections/pending_sockets.hpp
-        bitcoin/network/define.hpp
-        bitcoin/network/p2p.hpp
         bitcoin/network/protocols/protocol.hpp
         bitcoin/network/protocols/protocol_address_31402.hpp
         bitcoin/network/protocols/protocol_events.hpp
         bitcoin/network/protocols/protocol_ping_31402.hpp
         bitcoin/network/protocols/protocol_ping_60001.hpp
+        bitcoin/network/protocols/protocol_reject_70002.hpp
         bitcoin/network/protocols/protocol_seed_31402.hpp
         bitcoin/network/protocols/protocol_timer.hpp
         bitcoin/network/protocols/protocol_version_31402.hpp
         bitcoin/network/protocols/protocol_version_70002.hpp
-        bitcoin/network/proxy.hpp
+
         bitcoin/network/sessions/session.hpp
         bitcoin/network/sessions/session_batch.hpp
         bitcoin/network/sessions/session_inbound.hpp
         bitcoin/network/sessions/session_manual.hpp
         bitcoin/network/sessions/session_outbound.hpp
         bitcoin/network/sessions/session_seed.hpp
+
+        bitcoin/network/acceptor.hpp
+        bitcoin/network/channel.hpp
+        bitcoin/network/connector.hpp
+        bitcoin/network/define.hpp
+        bitcoin/network/hosts.hpp
+        bitcoin/network/message_subscriber.hpp
+        bitcoin/network/p2p.hpp
+        bitcoin/network/proxy.hpp
         bitcoin/network/settings.hpp
-        bitcoin/network/utility/acceptor.hpp
-        bitcoin/network/utility/connector.hpp
-        bitcoin/network/utility/const_buffer.hpp
-        bitcoin/network/utility/locked_socket.hpp
-        bitcoin/network/utility/message_subscriber.hpp
-        bitcoin/network/utility/socket.hpp
         bitcoin/network/version.hpp
         bitcoin/network.hpp)
 
