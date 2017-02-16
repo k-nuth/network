@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_NETWORK_MESSAGE_SUBSCRIBER_HPP
 #define LIBBITCOIN_NETWORK_MESSAGE_SUBSCRIBER_HPP
@@ -33,7 +32,7 @@ namespace libbitcoin {
 namespace network {
 
 #define DEFINE_SUBSCRIBER_TYPE(value) \
-    typedef resubscriber<const code&, message::value::const_ptr> \
+    typedef resubscriber<code, message::value::const_ptr> \
         value##_subscriber_type
 
 #define DEFINE_SUBSCRIBER_OVERLOAD(value) \
@@ -41,23 +40,24 @@ namespace network {
     void subscribe(message::value&&, Handler&& handler) \
     { \
         value##_subscriber_->subscribe(std::forward<Handler>(handler), \
-            error::channel_stopped, nullptr); \
+            error::channel_stopped, {}); \
     }
 
 #define DECLARE_SUBSCRIBER(value) \
     value##_subscriber_type::ptr value##_subscriber_
 
 template <class Message>
-using message_handler = std::function<bool(const code&,
-    std::shared_ptr<const Message>)>;
+using message_handler =
+    std::function<bool(const code&, std::shared_ptr<const Message>)>;
 
 /// Aggregation of subscribers by messasge type, thread safe.
 class BCT_API message_subscriber
+  : noncopyable
 {
 public:
     DEFINE_SUBSCRIBER_TYPE(address);
     DEFINE_SUBSCRIBER_TYPE(alert);
-    DEFINE_SUBSCRIBER_TYPE(block_message);
+    DEFINE_SUBSCRIBER_TYPE(block);
     DEFINE_SUBSCRIBER_TYPE(block_transactions);
     DEFINE_SUBSCRIBER_TYPE(compact_block);
     DEFINE_SUBSCRIBER_TYPE(fee_filter);
@@ -77,9 +77,9 @@ public:
     DEFINE_SUBSCRIBER_TYPE(ping);
     DEFINE_SUBSCRIBER_TYPE(pong);
     DEFINE_SUBSCRIBER_TYPE(reject);
+    DEFINE_SUBSCRIBER_TYPE(send_compact);
     DEFINE_SUBSCRIBER_TYPE(send_headers);
-    DEFINE_SUBSCRIBER_TYPE(send_compact_blocks);
-    DEFINE_SUBSCRIBER_TYPE(transaction_message);
+    DEFINE_SUBSCRIBER_TYPE(transaction);
     DEFINE_SUBSCRIBER_TYPE(verack);
     DEFINE_SUBSCRIBER_TYPE(version);
 
@@ -89,10 +89,6 @@ public:
      */
     message_subscriber(threadpool& pool);
 
-    /// This class is not copyable.
-    message_subscriber(const message_subscriber&) = delete;
-    void operator=(const message_subscriber&) = delete;
-    
     /**
      * Subscribe to receive a notification when a message of type is received.
      * The handler is unregistered when the call is made.
@@ -104,7 +100,7 @@ public:
     {
         subscribe(Message(), std::forward<Handler>(handler));
     }
-        
+
     /**
      * Load a stream into a message instance and notify subscribers.
      * @param[in]  stream      The stream from which to load the message.
@@ -114,17 +110,16 @@ public:
      */
     template <class Message, class Subscriber>
     code relay(std::istream& stream, uint32_t version,
-        Subscriber subscriber) const
+        Subscriber& subscriber) const
     {
-        const auto instance = Message::factory_from_data(version, stream);
+        const auto message = std::make_shared<Message>();
 
-        if (!instance.is_valid())
-        {
-            subscriber->relay(error::bad_stream, nullptr);
-        }
+        // Subscribers are invoked only with stop and success codes.
+        if (!message->from_data(version, stream))
+            return error::bad_stream;
 
-        const auto ptr = std::make_shared<const Message>(std::move(instance));
-        subscriber->relay(error::success, ptr);
+        ////const auto const_ptr = std::const_pointer_cast<const Message>(message);
+        subscriber->relay(error::success, message);
         return error::success;
     }
 
@@ -137,17 +132,16 @@ public:
      */
     template <class Message, class Subscriber>
     code handle(std::istream& stream, uint32_t version,
-        Subscriber subscriber) const
+        Subscriber& subscriber) const
     {
-        const auto instance = Message::factory_from_data(version, stream);
+        const auto message = std::make_shared<Message>();
 
-        if (!instance.is_valid())
-        {
-            subscriber->invoke(error::bad_stream, nullptr);
-        }
+        // Subscribers are invoked only with stop and success codes.
+        if (!message->from_data(version, stream))
+            return error::bad_stream;
 
-        const auto ptr = std::make_shared<const Message>(std::move(instance));
-        subscriber->invoke(error::success, ptr);
+        ////const auto const_ptr = std::const_pointer_cast<const Message>(message);
+        subscriber->invoke(error::success, message);
         return error::success;
     }
 
@@ -182,7 +176,7 @@ public:
 private:
     DEFINE_SUBSCRIBER_OVERLOAD(address);
     DEFINE_SUBSCRIBER_OVERLOAD(alert);
-    DEFINE_SUBSCRIBER_OVERLOAD(block_message);
+    DEFINE_SUBSCRIBER_OVERLOAD(block);
     DEFINE_SUBSCRIBER_OVERLOAD(block_transactions);
     DEFINE_SUBSCRIBER_OVERLOAD(compact_block);
     DEFINE_SUBSCRIBER_OVERLOAD(fee_filter);
@@ -202,15 +196,15 @@ private:
     DEFINE_SUBSCRIBER_OVERLOAD(ping);
     DEFINE_SUBSCRIBER_OVERLOAD(pong);
     DEFINE_SUBSCRIBER_OVERLOAD(reject);
+    DEFINE_SUBSCRIBER_OVERLOAD(send_compact);
     DEFINE_SUBSCRIBER_OVERLOAD(send_headers);
-    DEFINE_SUBSCRIBER_OVERLOAD(send_compact_blocks);
-    DEFINE_SUBSCRIBER_OVERLOAD(transaction_message);
+    DEFINE_SUBSCRIBER_OVERLOAD(transaction);
     DEFINE_SUBSCRIBER_OVERLOAD(verack);
     DEFINE_SUBSCRIBER_OVERLOAD(version);
 
     DECLARE_SUBSCRIBER(address);
     DECLARE_SUBSCRIBER(alert);
-    DECLARE_SUBSCRIBER(block_message);
+    DECLARE_SUBSCRIBER(block);
     DECLARE_SUBSCRIBER(block_transactions);
     DECLARE_SUBSCRIBER(compact_block);
     DECLARE_SUBSCRIBER(fee_filter);
@@ -230,9 +224,9 @@ private:
     DECLARE_SUBSCRIBER(ping);
     DECLARE_SUBSCRIBER(pong);
     DECLARE_SUBSCRIBER(reject);
+    DECLARE_SUBSCRIBER(send_compact);
     DECLARE_SUBSCRIBER(send_headers);
-    DECLARE_SUBSCRIBER(send_compact_blocks);
-    DECLARE_SUBSCRIBER(transaction_message);
+    DECLARE_SUBSCRIBER(transaction);
     DECLARE_SUBSCRIBER(verack);
     DECLARE_SUBSCRIBER(version);
 };

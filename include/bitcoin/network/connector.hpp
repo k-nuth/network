@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_NETWORK_CONNECTOR_HPP
 #define LIBBITCOIN_NETWORK_CONNECTOR_HPP
@@ -26,17 +25,17 @@
 #include <string>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/collections/pending_sockets.hpp>
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/utility/socket.hpp>
 
 namespace libbitcoin {
 namespace network {
 
-/// Create outbound socket connections, thread and lock safe.
+/// Create outbound socket connections.
+/// This class is thread safe against stop.
+/// This class is not safe for concurrent connection attempts.
 class BCT_API connector
-  : public enable_shared_from_base<connector>, track<connector>
+  : public enable_shared_from_base<connector>, noncopyable, track<connector>
 {
 public:
     typedef std::shared_ptr<connector> ptr;
@@ -45,9 +44,8 @@ public:
     /// Construct an instance.
     connector(threadpool& pool, const settings& settings);
 
-    /// This class is not copyable.
-    connector(const connector&) = delete;
-    void operator=(const connector&) = delete;
+    /// Validate connector stopped.
+    ~connector();
 
     /// Try to connect to the endpoint.
     virtual void connect(const config::endpoint& endpoint,
@@ -61,35 +59,31 @@ public:
     virtual void connect(const std::string& hostname, uint16_t port,
         connect_handler handler);
 
-    /// Cancel all outstanding connection attempts.
-    void stop();
+    /// Cancel outstanding connection attempt.
+    void stop(const code& ec);
 
 private:
-    bool stopped() const;
-    void close_socket(socket socket);
-    std::shared_ptr<channel> new_channel(socket::ptr socket);
+    typedef std::shared_ptr<asio::query> query_ptr;
 
-    void safe_stop();
-    void safe_resolve(asio::query_ptr query, connect_handler handler);
-    void safe_connect(asio::iterator iterator, socket::ptr socket,
-        deadline::ptr timer, connect_handler handler);
+    bool stopped() const;
 
     void handle_resolve(const boost_code& ec, asio::iterator iterator,
         connect_handler handler);
+    void handle_connect(const boost_code& ec, asio::iterator iterator,
+        socket::ptr socket, connect_handler handler);
     void handle_timer(const code& ec, socket::ptr socket,
         connect_handler handler);
-    void handle_connect(const boost_code& ec, asio::iterator iterator,
-        socket::ptr socket, deadline::ptr timer, connect_handler handler);
 
     // These are thread safe
     std::atomic<bool> stopped_;
     threadpool& pool_;
     const settings& settings_;
-    pending_sockets pending_;
     mutable dispatcher dispatch_;
 
-    // This is protected by mutex.
-    std::shared_ptr<asio::resolver> resolver_;
+    // These are protected by mutex.
+    query_ptr query_;
+    deadline::ptr timer_;
+    asio::resolver resolver_;
     mutable upgrade_mutex mutex_;
 };
 

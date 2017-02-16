@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +14,11 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/p2p.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -27,9 +27,8 @@
 #include <vector>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/collections/connections.hpp>
-#include <bitcoin/network/collections/hosts.hpp>
 #include <bitcoin/network/define.hpp>
+#include <bitcoin/network/hosts.hpp>
 #include <bitcoin/network/protocols/protocol_address_31402.hpp>
 #include <bitcoin/network/protocols/protocol_ping_31402.hpp>
 #include <bitcoin/network/protocols/protocol_ping_60001.hpp>
@@ -50,15 +49,32 @@ namespace network {
 using namespace bc::config;
 using namespace std::placeholders;
 
+// This can be exceeded due to manual connection calls and race conditions.
+inline size_t nominal_connecting(const settings& settings)
+{
+    return settings.peers.size() + settings.connect_batch_size *
+        settings.outbound_connections;
+}
+
+// This can be exceeded due to manual connection calls and race conditions.
+inline size_t nominal_connected(const settings& settings)
+{
+    return settings.peers.size() + settings.outbound_connections +
+        settings.inbound_connections;
+}
+
 p2p::p2p(const settings& settings)
   : settings_(settings),
     stopped_(true),
     top_block_({ null_hash, 0 }),
-    pending_(settings_),
-    connections_(settings_),
-    hosts_(threadpool_, settings_),
-    stop_subscriber_(std::make_shared<stop_subscriber>(threadpool_, NAME "_stop_sub")),
-    channel_subscriber_(std::make_shared<channel_subscriber>(threadpool_, NAME "_sub"))
+    hosts_(settings_),
+    pending_connect_(nominal_connecting(settings_)),
+    pending_handshake_(nominal_connected(settings_)),
+    pending_close_(nominal_connected(settings_)),
+    stop_subscriber_(std::make_shared<stop_subscriber>(threadpool_,
+        NAME "_stop_sub")),
+    channel_subscriber_(std::make_shared<channel_subscriber>(threadpool_,
+        NAME "_sub"))
 {
 }
 
@@ -80,18 +96,18 @@ void p2p::start(result_handler handler)
     }
 
     threadpool_.join();
-    threadpool_.spawn(settings_.threads, thread_priority::low);
+    threadpool_.spawn(thread_default(settings_.threads),
+        thread_priority::normal);
 
     stopped_ = false;
     stop_subscriber_->start();
     channel_subscriber_->start();
 
-    // This instance is retained by stop handler and member references.
-    const auto manual = attach_manual_session();
-    manual_.store(manual);
+    // This instance is retained by stop handler and member reference.
+    manual_.store(attach_manual_session());
 
     // This is invoked on a new thread.
-    manual->start(
+    manual_.load()->start(
         std::bind(&p2p::handle_manual_started,
             this, _1, handler));
 }
@@ -246,7 +262,7 @@ session_outbound::ptr p2p::attach_outbound_session()
 // IOW queued shutdown operations must not enqueue additional work.
 
 // This is not short-circuited by a stopped test because we need to ensure it
-// completes at least once before returning. This requires a unique lock be 
+// completes at least once before returning. This requires a unique lock be
 // taken around the entire section, which poses a deadlock risk. Instead this
 // is thread safe and idempotent, allowing it to be unguarded.
 bool p2p::stop()
@@ -256,7 +272,7 @@ bool p2p::stop()
 
     // Signal all current work to stop and free manual session.
     stopped_ = true;
-    manual_.store(nullptr);
+    manual_.store({});
 
     // Prevent subscription after stop.
     stop_subscriber_->stop();
@@ -264,10 +280,12 @@ bool p2p::stop()
 
     // Prevent subscription after stop.
     channel_subscriber_->stop();
-    channel_subscriber_->invoke(error::service_stopped, nullptr);
+    channel_subscriber_->invoke(error::service_stopped, {});
 
-    // Stop accepting channels and stop those that exist (self-clearing).
-    connections_.stop(error::service_stopped);
+    // Stop creating new channels and stop those that exist (self-clearing).
+    pending_connect_.stop(error::service_stopped);
+    pending_handshake_.stop(error::service_stopped);
+    pending_close_.stop(error::service_stopped);
 
     // Signal threadpool to stop accepting work now that subscribers are clear.
     threadpool_.shutdown();
@@ -310,7 +328,7 @@ void p2p::set_top_block(const checkpoint& top)
 
 bool p2p::stopped() const
 {
-    return stopped_.load();
+    return stopped_;
 }
 
 threadpool& p2p::thread_pool()
@@ -318,12 +336,23 @@ threadpool& p2p::thread_pool()
     return threadpool_;
 }
 
+// Send.
+// ----------------------------------------------------------------------------
+
+// private
+void p2p::handle_send(const code& ec, channel::ptr channel,
+    channel_handler handle_channel, result_handler handle_complete)
+{
+    handle_channel(ec, channel);
+    handle_complete(ec);
+}
+
 // Subscriptions.
 // ----------------------------------------------------------------------------
 
 void p2p::subscribe_connection(connect_handler handler)
 {
-    channel_subscriber_->subscribe(handler, error::service_stopped, nullptr);
+    channel_subscriber_->subscribe(handler, error::service_stopped, {});
 }
 
 void p2p::subscribe_stop(result_handler handler)
@@ -345,6 +374,8 @@ void p2p::connect(const std::string& hostname, uint16_t port)
         return;
 
     auto manual = manual_.load();
+
+    // Connect is invoked on a new thread.
     if (manual)
         manual->connect(hostname, port);
 }
@@ -354,85 +385,27 @@ void p2p::connect(const std::string& hostname, uint16_t port,
 {
     if (stopped())
     {
-        handler(error::service_stopped, nullptr);
+        handler(error::service_stopped, {});
         return;
     }
 
     auto manual = manual_.load();
+
     if (manual)
-    {
-        // Connect is invoked on a new thread.
         manual->connect(hostname, port, handler);
-    }
-}
-
-// Pending connections collection.
-// ----------------------------------------------------------------------------
-
-void p2p::pend(channel::ptr channel, result_handler handler)
-{
-    pending_.store(channel, handler);
-}
-
-void p2p::unpend(channel::ptr channel, result_handler handler)
-{
-    pending_.remove(channel, handler);
-}
-
-void p2p::pending(uint64_t version_nonce, truth_handler handler) const
-{
-    pending_.exists(version_nonce, handler);
-}
-
-// Connections collection.
-// ----------------------------------------------------------------------------
-
-void p2p::connected(const address& address, truth_handler handler) const
-{
-    connections_.exists(address, handler);
-}
-
-void p2p::store(channel::ptr channel, result_handler handler)
-{
-    const auto new_connection_handler =
-        std::bind(&p2p::handle_new_connection,
-            this, _1, channel, handler);
-
-    connections_.store(channel, new_connection_handler);
-}
-
-void p2p::handle_new_connection(const code& ec, channel::ptr channel,
-    result_handler handler)
-{
-    // Connection-in-use indicated here by error::address_in_use.
-    handler(ec);
-    
-    if (!ec && channel->notify())
-        channel_subscriber_->relay(error::success, channel);
-}
-
-void p2p::remove(channel::ptr channel, result_handler handler)
-{
-    connections_.remove(channel, handler);
-}
-
-void p2p::connected_count(count_handler handler) const
-{
-    connections_.count(handler);
 }
 
 // Hosts collection.
 // ----------------------------------------------------------------------------
 
-void p2p::fetch_address(address_handler handler) const
+size_t p2p::address_count() const
 {
-    address out;
-    handler(hosts_.fetch(out), out);
+    return hosts_.count();
 }
 
-void p2p::store(const address& address, result_handler handler)
+code p2p::store(const address& address)
 {
-    handler(hosts_.store(address));
+    return hosts_.store(address);
 }
 
 void p2p::store(const address::list& addresses, result_handler handler)
@@ -441,14 +414,91 @@ void p2p::store(const address::list& addresses, result_handler handler)
     hosts_.store(addresses, handler);
 }
 
-void p2p::remove(const address& address, result_handler handler)
+code p2p::fetch_address(address& out_address) const
 {
-    handler(hosts_.remove(address));
+    return hosts_.fetch(out_address);
 }
 
-void p2p::address_count(count_handler handler) const
+code p2p::remove(const address& address)
 {
-    handler(hosts_.count());
+    return hosts_.remove(address);
+}
+
+// Pending connect collection.
+// ----------------------------------------------------------------------------
+
+code p2p::pend(connector::ptr connector)
+{
+    return pending_connect_.store(connector);
+}
+
+void p2p::unpend(connector::ptr connector)
+{
+    connector->stop(error::success);
+    pending_connect_.remove(connector);
+}
+
+// Pending handshake collection.
+// ----------------------------------------------------------------------------
+
+code p2p::pend(channel::ptr channel)
+{
+    return pending_handshake_.store(channel);
+}
+
+void p2p::unpend(channel::ptr channel)
+{
+    pending_handshake_.remove(channel);
+}
+
+bool p2p::pending(uint64_t version_nonce) const
+{
+    const auto match = [version_nonce](const channel::ptr& element)
+    {
+        return element->nonce() == version_nonce;
+    };
+
+    return pending_handshake_.exists(match);
+}
+
+// Pending close collection (open connections).
+// ----------------------------------------------------------------------------
+
+size_t p2p::connection_count() const
+{
+    return pending_close_.size();
+}
+
+bool p2p::connected(const address& address) const
+{
+    const auto match = [&address](const channel::ptr& element)
+    {
+        return element->authority() == address;
+    };
+
+    return pending_close_.exists(match);
+}
+
+code p2p::store(channel::ptr channel)
+{
+    const auto address = channel->authority();
+    const auto match = [&address](const channel::ptr& element)
+    {
+        return element->authority() == address;
+    };
+
+    // May return error::address_in_use.
+    const auto ec = pending_close_.store(channel, match);
+
+    if (!ec && channel->notify())
+        channel_subscriber_->relay(error::success, channel);
+
+    return ec;
+}
+
+void p2p::remove(channel::ptr channel)
+{
+    pending_close_.remove(channel);
 }
 
 } // namespace network

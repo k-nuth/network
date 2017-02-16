@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_NETWORK_PROTOCOL_HPP
 #define LIBBITCOIN_NETWORK_PROTOCOL_HPP
@@ -49,7 +48,7 @@ class p2p;
 
 /// Virtual base class for protocol implementation, mostly thread safe.
 class BCT_API protocol
-  : public enable_shared_from_base<protocol>
+  : public enable_shared_from_base<protocol>, noncopyable
 {
 protected:
     typedef std::function<void()> completion_handler;
@@ -59,10 +58,6 @@ protected:
     /// Construct an instance.
     protocol(p2p& network, channel::ptr channel, const std::string& name);
 
-    /// This class is not copyable.
-    protocol(const protocol&) = delete;
-    void operator=(const protocol&) = delete;
-
     /// Bind a method in the derived class.
     template <class Protocol, typename Handler, typename... Args>
     auto bind(Handler&& handler, Args&&... args) ->
@@ -71,12 +66,17 @@ protected:
         return BOUND_PROTOCOL(handler, args);
     }
 
+    template <class Protocol, typename Handler, typename... Args>
+    void dispatch_concurrent(Handler&& handler, Args&&... args)
+    {
+        dispatch_.concurrent(BOUND_PROTOCOL(handler, args));
+    }
+
     /// Send a message on the channel and handle the result.
     template <class Protocol, class Message, typename Handler, typename... Args>
-    void send(Message&& packet, Handler&& handler, Args&&... args)
+    void send(const Message& packet, Handler&& handler, Args&&... args)
     {
-        channel_->send(std::forward<Message>(packet),
-            BOUND_PROTOCOL(handler, args));
+        channel_->send(packet, BOUND_PROTOCOL(handler, args));
     }
 
     /// Subscribe to all channel messages, blocking until subscribed.
@@ -120,8 +120,12 @@ protected:
     /// Stop the channel (and the protocol).
     virtual void stop(const code& ec);
 
+protected:
+    void handle_send(const code& ec, const std::string& command);
+
 private:
     threadpool& pool_;
+    dispatcher dispatch_;
     channel::ptr channel_;
     const std::string name_;
 };
@@ -130,13 +134,6 @@ private:
 #undef BOUND_PROTOCOL
 #undef PROTOCOL_ARGS_TYPE
 #undef BOUND_PROTOCOL_TYPE
-
-#define BIND1(method, p1) \
-    bind<CLASS>(&CLASS::method, p1)
-#define BIND2(method, p1, p2) \
-    bind<CLASS>(&CLASS::method, p1, p2)
-#define BIND3(method, p1, p2, p3) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3)
 
 #define SEND1(message, method, p1) \
     send<CLASS>(message, &CLASS::method, p1)
@@ -152,6 +149,9 @@ private:
 
 #define SUBSCRIBE_STOP1(method, p1) \
     subscribe_stop<CLASS>(&CLASS::method, p1)
+
+#define DISPATCH_CONCURRENT1(method, p1) \
+    dispatch_concurrent<CLASS>(&CLASS::method, p1)
 
 } // namespace network
 } // namespace libbitcoin

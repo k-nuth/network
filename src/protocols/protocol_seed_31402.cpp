@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/protocols/protocol_seed_31402.hpp>
 
@@ -48,10 +47,8 @@ protocol_seed_31402::protocol_seed_31402(p2p& network, channel::ptr channel)
 
 void protocol_seed_31402::start(event_handler handler)
 {
-    static const auto mode = synchronizer_terminate::on_error;
     const auto& settings = network_.network_settings();
-
-    auto complete = BIND2(handle_seeding_complete, _1, handler);
+    const event_handler complete = BIND2(handle_seeding_complete, _1, handler);
 
     if (settings.host_pool_capacity == 0)
     {
@@ -59,8 +56,10 @@ void protocol_seed_31402::start(event_handler handler)
         return;
     }
 
-    protocol_timer::start(settings.channel_germination(),
-        synchronize(complete, 3, NAME, mode));
+    const auto join_handler = synchronize(complete, 3, NAME,
+        synchronizer_terminate::on_error);
+
+    protocol_timer::start(settings.channel_germination(), join_handler);
 
     SUBSCRIBE2(address, handle_receive_address, _1, _2);
     send_own_address(settings);
@@ -94,17 +93,8 @@ void protocol_seed_31402::handle_seeding_complete(const code& ec,
 bool protocol_seed_31402::handle_receive_address(const code& ec,
     address_const_ptr message)
 {
-    if (stopped())
+    if (stopped(ec))
         return false;
-
-    if (ec)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failure receiving addresses from seed [" << authority() << "] "
-            << ec.message();
-        set_event(ec);
-        return false;
-    }
 
     LOG_DEBUG(LOG_NETWORK)
         << "Storing addresses from seed [" << authority() << "] ("
@@ -112,23 +102,13 @@ bool protocol_seed_31402::handle_receive_address(const code& ec,
 
     // TODO: manage timestamps (active channels are connected < 3 hours ago).
     network_.store(message->addresses(), BIND1(handle_store_addresses, _1));
-
     return false;
 }
 
 void protocol_seed_31402::handle_send_address(const code& ec)
 {
-    if (stopped())
+    if (stopped(ec))
         return;
-
-    if (ec)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failure sending address to seed [" << authority() << "] "
-            << ec.message();
-        set_event(ec);
-        return;
-    }
 
     // 1 of 3
     set_event(error::success);
@@ -136,7 +116,7 @@ void protocol_seed_31402::handle_send_address(const code& ec)
 
 void protocol_seed_31402::handle_send_get_address(const code& ec)
 {
-    if (stopped())
+    if (stopped(ec))
         return;
 
     if (ec)
@@ -154,16 +134,14 @@ void protocol_seed_31402::handle_send_get_address(const code& ec)
 
 void protocol_seed_31402::handle_store_addresses(const code& ec)
 {
-    if (stopped())
+    if (stopped(ec))
         return;
-
-    if (ec && ec != error::service_stopped)
-        LOG_ERROR(LOG_NETWORK)
-            << "Failure storing addresses from seed [" << authority() << "] "
-            << ec.message();
 
     if (ec)
     {
+        LOG_ERROR(LOG_NETWORK)
+            << "Failure storing addresses from seed [" << authority() << "] "
+            << ec.message();
         set_event(ec);
         return;
     }

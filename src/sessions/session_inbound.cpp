@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/sessions/session_inbound.hpp>
 
@@ -26,6 +25,7 @@
 #include <bitcoin/network/protocols/protocol_address_31402.hpp>
 #include <bitcoin/network/protocols/protocol_ping_31402.hpp>
 #include <bitcoin/network/protocols/protocol_ping_60001.hpp>
+#include <bitcoin/network/protocols/protocol_reject_70002.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -36,6 +36,8 @@ using namespace std::placeholders;
 
 session_inbound::session_inbound(p2p& network, bool notify_on_connect)
   : session(network, notify_on_connect),
+    connection_limit_(settings_.inbound_connections +
+        settings_.outbound_connections + settings_.peers.size()),
     CONSTRUCT_TRACK(session_inbound)
 {
 }
@@ -53,7 +55,7 @@ void session_inbound::start(result_handler handler)
         return;
     }
 
-    session::start(CONCURRENT2(handle_started, _1, handler));
+    session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
 
 void session_inbound::handle_started(const code& ec, result_handler handler)
@@ -64,50 +66,61 @@ void session_inbound::handle_started(const code& ec, result_handler handler)
         return;
     }
 
-    const auto accept = create_acceptor();
-    const auto port = settings_.inbound_port;
+    acceptor_ = create_acceptor();
+
+    // Relay stop to the acceptor.
+    subscribe_stop(BIND1(handle_stop, _1));
 
     // START LISTENING ON PORT
-    accept->listen(port, BIND2(start_accept, _1, accept));
+    const auto error_code = acceptor_->listen(settings_.inbound_port);
+
+    if (error_code)
+    {
+        LOG_ERROR(LOG_NETWORK)
+            << "Error starting listener: " << ec.message();
+        handler(error_code);
+        return;
+    }
+
+    start_accept();
 
     // This is the end of the start sequence.
     handler(error::success);
 }
 
+void session_inbound::handle_stop(const code& ec)
+{
+    // Signal the stop of listener/accept attempt.
+    acceptor_->stop(ec);
+}
+
 // Accept sequence.
 // ----------------------------------------------------------------------------
 
-void session_inbound::start_accept(const code& ec, acceptor::ptr accept)
+void session_inbound::start_accept()
 {
     if (stopped())
     {
         LOG_DEBUG(LOG_NETWORK)
             << "Suspended inbound connection.";
-        return;
-    }
-
-    if (ec)
-    {
-        LOG_ERROR(LOG_NETWORK)
-            << "Error starting listener: " << ec.message();
         return;
     }
 
     // ACCEPT THE NEXT INCOMING CONNECTION
-    accept->accept(BIND3(handle_accept, _1, _2, accept));
+    acceptor_->accept(BIND2(handle_accept, _1, _2));
 }
 
-void session_inbound::handle_accept(const code& ec, channel::ptr channel,
-    acceptor::ptr accept)
+void session_inbound::handle_accept(const code& ec, channel::ptr channel)
 {
-    if (stopped())
+    if (stopped(ec))
     {
         LOG_DEBUG(LOG_NETWORK)
             << "Suspended inbound connection.";
         return;
     }
 
-    start_accept(error::success, accept);
+    // Start accepting again immediately, regardless of previous error.
+    start_accept();
 
     if (ec)
     {
@@ -124,27 +137,17 @@ void session_inbound::handle_accept(const code& ec, channel::ptr channel,
         return;
     }
 
-    connection_count(BIND2(handle_connection_count, _1, channel));
-}
-
-void session_inbound::handle_connection_count(size_t connections,
-    channel::ptr channel)
-{
-    const auto connection_limit = settings_.inbound_connections + 
-        settings_.outbound_connections;
-
-    if (connections >= connection_limit)
+    // Inbound connections can easily overflow in the case where manual and/or
+    // outbound connections at the time are not yet connected as configured.
+    if (connection_count() >= connection_limit_)
     {
         LOG_DEBUG(LOG_NETWORK)
             << "Rejected inbound connection from ["
             << channel->authority() << "] due to connection limit.";
         return;
     }
-   
-    LOG_INFO(LOG_NETWORK)
-        << "Connected inbound channel [" << channel->authority() << "]";
 
-    register_channel(channel, 
+    register_channel(channel,
         BIND2(handle_channel_start, _1, channel),
         BIND1(handle_channel_stop, _1));
 }
@@ -160,15 +163,24 @@ void session_inbound::handle_channel_start(const code& ec,
         return;
     }
 
+    LOG_INFO(LOG_NETWORK)
+        << "Connected inbound channel [" << channel->authority() << "] ("
+        << connection_count() << ")";
+
     attach_protocols(channel);
 };
 
 void session_inbound::attach_protocols(channel::ptr channel)
 {
-    if (channel->negotiated_version() >= message::version::level::bip31)
+    const auto version = channel->negotiated_version();
+
+    if (version >= message::version::level::bip31)
         attach<protocol_ping_60001>(channel)->start();
     else
         attach<protocol_ping_31402>(channel)->start();
+
+    if (version >= message::version::level::bip61)
+        attach<protocol_reject_70002>(channel)->start();
 
     attach<protocol_address_31402>(channel)->start();
 }
@@ -181,19 +193,12 @@ void session_inbound::handle_channel_stop(const code& ec)
 
 // Channel start sequence.
 // ----------------------------------------------------------------------------
-// Loopback test required for incoming connections.
+// Check pending outbound connections for loopback to this inbound.
 
-void session_inbound::start_channel(channel::ptr channel,
+void session_inbound::handshake_complete(channel::ptr channel,
     result_handler handle_started)
 {
-    pending(channel->peer_version()->nonce(),
-        BIND3(handle_is_pending, _1, channel, handle_started));
-}
-
-void session_inbound::handle_is_pending(bool pending, channel::ptr channel,
-    result_handler handle_started)
-{
-    if (pending)
+    if (pending(channel->peer_version()->nonce()))
     {
         LOG_DEBUG(LOG_NETWORK)
             << "Rejected connection from [" << channel->authority()
@@ -202,7 +207,7 @@ void session_inbound::handle_is_pending(bool pending, channel::ptr channel,
         return;
     }
 
-    session::start_channel(channel, handle_started);
+    session::handshake_complete(channel, handle_started);
 }
 
 } // namespace network

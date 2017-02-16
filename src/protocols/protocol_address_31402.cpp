@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/protocols/protocol_address_31402.hpp>
 
@@ -83,17 +82,8 @@ void protocol_address_31402::start()
 bool protocol_address_31402::handle_receive_address(const code& ec,
     address_const_ptr message)
 {
-    if (stopped())
+    if (stopped(ec))
         return false;
-
-    if (ec)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failure receiving address message from ["
-            << authority() << "] " << ec.message();
-        stop(ec);
-        return false;
-    }
 
     LOG_DEBUG(LOG_NETWORK)
         << "Storing addresses from [" << authority() << "] ("
@@ -109,17 +99,8 @@ bool protocol_address_31402::handle_receive_address(const code& ec,
 bool protocol_address_31402::handle_receive_get_address(const code& ec,
     get_address_const_ptr message)
 {
-    if (stopped())
+    if (stopped(ec))
         return false;
-
-    if (ec)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failure receiving get_address message from ["
-            << authority() << "] " << ec.message();
-        stop(ec);
-        return false;
-    }
 
     // TODO: allowing repeated queries can allow a channel to map our history.
     // TODO: pull active hosts from host cache (currently just resending self).
@@ -140,22 +121,23 @@ bool protocol_address_31402::handle_receive_get_address(const code& ec,
 
 void protocol_address_31402::handle_store_addresses(const code& ec)
 {
-    if (stopped())
+    if (stopped(ec))
         return;
 
-    if (ec && ec != error::service_stopped)
-        LOG_ERROR(LOG_NETWORK)
-        << "Failure storing addresses from [" << authority() << "] "
-        << ec.message();
-
     if (ec)
+    {
+        LOG_ERROR(LOG_NETWORK)
+            << "Failure storing addresses from [" << authority() << "] "
+            << ec.message();
         stop(ec);
+    }
 }
 
 void protocol_address_31402::handle_stop(const code&)
 {
-    LOG_DEBUG(LOG_NETWORK)
-        << "Stopped address protocol";
+    // None of the other bc::network protocols log their stop.
+    ////LOG_DEBUG(LOG_NETWORK)
+    ////    << "Stopped address protocol for [" << authority() << "].";
 }
 
 } // namespace network

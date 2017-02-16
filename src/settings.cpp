@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,11 +14,10 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/settings.hpp>
 
-#include <limits>
 #include <bitcoin/bitcoin.hpp>
 
 namespace libbitcoin {
@@ -30,10 +28,12 @@ using namespace bc::message;
 
 // Common default values (no settings context).
 settings::settings()
-  : threads(50),
+  : threads(0),
     protocol_maximum(version::level::maximum),
     protocol_minimum(version::level::minimum),
     services(version::service::none),
+    relay_transactions(false),
+    validate_checksum(false),
     inbound_connections(0),
     outbound_connections(8),
     manual_attempt_limit(0),
@@ -45,7 +45,6 @@ settings::settings()
     channel_expiration_minutes(1440),
     channel_germination_seconds(30),
     host_pool_capacity(0),
-    relay_transactions(false),
     hosts_file("hosts.cache"),
     self(unspecified_network_address),
 
@@ -54,9 +53,11 @@ settings::settings()
     error_file("error.log"),
     archive_directory("archive"),
     rotation_size(0),
-    maximum_archive_size(max_uint32),
     minimum_free_space(0),
-    maximum_archive_files(max_uint32)
+    maximum_archive_size(0),
+    maximum_archive_files(0),
+    statistics_server(unspecified_network_address),
+    verbose(false)
 {
 }
 
@@ -148,7 +149,7 @@ duration settings::channel_expiration() const
 duration settings::channel_germination() const
 {
     return seconds(channel_germination_seconds);
-} 
+}
 
 } // namespace network
 } // namespace libbitcoin

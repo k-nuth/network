@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_NETWORK_P2P_HPP
 #define LIBBITCOIN_NETWORK_P2P_HPP
@@ -29,23 +28,21 @@
 #include <vector>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/collections/connections.hpp>
-#include <bitcoin/network/collections/hosts.hpp>
-#include <bitcoin/network/collections/pending_channels.hpp>
 #include <bitcoin/network/define.hpp>
+#include <bitcoin/network/hosts.hpp>
+#include <bitcoin/network/message_subscriber.hpp>
 #include <bitcoin/network/sessions/session_inbound.hpp>
 #include <bitcoin/network/sessions/session_manual.hpp>
 #include <bitcoin/network/sessions/session_outbound.hpp>
 #include <bitcoin/network/sessions/session_seed.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/utility/message_subscriber.hpp>
 
 namespace libbitcoin {
 namespace network {
 
 /// Top level public networking interface, partly thread safe.
 class BCT_API p2p
-  : public enable_shared_from_base<p2p>
+  : public enable_shared_from_base<p2p>, noncopyable
 {
 public:
     typedef std::shared_ptr<p2p> ptr;
@@ -57,26 +54,28 @@ public:
     typedef std::function<void(const code&, const address&)> address_handler;
     typedef std::function<void(const code&, channel::ptr)> channel_handler;
     typedef std::function<bool(const code&, channel::ptr)> connect_handler;
-    typedef subscriber<const code&> stop_subscriber;
-    typedef resubscriber<const code&, channel::ptr> channel_subscriber;
+    typedef subscriber<code> stop_subscriber;
+    typedef resubscriber<code, channel::ptr> channel_subscriber;
 
     // Templates (send/receive).
     // ------------------------------------------------------------------------
 
     /// Send message to all connections.
     template <typename Message>
-    void broadcast(Message&& message, channel_handler handle_channel,
+    void broadcast(const Message& message, channel_handler handle_channel,
         result_handler handle_complete)
     {
-        connections_.broadcast(message, handle_channel, handle_complete);
-    }
+        // Safely copy the channel collection.
+        const auto channels = pending_close_.collection();
 
-    /// Subscribe to all incoming messages of a type.
-    template <class Message>
-    void subscribe(message_handler<Message>&& handler)
-    {
-        connections_.subscribe(
-            std::forward<message_handler<Message>>(handler));
+        // Invoke the completion handler after send complete on all channels.
+        const auto join_handler = synchronize(handle_complete, channels.size(),
+            "p2p_join", synchronizer_terminate::on_count);
+
+        // No pre-serialize, channels may have different protocol versions.
+        for (const auto channel: channels)
+            channel->send(message, std::bind(&p2p::handle_send, this,
+                std::placeholders::_1, channel, handle_channel, join_handler));
     }
 
     // Constructors.
@@ -84,10 +83,6 @@ public:
 
     /// Construct an instance.
     p2p(const settings& settings);
-
-    /// This class is not copyable.
-    p2p(const p2p&) = delete;
-    void operator=(const p2p&) = delete;
 
     /// Ensure all threads are coalesced.
     virtual ~p2p();
@@ -158,51 +153,59 @@ public:
     virtual void connect(const std::string& hostname, uint16_t port,
         channel_handler handler);
 
-    // Pending connections collection.
-    // ------------------------------------------------------------------------
-
-    /// Store a pending connection reference.
-    virtual void pend(channel::ptr channel, result_handler handler);
-
-    /// Free a pending connection reference.
-    virtual void unpend(channel::ptr channel, result_handler handler);
-
-    /// Test for a pending connection reference.
-    virtual void pending(uint64_t version_nonce, truth_handler handler) const;
-
-    // Connections collection.
-    // ------------------------------------------------------------------------
-
-    /// Determine if there exists a connection to the address.
-    virtual void connected(const address& address,
-        truth_handler handler) const;
-
-    /// Store a connection.
-    virtual void store(channel::ptr channel, result_handler handler);
-
-    /// Remove a connection.
-    virtual void remove(channel::ptr channel, result_handler handler);
-
-    /// Get the number of connections.
-    virtual void connected_count(count_handler handler) const;
-
     // Hosts collection.
     // ------------------------------------------------------------------------
 
-    /// Get a randomly-selected address.
-    virtual void fetch_address(address_handler handler) const;
+    /// Get the number of addresses.
+    virtual size_t address_count() const;
 
     /// Store an address.
-    virtual void store(const address& address, result_handler handler);
+    virtual code store(const address& address);
 
-    /// Store a collection of addresses.
+    /// Store a collection of addresses (asynchronous).
     virtual void store(const address::list& addresses, result_handler handler);
 
-    /// Remove an address.
-    virtual void remove(const address& address, result_handler handler);
+    /// Get a randomly-selected address.
+    virtual code fetch_address(address& out_address) const;
 
-    /// Get the number of addresses.
-    virtual void address_count(count_handler handler) const;
+    /// Remove an address.
+    virtual code remove(const address& address);
+
+    // Pending connect collection.
+    // ------------------------------------------------------------------------
+
+    /// Store a pending connection reference.
+    virtual code pend(connector::ptr connector);
+
+    /// Free a pending connection reference.
+    virtual void unpend(connector::ptr connector);
+
+    // Pending handshake collection.
+    // ------------------------------------------------------------------------
+
+    /// Store a pending connection reference.
+    virtual code pend(channel::ptr channel);
+
+    /// Test for a pending connection reference.
+    virtual bool pending(uint64_t version_nonce) const;
+
+    /// Free a pending connection reference.
+    virtual void unpend(channel::ptr channel);
+
+    // Pending close collection (open connections).
+    // ------------------------------------------------------------------------
+
+    /// Get the number of connections.
+    virtual size_t connection_count() const;
+
+    /// Store a connection.
+    virtual code store(channel::ptr channel);
+
+    /// Determine if there exists a connection to the address.
+    virtual bool connected(const address& address) const;
+
+    /// Remove a connection.
+    virtual void remove(channel::ptr channel);
 
 protected:
 
@@ -220,26 +223,29 @@ protected:
     virtual session_outbound::ptr attach_outbound_session();
 
 private:
+    typedef bc::pending<channel> pending_channels;
+    typedef bc::pending<connector> pending_connectors;
+
     void handle_manual_started(const code& ec, result_handler handler);
     void handle_inbound_started(const code& ec, result_handler handler);
     void handle_hosts_loaded(const code& ec, result_handler handler);
     void handle_hosts_saved(const code& ec, result_handler handler);
-    void handle_new_connection(const code& ec, channel::ptr channel,
-        result_handler handler);
+    void handle_send(const code& ec, channel::ptr channel,
+        channel_handler handle_channel, result_handler handle_complete);
 
     void handle_started(const code& ec, result_handler handler);
     void handle_running(const code& ec, result_handler handler);
 
-    const settings& settings_;
-
     // These are thread safe.
+    const settings& settings_;
     std::atomic<bool> stopped_;
     bc::atomic<config::checkpoint> top_block_;
     bc::atomic<session_manual::ptr> manual_;
     threadpool threadpool_;
-    pending_channels pending_;
-    connections connections_;
     hosts hosts_;
+    pending_connectors pending_connect_;
+    pending_channels pending_handshake_;
+    pending_channels pending_close_;
     stop_subscriber::ptr stop_subscriber_;
     channel_subscriber::ptr channel_subscriber_;
 };

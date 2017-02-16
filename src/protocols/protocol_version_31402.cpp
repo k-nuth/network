@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,14 +14,11 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/protocols/protocol_version_31402.hpp>
 
-#include <algorithm>
-#include <chrono>
 #include <cstdint>
-#include <cstdlib>
 #include <functional>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
@@ -40,28 +36,19 @@ namespace network {
 using namespace bc::message;
 using namespace std::placeholders;
 
-static const std::string reason_insufficient_services = "insufficient-services";
-static const std::string reason_insufficient_version = "insufficient-version";
-
-// TODO: move to libbitcoin utility with similar blockchain function.
-static uint64_t time_stamp()
-{
-    // Use system clock because we require accurate time of day.
-    typedef std::chrono::system_clock wall_clock;
-    const auto now = wall_clock::now();
-    return wall_clock::to_time_t(now);
-}
-
+// TODO: set explicitly on inbound (none or new config) and self on outbound.
 // Require the configured minimum and services by default.
 // Configured min version is our own but we may require higer for some stuff.
-// Configured services are our own and may not always make sense to require.
+// Configured services was our but we found that most incoming connections are
+// set to zero, so that is currently the default (see below).
 protocol_version_31402::protocol_version_31402(p2p& network,
     channel::ptr channel)
   : protocol_version_31402(network, channel,
         network.network_settings().protocol_maximum,
         network.network_settings().services,
         network.network_settings().protocol_minimum,
-        network.network_settings().services)
+        bc::message::version::service::none
+        /*network.network_settings().services*/)
 {
 }
 
@@ -83,15 +70,17 @@ protocol_version_31402::protocol_version_31402(p2p& network,
 
 void protocol_version_31402::start(event_handler handler)
 {
-    static const auto mode = synchronizer_terminate::on_error;
     const auto period = network_.network_settings().channel_handshake();
 
+    const auto join_handler = synchronize(handler, 2, NAME,
+        synchronizer_terminate::on_error);
+
     // The handler is invoked in the context of the last message receipt.
-    protocol_timer::start(period, synchronize(handler, 2, NAME, mode));
+    protocol_timer::start(period, join_handler);
 
     SUBSCRIBE2(version, handle_receive_version, _1, _2);
     SUBSCRIBE2(verack, handle_receive_verack, _1, _2);
-    SEND1(version_factory(), handle_version_sent, _1);
+    SEND2(version_factory(), handle_send, _1, version::command);
 }
 
 message::version protocol_version_31402::version_factory() const
@@ -103,7 +92,7 @@ message::version protocol_version_31402::version_factory() const
     message::version version;
     version.set_value(own_version_);
     version.set_services(own_services_);
-    version.set_timestamp( time_stamp());
+    version.set_timestamp(static_cast<uint64_t>(zulu_time()));
     version.set_address_receiver(authority().to_network_address());
     version.set_address_sender(settings.self.to_network_address());
     version.set_nonce(nonce());
@@ -124,7 +113,7 @@ message::version protocol_version_31402::version_factory() const
 bool protocol_version_31402::handle_receive_version(const code& ec,
     version_const_ptr message)
 {
-    if (stopped())
+    if (stopped(ec))
         return false;
 
     if (ec)
@@ -137,12 +126,14 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
     }
 
     LOG_DEBUG(LOG_NETWORK)
-        << "Peer [" << authority() << "] user agent: " << message->user_agent();
-
-    const auto& settings = network_.network_settings();
+        << "Peer [" << authority() << "] protocol version ("
+        << message->value() << ") user agent: " << message->user_agent();
 
     // TODO: move these three checks to initialization.
     //-------------------------------------------------------------------------
+
+    const auto& settings = network_.network_settings();
+
     if (settings.protocol_minimum < version::level::minimum)
     {
         LOG_ERROR(LOG_NETWORK)
@@ -169,24 +160,37 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
         set_event(error::channel_stopped);
         return false;
     }
+
     //-------------------------------------------------------------------------
 
+    if (!sufficient_peer(message))
+    {
+        set_event(error::channel_stopped);
+        return false;
+    }
+
+    const auto version = std::min(message->value(), own_version_);
+    set_negotiated_version(version);
+    set_peer_version(message);
+
+    LOG_DEBUG(LOG_NETWORK)
+        << "Negotiated protocol version (" << version
+        << ") for [" << authority() << "]";
+
+    SEND2(verack(), handle_send, _1, verack::command);
+
+    // 1 of 2
+    set_event(error::success);
+    return false;
+}
+
+bool protocol_version_31402::sufficient_peer(version_const_ptr message)
+{
     if ((message->services() & minimum_services_) != minimum_services_)
     {
         LOG_DEBUG(LOG_NETWORK)
             << "Insufficient peer network services (" << message->services()
             << ") for [" << authority() << "]";
-
-        static const message::reject rejection
-        {
-            reject::reason_code::obsolete,
-            version::command,
-            reason_insufficient_services,
-            null_hash
-        };
-
-        SEND2(rejection, handle_send, _1, rejection.command);
-        set_event(error::channel_stopped);
         return false;
     }
 
@@ -195,38 +199,16 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
         LOG_DEBUG(LOG_NETWORK)
             << "Insufficient peer protocol version (" << message->value()
             << ") for [" << authority() << "]";
-
-        static const message::reject rejection
-        {
-            reject::reason_code::obsolete,
-            version::command,
-            reason_insufficient_version,
-            null_hash
-        };
-
-        SEND2(rejection, handle_send, _1, rejection.command);
-        set_event(error::channel_stopped);
         return false;
     }
 
-    const auto version = std::min(message->value(), own_version_);
-    set_negotiated_version(version);
-
-    LOG_DEBUG(LOG_NETWORK)
-        << "Negotiated protocol version (" << version
-        << ") for [" << authority() << "]";
-
-    SEND1(verack(), handle_verack_sent, _1);
-
-    // 1 of 2
-    set_event(error::success);
-    return false;
+    return true;
 }
 
 bool protocol_version_31402::handle_receive_verack(const code& ec,
     verack_const_ptr)
 {
-    if (stopped())
+    if (stopped(ec))
         return false;
 
     if (ec)
@@ -241,36 +223,6 @@ bool protocol_version_31402::handle_receive_verack(const code& ec,
     // 2 of 2
     set_event(error::success);
     return false;
-}
-
-void protocol_version_31402::handle_version_sent(const code& ec)
-{
-    if (stopped())
-        return;
-
-    if (ec)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failure sending version to [" << authority() << "] "
-            << ec.message();
-        set_event(ec);
-        return;
-    }
-}
-
-void protocol_version_31402::handle_verack_sent(const code& ec)
-{
-    if (stopped())
-        return;
-
-    if (ec)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failure sending verack to [" << authority() << "] "
-            << ec.message();
-        set_event(ec);
-        return;
-    }
 }
 
 } // namespace network

@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,13 +14,15 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/sessions/session_batch.hpp>
 
+#include <cstddef>
 #include <bitcoin/bitcoin.hpp>
+#include <bitcoin/network/connector.hpp>
 #include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/utility/connector.hpp>
+#include <bitcoin/network/sessions/session.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -30,6 +31,7 @@ namespace network {
 #define NAME "session_batch"
 
 using namespace bc::config;
+using namespace bc::message;
 using namespace std::placeholders;
 
 session_batch::session_batch(p2p& network, bool notify_on_connect)
@@ -42,22 +44,16 @@ session_batch::session_batch(p2p& network, bool notify_on_connect)
 // ----------------------------------------------------------------------------
 
 // protected:
-void session_batch::connect(connector::ptr connect, channel_handler handler)
+void session_batch::connect(channel_handler handler)
 {
-    static const auto mode = synchronizer_terminate::on_success;
+    const auto join_handler = synchronize(handler, batch_size_, NAME "_join",
+        synchronizer_terminate::on_success);
 
-    const channel_handler complete_handler =
-        BIND3(handle_connect, _1, _2, handler);
-
-    const channel_handler join_handler =
-        synchronize(complete_handler, batch_size_, NAME "_join", mode);
-
-    for (uint32_t host = 0; host < batch_size_; ++host)
-        new_connect(connect, join_handler);
+    for (size_t host = 0; host < batch_size_; ++host)
+        new_connect(join_handler);
 }
 
-void session_batch::new_connect(connector::ptr connect,
-    channel_handler handler)
+void session_batch::new_connect(channel_handler handler)
 {
     if (stopped())
     {
@@ -67,13 +63,15 @@ void session_batch::new_connect(connector::ptr connect,
         return;
     }
 
-    fetch_address(BIND4(start_connect, _1, _2, connect, handler));
+    network_address address;
+    const auto ec = fetch_address(address);
+    start_connect(ec, address, handler);
 }
 
 void session_batch::start_connect(const code& ec, const authority& host,
-    connector::ptr connect, channel_handler handler)
+    channel_handler handler)
 {
-    if (stopped() || ec == error::service_stopped)
+    if (stopped(ec))
     {
         LOG_DEBUG(LOG_NETWORK)
             << "Batch session stopped while starting.";
@@ -102,21 +100,21 @@ void session_batch::start_connect(const code& ec, const authority& host,
     LOG_DEBUG(LOG_NETWORK)
         << "Connecting to [" << host << "]";
 
+    const auto connector = create_connector();
+    pend(connector);
+
     // CONNECT
-    connect->connect(host, handler);
+    connector->connect(host,
+        BIND4(handle_connect, _1, _2, connector, handler));
 }
 
-// It is common for no connections, one connection or multiple connections to
-// succeed, but only zero or one will reach this point. Other connections that
-// succeed fall out of scope causing the socket to close on destruct.
 void session_batch::handle_connect(const code& ec, channel::ptr channel,
-    channel_handler handler)
+    connector::ptr connector, channel_handler handler)
 {
+    unpend(connector);
+
     if (ec)
     {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failed to connect after (" << batch_size_
-            << ") concurrent attempts: " << ec.message();
         handler(ec, nullptr);
         return;
     }

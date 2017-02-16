@@ -15,21 +15,22 @@
  */
 
 #include <bitcoin/bitcoin.hpp>
+#include <bitcoin/network/acceptor.hpp>
 #include <bitcoin/network/channel.hpp>
+#include <bitcoin/network/connector.hpp>
 #include <bitcoin/network/define.hpp>
+#include <bitcoin/network/hosts.hpp>
+#include <bitcoin/network/message_subscriber.hpp>
 #include <bitcoin/network/p2p.hpp>
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
 #include <bitcoin/network/version.hpp>
-#include <bitcoin/network/collections/connections.hpp>
-#include <bitcoin/network/collections/hosts.hpp>
-#include <bitcoin/network/collections/pending_channels.hpp>
-#include <bitcoin/network/collections/pending_sockets.hpp>
 #include <bitcoin/network/protocols/protocol.hpp>
 #include <bitcoin/network/protocols/protocol_address_31402.hpp>
 #include <bitcoin/network/protocols/protocol_events.hpp>
 #include <bitcoin/network/protocols/protocol_ping_31402.hpp>
 #include <bitcoin/network/protocols/protocol_ping_60001.hpp>
+#include <bitcoin/network/protocols/protocol_reject_70002.hpp>
 #include <bitcoin/network/protocols/protocol_seed_31402.hpp>
 #include <bitcoin/network/protocols/protocol_timer.hpp>
 #include <bitcoin/network/protocols/protocol_version_31402.hpp>
@@ -40,11 +41,5 @@
 #include <bitcoin/network/sessions/session_manual.hpp>
 #include <bitcoin/network/sessions/session_outbound.hpp>
 #include <bitcoin/network/sessions/session_seed.hpp>
-#include <bitcoin/network/utility/acceptor.hpp>
-#include <bitcoin/network/utility/connector.hpp>
-#include <bitcoin/network/utility/const_buffer.hpp>
-#include <bitcoin/network/utility/locked_socket.hpp>
-#include <bitcoin/network/utility/message_subscriber.hpp>
-#include <bitcoin/network/utility/socket.hpp>
 
 #endif

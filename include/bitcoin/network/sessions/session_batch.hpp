@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,17 +14,17 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_NETWORK_SESSION_BATCH_HPP
 #define LIBBITCOIN_NETWORK_SESSION_BATCH_HPP
 
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/channel.hpp>
+#include <bitcoin/network/connector.hpp>
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/sessions/session.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/utility/connector.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -42,15 +41,15 @@ protected:
     session_batch(p2p& network, bool notify_on_connect);
 
     /// Create a channel from the configured number of concurrent attempts.
-    virtual void connect(connector::ptr connect, channel_handler handler);
+    virtual void connect(channel_handler handler);
 
 private:
     // Connect sequence
-    void new_connect(connector::ptr connect, channel_handler handler);
+    void new_connect(channel_handler handler);
     void start_connect(const code& ec, const authority& host,
-        connector::ptr connect, channel_handler handler);
-    void handle_connect(const code& ec, channel::ptr channel,
         channel_handler handler);
+    void handle_connect(const code& ec, channel::ptr channel,
+        connector::ptr connector, channel_handler handler);
 
     const size_t batch_size_;
 };

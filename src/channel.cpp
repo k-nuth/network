@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/channel.hpp>
 
@@ -28,7 +27,6 @@
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/utility/socket.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -44,7 +42,7 @@ static deadline::ptr alarm(threadpool& pool, const asio::duration& duration)
 
 channel::channel(threadpool& pool, socket::ptr socket,
     const settings& settings)
-  : proxy(pool, socket, settings.identifier, settings.protocol_maximum),
+  : proxy(pool, socket, settings),
     notify_(false),
     nonce_(0),
     expiration_(alarm(pool, settings.channel_expiration())),
@@ -77,17 +75,17 @@ void channel::do_start(const code& ec, result_handler handler)
 
 bool channel::notify() const
 {
-    return notify_.load();
+    return notify_;
 }
 
 void channel::set_notify(bool value)
 {
-    notify_.store(value);
+    notify_ = value;
 }
 
 uint64_t channel::nonce() const
 {
-    return nonce_.load();
+    return nonce_;
 }
 
 void channel::set_nonce(uint64_t value)
@@ -117,9 +115,15 @@ void channel::handle_stopping()
     inactivity_->stop();
 }
 
-void channel::handle_activity()
+void channel::signal_activity()
 {
     start_inactivity();
+}
+
+bool channel::stopped(const code& ec) const
+{
+    return proxy::stopped() || ec == error::channel_stopped ||
+        ec == error::service_stopped;
 }
 
 // Timers (these are inherent races, requiring stranding by stop only).
@@ -127,7 +131,7 @@ void channel::handle_activity()
 
 void channel::start_expiration()
 {
-    if (stopped())
+    if (proxy::stopped())
         return;
 
     expiration_->start(
@@ -137,7 +141,7 @@ void channel::start_expiration()
 
 void channel::handle_expiration(const code& ec)
 {
-    if (stopped())
+    if (stopped(ec))
         return;
 
     LOG_DEBUG(LOG_NETWORK)
@@ -148,7 +152,7 @@ void channel::handle_expiration(const code& ec)
 
 void channel::start_inactivity()
 {
-    if (stopped())
+    if (proxy::stopped())
         return;
 
     inactivity_->start(
@@ -158,7 +162,7 @@ void channel::start_inactivity()
 
 void channel::handle_inactivity(const code& ec)
 {
-    if (stopped())
+    if (stopped(ec))
         return;
 
     LOG_DEBUG(LOG_NETWORK)

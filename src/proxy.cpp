@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,42 +14,50 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/network/proxy.hpp>
 
 #define BOOST_BIND_NO_PLACEHOLDERS
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <functional>
 #include <memory>
+#include <utility>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/define.hpp>
-#include <bitcoin/network/utility/const_buffer.hpp>
-#include <bitcoin/network/utility/socket.hpp>
+#include <bitcoin/network/settings.hpp>
 
 namespace libbitcoin {
 namespace network {
 
 #define NAME "proxy"
 
-using namespace message;
 using namespace std::placeholders;
+using namespace boost::asio;
+using namespace bc::message;
+
+// Dump up to 1k of payload as hex in order to diagnore failure.
+static const size_t invalid_payload_dump_size = 1024;
 
 // payload_buffer_ sizing assumes monotonically increasing size by version.
-proxy::proxy(threadpool& pool, socket::ptr socket, uint32_t protocol_magic,
-    uint32_t protocol_maximum)
-  : protocol_magic_(protocol_magic),
-    authority_(socket->get_authority()),
+// The socket owns the single thread on which this channel reads and writes.
+proxy::proxy(threadpool& pool, socket::ptr socket, const settings& settings)
+  : authority_(socket->authority()),
     heading_buffer_(heading::maximum_size()),
-    payload_buffer_(heading::maximum_payload_size(protocol_maximum)),
+    payload_buffer_(heading::maximum_payload_size(settings.protocol_maximum)),
     socket_(socket),
     stopped_(true),
-    version_(protocol_maximum),
+    protocol_magic_(settings.identifier),
+    validate_checksum_(settings.validate_checksum),
+    verbose_(settings.verbose),
+    version_(settings.protocol_maximum),
     message_subscriber_(pool),
-    stop_subscriber_(std::make_shared<stop_subscriber>(pool, NAME))
+    stop_subscriber_(std::make_shared<stop_subscriber>(pool, NAME "_sub")),
+    dispatch_(pool, NAME "_dispatch")
 {
 }
 
@@ -115,17 +122,9 @@ void proxy::read_heading()
     if (stopped())
         return;
 
-    // The heading buffer is protected by ordering, not the critial section.
-
-    // Critical Section (external)
-    ///////////////////////////////////////////////////////////////////////////
-    const auto socket = socket_->get_socket();
-
-    using namespace boost::asio;
-    async_read(socket->get(), buffer(heading_buffer_, heading_buffer_.size()),
+    async_read(socket_->get(), buffer(heading_buffer_),
         std::bind(&proxy::handle_read_heading,
             shared_from_this(), _1, _2));
-    ///////////////////////////////////////////////////////////////////////////
 }
 
 void proxy::handle_read_heading(const boost_code& ec, size_t)
@@ -133,7 +132,6 @@ void proxy::handle_read_heading(const boost_code& ec, size_t)
     if (stopped())
         return;
 
-    // TODO: verify client quick disconnect.
     if (ec)
     {
         LOG_DEBUG(LOG_NETWORK)
@@ -173,7 +171,6 @@ void proxy::handle_read_heading(const boost_code& ec, size_t)
     }
 
     read_payload(head);
-    handle_activity();
 }
 
 void proxy::read_payload(const heading& head)
@@ -184,17 +181,9 @@ void proxy::read_payload(const heading& head)
     // This does not cause a reallocation.
     payload_buffer_.resize(head.payload_size());
 
-    // The payload buffer is protected by ordering, not the critial section.
-
-    // Critical Section (external)
-    ///////////////////////////////////////////////////////////////////////////
-    const auto socket = socket_->get_socket();
-
-    using namespace boost::asio;
-    async_read(socket->get(), buffer(payload_buffer_, head.payload_size()),
+    async_read(socket_->get(), buffer(payload_buffer_),
         std::bind(&proxy::handle_read_payload,
             shared_from_this(), _1, _2, head));
-    ///////////////////////////////////////////////////////////////////////////
 }
 
 void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
@@ -203,7 +192,6 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
     if (stopped())
         return;
 
-    // TODO: verify client quick disconnect.
     if (ec)
     {
         LOG_DEBUG(LOG_NETWORK)
@@ -213,7 +201,9 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
         return;
     }
 
-    if (head.checksum() != bitcoin_checksum(payload_buffer_))
+    // This is a pointless test but we allow it as an option for completeness.
+    if (validate_checksum_ &&
+        head.checksum() != bitcoin_checksum(payload_buffer_))
     {
         LOG_WARNING(LOG_NETWORK)
             << "Invalid " << head.command() << " payload from [" << authority()
@@ -221,22 +211,26 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
         stop(error::bad_stream);
         return;
     }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    // TODO: we aren't getting a stream benefit if we read the full payload
-    // before parsing the message. Should just make this a message parse.
-    ///////////////////////////////////////////////////////////////////////////
 
     // Notify subscribers of the new message.
     payload_source source(payload_buffer_);
     payload_stream istream(source);
+
+    // Failures are not forwarded to subscribers and channel is stopped below.
     const auto code = message_subscriber_.load(head.type(), version_, istream);
     const auto consumed = istream.peek() == std::istream::traits_type::eof();
 
-    // For finding agents of bad versions.
-    ////const auto agent =
-    ////    ((!code && consumed) || head.command != version::command) ? "" : " " +
-    ////        std::string(payload_buffer_.begin(), payload_buffer_.end());
+    if (verbose_ && code)
+    {
+        const auto size = std::min(payload_size, invalid_payload_dump_size);
+        const auto begin = payload_buffer_.begin();
+
+        LOG_DEBUG(LOG_NETWORK)
+            << "Invalid payload from [" << authority() << "] "
+            << encode_base16(data_chunk{ begin, begin + size });
+        stop(code);
+        return;
+    }
 
     if (code)
     {
@@ -256,52 +250,57 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
         return;
     }
 
-    LOG_DEBUG(LOG_NETWORK)
-        << "Valid " << head.command() << " payload from [" << authority()
-        << "] (" << payload_size << " bytes)";
+    if (verbose_)
+    {
+        LOG_DEBUG(LOG_NETWORK)
+            << "Valid " << head.command() << " payload from [" << authority()
+            << "] (" << payload_size << " bytes)";
+    }
 
-    handle_activity();
+    signal_activity();
     read_heading();
 }
 
 // Message send sequence.
 // ----------------------------------------------------------------------------
 
-void proxy::do_send(const std::string& command, const_buffer buffer,
+void proxy::do_send(command_ptr command, payload_ptr payload,
     result_handler handler)
 {
+    async_write(socket_->get(), buffer(*payload),
+        std::bind(&proxy::handle_send,
+            shared_from_this(), _1, _2, command, payload, handler));
+}
+
+void proxy::handle_send(const boost_code& ec, size_t, command_ptr command,
+    payload_ptr payload, result_handler handler)
+{
+    dispatch_.unlock();
+    const auto size = payload->size();
+    const auto error = code(error::boost_to_error_code(ec));
+
     if (stopped())
     {
-        handler(error::channel_stopped);
+        handler(error);
         return;
     }
 
-    LOG_DEBUG(LOG_NETWORK)
-        << "Sending " << command << " to [" << authority() << "] ("
-        << buffer.size() << " bytes)";
-
-    // Critical Section (protect socket)
-    ///////////////////////////////////////////////////////////////////////////
-    // The socket is locked until async_write returns.
-    const auto socket = socket_->get_socket();
-
-    // The shared buffer is kept in scope until the handler is invoked.
-    using namespace boost::asio;
-    async_write(socket->get(), buffer,
-        std::bind(&proxy::handle_send,
-            shared_from_this(), _1, buffer, handler));
-    ///////////////////////////////////////////////////////////////////////////
-}
-
-void proxy::handle_send(const boost_code& ec, const_buffer buffer,
-    result_handler handler)
-{
-    const auto error = code(error::boost_to_error_code(ec));
-
     if (error)
+    {
         LOG_DEBUG(LOG_NETWORK)
-            << "Failure sending " << buffer.size() << " byte message to ["
-            << authority() << "] " << error.message();
+            << "Failure sending " << *command << " payload to [" << authority()
+            << "] (" << size << " bytes) " << error.message();
+        stop(error);
+        handler(error);
+        return;
+    }
+
+    if (verbose_)
+    {
+        LOG_DEBUG(LOG_NETWORK)
+            << "Sent " << *command << " payload to [" << authority() << "] ("
+            << size << " bytes)";
+    }
 
     handler(error);
 }
@@ -330,8 +329,8 @@ void proxy::stop(const code& ec)
     // Give channel opportunity to terminate timers.
     handle_stopping();
 
-    // The socket_ is internally guarded against concurrent use.
-    socket_->close();
+    // Signal socket to stop reading and accepting new work.
+    socket_->stop();
 }
 
 void proxy::stop(const boost_code& ec)

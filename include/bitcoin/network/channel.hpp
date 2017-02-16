@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_NETWORK_CHANNEL_HPP
 #define LIBBITCOIN_NETWORK_CHANNEL_HPP
@@ -28,11 +27,9 @@
 #include <string>
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/define.hpp>
+#include <bitcoin/network/message_subscriber.hpp>
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/utility/const_buffer.hpp>
-#include <bitcoin/network/utility/message_subscriber.hpp>
-#include <bitcoin/network/utility/socket.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -61,8 +58,9 @@ public:
     virtual void set_peer_version(version_const_ptr value);
 
 protected:
-    virtual void handle_activity() override;
+    virtual void signal_activity() override;
     virtual void handle_stopping() override;
+    virtual bool stopped(const code& ec) const;
 
 private:
     void do_start(const code& ec, result_handler handler);

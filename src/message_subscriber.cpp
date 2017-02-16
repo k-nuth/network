@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,9 +14,9 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <bitcoin/network/utility/message_subscriber.hpp>
+#include <bitcoin/network/message_subscriber.hpp>
 
 #include <istream>
 #include <memory>
@@ -29,7 +28,7 @@
         pool, #value "_sub"))
 
 #define RELAY_CODE(code, value) \
-    value##_subscriber_->relay(code, nullptr)
+    value##_subscriber_->relay(code, {})
 
 #define CASE_HANDLE_MESSAGE(stream, version, value) \
     case message_type::value: \
@@ -53,7 +52,7 @@ using namespace message;
 message_subscriber::message_subscriber(threadpool& pool)
   : INITIALIZE_SUBSCRIBER(pool, address),
     INITIALIZE_SUBSCRIBER(pool, alert),
-    INITIALIZE_SUBSCRIBER(pool, block_message),
+    INITIALIZE_SUBSCRIBER(pool, block),
     INITIALIZE_SUBSCRIBER(pool, block_transactions),
     INITIALIZE_SUBSCRIBER(pool, compact_block),
     INITIALIZE_SUBSCRIBER(pool, fee_filter),
@@ -73,9 +72,9 @@ message_subscriber::message_subscriber(threadpool& pool)
     INITIALIZE_SUBSCRIBER(pool, ping),
     INITIALIZE_SUBSCRIBER(pool, pong),
     INITIALIZE_SUBSCRIBER(pool, reject),
+    INITIALIZE_SUBSCRIBER(pool, send_compact),
     INITIALIZE_SUBSCRIBER(pool, send_headers),
-    INITIALIZE_SUBSCRIBER(pool, send_compact_blocks),
-    INITIALIZE_SUBSCRIBER(pool, transaction_message),
+    INITIALIZE_SUBSCRIBER(pool, transaction),
     INITIALIZE_SUBSCRIBER(pool, verack),
     INITIALIZE_SUBSCRIBER(pool, version)
 {
@@ -85,7 +84,7 @@ void message_subscriber::broadcast(const code& ec)
 {
     RELAY_CODE(ec, address);
     RELAY_CODE(ec, alert);
-    RELAY_CODE(ec, block_message);
+    RELAY_CODE(ec, block);
     RELAY_CODE(ec, block_transactions);
     RELAY_CODE(ec, compact_block);
     RELAY_CODE(ec, fee_filter);
@@ -105,9 +104,9 @@ void message_subscriber::broadcast(const code& ec)
     RELAY_CODE(ec, ping);
     RELAY_CODE(ec, pong);
     RELAY_CODE(ec, reject);
+    RELAY_CODE(ec, send_compact);
     RELAY_CODE(ec, send_headers);
-    RELAY_CODE(ec, send_compact_blocks);
-    RELAY_CODE(ec, transaction_message);
+    RELAY_CODE(ec, transaction);
     RELAY_CODE(ec, verack);
     RELAY_CODE(ec, version);
 }
@@ -119,7 +118,7 @@ code message_subscriber::load(message_type type, uint32_t version,
     {
         CASE_RELAY_MESSAGE(stream, version, address);
         CASE_RELAY_MESSAGE(stream, version, alert);
-        CASE_HANDLE_MESSAGE(stream, version, block_message);
+        CASE_HANDLE_MESSAGE(stream, version, block);
         CASE_RELAY_MESSAGE(stream, version, block_transactions);
         CASE_RELAY_MESSAGE(stream, version, compact_block);
         CASE_RELAY_MESSAGE(stream, version, fee_filter);
@@ -139,9 +138,9 @@ code message_subscriber::load(message_type type, uint32_t version,
         CASE_RELAY_MESSAGE(stream, version, ping);
         CASE_RELAY_MESSAGE(stream, version, pong);
         CASE_RELAY_MESSAGE(stream, version, reject);
+        CASE_RELAY_MESSAGE(stream, version, send_compact);
         CASE_RELAY_MESSAGE(stream, version, send_headers);
-        CASE_RELAY_MESSAGE(stream, version, send_compact_blocks);
-        CASE_RELAY_MESSAGE(stream, version, transaction_message);
+        CASE_RELAY_MESSAGE(stream, version, transaction);
         CASE_RELAY_MESSAGE(stream, version, verack);
         CASE_RELAY_MESSAGE(stream, version, version);
         case message_type::unknown:
@@ -154,7 +153,7 @@ void message_subscriber::start()
 {
     START_SUBSCRIBER(address);
     START_SUBSCRIBER(alert);
-    START_SUBSCRIBER(block_message);
+    START_SUBSCRIBER(block);
     START_SUBSCRIBER(block_transactions);
     START_SUBSCRIBER(compact_block);
     START_SUBSCRIBER(fee_filter);
@@ -174,9 +173,9 @@ void message_subscriber::start()
     START_SUBSCRIBER(ping);
     START_SUBSCRIBER(pong);
     START_SUBSCRIBER(reject);
+    START_SUBSCRIBER(send_compact);
     START_SUBSCRIBER(send_headers);
-    START_SUBSCRIBER(send_compact_blocks);
-    START_SUBSCRIBER(transaction_message);
+    START_SUBSCRIBER(transaction);
     START_SUBSCRIBER(verack);
     START_SUBSCRIBER(version);
 }
@@ -185,7 +184,7 @@ void message_subscriber::stop()
 {
     STOP_SUBSCRIBER(address);
     STOP_SUBSCRIBER(alert);
-    STOP_SUBSCRIBER(block_message);
+    STOP_SUBSCRIBER(block);
     STOP_SUBSCRIBER(block_transactions);
     STOP_SUBSCRIBER(compact_block);
     STOP_SUBSCRIBER(fee_filter);
@@ -205,9 +204,9 @@ void message_subscriber::stop()
     STOP_SUBSCRIBER(ping);
     STOP_SUBSCRIBER(pong);
     STOP_SUBSCRIBER(reject);
+    STOP_SUBSCRIBER(send_compact);
     STOP_SUBSCRIBER(send_headers);
-    STOP_SUBSCRIBER(send_compact_blocks);
-    STOP_SUBSCRIBER(transaction_message);
+    STOP_SUBSCRIBER(transaction);
     STOP_SUBSCRIBER(verack);
     STOP_SUBSCRIBER(version);
 }

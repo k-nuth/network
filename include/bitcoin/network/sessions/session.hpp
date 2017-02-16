@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_NETWORK_SESSION_HPP
 #define LIBBITCOIN_NETWORK_SESSION_HPP
@@ -25,34 +24,15 @@
 #include <functional>
 #include <memory>
 #include <bitcoin/bitcoin.hpp>
+#include <bitcoin/network/acceptor.hpp>
 #include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/collections/connections.hpp>
+#include <bitcoin/network/connector.hpp>
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/utility/acceptor.hpp>
-#include <bitcoin/network/utility/connector.hpp>
 
 namespace libbitcoin {
 namespace network {
-
-// Base session type.
-
-#define BASE_ARGS(handler, args) \
-    std::forward<Handler>(handler), \
-    shared_from_this(), \
-    std::forward<Args>(args)...
-#define BOUND_BASE(handler, args) \
-    std::bind(BASE_ARGS(handler, args))
-
-#define BASE_ARGS_TYPE(handler, args) \
-    std::forward<Handler>(handler), \
-    std::shared_ptr<session>(), \
-    std::forward<Args>(args)...
-#define BOUND_BASE_TYPE(handler, args) \
-    std::bind(BASE_ARGS_TYPE(handler, args))
-
-// Derived session types.
 
 #define SESSION_ARGS(handler, args) \
     std::forward<Handler>(handler), \
@@ -72,10 +52,11 @@ class p2p;
 
 /// Base class for maintaining the lifetime of a channel set, thread safe.
 class BCT_API session
-  : public enable_shared_from_base<session>
+  : public enable_shared_from_base<session>, noncopyable
 {
 public:
     typedef config::authority authority;
+    typedef message::network_address address;
     typedef std::function<void(bool)> truth_handler;
     typedef std::function<void(size_t)> count_handler;
     typedef std::function<void(const code&)> result_handler;
@@ -97,9 +78,8 @@ protected:
     /// Validate session stopped.
     ~session();
 
-    /// This class is not copyable.
-    session(const session&) = delete;
-    void operator=(const session&) = delete;
+    /// Template helpers.
+    // ------------------------------------------------------------------------
 
     /// Attach a protocol to a channel, caller must start the channel.
     template <class Protocol, typename... Args>
@@ -117,13 +97,6 @@ protected:
         return BOUND_SESSION(handler, args);
     }
 
-    /////// Dispatch a concurrent method in the derived class.
-    ////template <class Session, typename Handler, typename... Args>
-    ////void concurrent(Handler&& handler, Args&&... args) const
-    ////{
-    ////    return dispatch_.concurrent(SESSION_ARGS(handler, args));
-    ////}
-
     /// Bind a concurrent delegate to a method in the derived class.
     template <class Session, typename Handler, typename... Args>
     auto concurrent_delegate(Handler&& handler, Args&&... args) ->
@@ -133,27 +106,41 @@ protected:
     }
 
     /// Properties.
-    virtual void address_count(count_handler handler) const;
-    virtual void fetch_address(host_handler handler) const;
-    virtual void connection_count(count_handler handler) const;
+    // ------------------------------------------------------------------------
+
+    virtual size_t address_count() const;
+    virtual size_t connection_count() const;
+    virtual code fetch_address(address& out_address) const;
     virtual bool blacklisted(const authority& authority) const;
     virtual bool stopped() const;
+    virtual bool stopped(const code& ec) const;
 
     /// Socket creators.
+    // ------------------------------------------------------------------------
+
     virtual acceptor::ptr create_acceptor();
     virtual connector::ptr create_connector();
 
-    // Pending connections collection.
+    // Pending connect.
     // ------------------------------------------------------------------------
 
     /// Store a pending connection reference.
-    virtual void pend(channel::ptr channel, result_handler handler);
+    virtual code pend(connector::ptr connector);
 
     /// Free a pending connection reference.
-    virtual void unpend(channel::ptr channel, result_handler handler);
+    virtual void unpend(connector::ptr connector);
+
+    // Pending handshake.
+    // ------------------------------------------------------------------------
+
+    /// Store a pending connection reference.
+    virtual code pend(channel::ptr channel);
+
+    /// Free a pending connection reference.
+    virtual void unpend(channel::ptr channel);
 
     /// Test for a pending connection reference.
-    virtual void pending(uint64_t version_nonce, truth_handler handler) const;
+    virtual bool pending(uint64_t version_nonce) const;
 
     // Registration sequence.
     //-------------------------------------------------------------------------
@@ -162,7 +149,7 @@ protected:
     virtual void register_channel(channel::ptr channel,
         result_handler handle_started, result_handler handle_stopped);
 
-    /// Start the channel, override to perform pending or loopback check.
+    /// Start the channel, override to perform pending registration.
     virtual void start_channel(channel::ptr channel,
         result_handler handle_started);
 
@@ -170,33 +157,26 @@ protected:
     virtual void attach_handshake_protocols(channel::ptr channel,
         result_handler handle_started);
 
+    /// The handshake is complete, override to perform loopback check.
+    virtual void handshake_complete(channel::ptr channel,
+        result_handler handle_started);
+
     // TODO: create session_timer base class.
     threadpool& pool_;
     const settings& settings_;
 
 private:
-    /// Bind a method in the base class.
-    template <typename Handler, typename... Args>
-    auto base_bind(Handler&& handler, Args&&... args) ->
-        decltype(BOUND_BASE_TYPE(handler, args))
-    {
-        return BOUND_BASE(handler, args);
-    }
+    typedef bc::pending<connector> connectors;
 
-    void do_stop_acceptor(const code& ec, acceptor::ptr connect);
-    void do_stop_connector(const code& ec, connector::ptr connect);
-
-    void do_stop_session(const code&);
-    void do_remove(const code& ec, channel::ptr channel,
-        result_handler handle_stopped);
-
+    void handle_stop(const code& ec);
     void handle_starting(const code& ec, channel::ptr channel,
         result_handler handle_started);
     void handle_handshake(const code& ec, channel::ptr channel,
         result_handler handle_started);
     void handle_start(const code& ec, channel::ptr channel,
         result_handler handle_started, result_handler handle_stopped);
-    void handle_remove(const code& ec, channel::ptr channel);
+    void handle_remove(const code& ec, channel::ptr channel,
+        result_handler handle_stopped);
 
     // These are thread safe.
     std::atomic<bool> stopped_;
@@ -204,15 +184,6 @@ private:
     p2p& network_;
     mutable dispatcher dispatch_;
 };
-
-// Base session type.
-
-#undef BASE_ARGS
-#undef BOUND_BASE
-#undef BASE_ARGS_TYPE
-#undef BOUND_BASE_TYPE
-
-// Derived session types.
 
 #undef SESSION_ARGS
 #undef BOUND_SESSION
@@ -231,8 +202,10 @@ private:
     bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5)
 #define BIND6(method, p1, p2, p3, p4, p5, p6) \
     bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6)
+#define BIND7(method, p1, p2, p3, p4, p5, p6, p7) \
+    bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6, p7)
 
-#define CONCURRENT2(method, p1, p2) \
+#define CONCURRENT_DELEGATE2(method, p1, p2) \
     concurrent_delegate<CLASS>(&CLASS::method, p1, p2)
 
 

@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_NETWORK_PROTOCOL_EVENTS_HPP
 #define LIBBITCOIN_NETWORK_PROTOCOL_EVENTS_HPP
@@ -49,6 +48,11 @@ protected:
         const std::string& name);
 
     /**
+     * Start the protocol with no event handler.
+     */
+    virtual void start();
+
+    /**
      * Start the protocol.
      * The event handler may be invoked one or more times.
      * @param[in]  handler  The handler to call at each completion event.
@@ -66,8 +70,10 @@ protected:
      */
     virtual bool stopped() const;
 
-protected:
-    void handle_send(const code& ec, const std::string& command);
+    /**
+     * Determine if the code is a stop code or the handler has been cleared.
+     */
+    virtual bool stopped(const code& ec) const;
 
 private:
     void handle_started(completion_handler handler);

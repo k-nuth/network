@@ -1,13 +1,12 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
  * This file is part of libbitcoin.
  *
- * libbitcoin is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,9 +14,9 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <bitcoin/network/collections/hosts.hpp>
+#include <bitcoin/network/hosts.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -29,9 +28,11 @@
 namespace libbitcoin {
 namespace network {
 
+using namespace bc::config;
+
 #define NAME "hosts"
 
-hosts::hosts(threadpool& pool, const settings& settings)
+hosts::hosts(const settings& settings)
   : buffer_(std::max(settings.host_pool_capacity, 1u)),
     stopped_(true),
     file_path_(settings.hosts_file),
@@ -52,8 +53,8 @@ hosts::iterator hosts::find(const address& host)
 
 size_t hosts::count() const
 {
-    ///////////////////////////////////////////////////////////////////////////
     // Critical Section
+    ///////////////////////////////////////////////////////////////////////////
     shared_lock lock(mutex_);
 
     return buffer_.size();
@@ -62,8 +63,11 @@ size_t hosts::count() const
 
 code hosts::fetch(address& out) const
 {
-    ///////////////////////////////////////////////////////////////////////////
+    if (disabled_)
+        return error::not_found;
+
     // Critical Section
+    ///////////////////////////////////////////////////////////////////////////
     shared_lock lock(mutex_);
 
     if (stopped_)
@@ -86,8 +90,8 @@ code hosts::start()
     if (disabled_)
         return error::success;
 
-    ///////////////////////////////////////////////////////////////////////////
     // Critical Section
+    ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
     if (!stopped_)
@@ -135,8 +139,8 @@ code hosts::stop()
     if (disabled_)
         return error::success;
 
-    ///////////////////////////////////////////////////////////////////////////
     // Critical Section
+    ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
     if (stopped_)
@@ -175,8 +179,11 @@ code hosts::stop()
 
 code hosts::remove(const address& host)
 {
-    ///////////////////////////////////////////////////////////////////////////
+    if (disabled_)
+        return error::not_found;
+
     // Critical Section
+    ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
     if (stopped_)
@@ -207,17 +214,20 @@ code hosts::remove(const address& host)
 
 code hosts::store(const address& host)
 {
+    if (disabled_)
+        return error::success;
+
     if (!host.is_valid())
     {
+        // Do not treat invalid address as an error, just log it.
         LOG_DEBUG(LOG_NETWORK)
-            << "Invalid host address from peer";
+            << "Invalid host address from peer.";
 
-        // We don't treat invalid address as an error, just log it.
         return error::success;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     // Critical Section
+    ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
     if (stopped_)
@@ -241,31 +251,77 @@ code hosts::store(const address& host)
     mutex_.unlock_upgrade();
     ///////////////////////////////////////////////////////////////////////////
 
-    LOG_DEBUG(LOG_NETWORK)
-        << "Redundant host address from peer";
+    ////// We don't treat redundant address as an error, just log it.
+    ////LOG_DEBUG(LOG_NETWORK)
+    ////    << "Redundant host address [" << authority(host) << "] from peer.";
 
-    // We don't treat redundant address as an error, just log it.
     return error::success;
 }
 
-// The handler is invoked once all calls to do_store are completed.
 void hosts::store(const address::list& hosts, result_handler handler)
 {
-    if (stopped_)
-        return;
-
-    code last_error(error::success);
-
-    const auto storer = [this, &last_error](const address& host)
+    if (disabled_ || hosts.empty())
     {
-        const auto result = store(host);
+        handler(error::success);
+        return;
+    }
 
-        if (result)
-            last_error = result;
-    };
+    // Critical Section
+    ///////////////////////////////////////////////////////////////////////////
+    mutex_.lock_upgrade();
 
-    std::for_each(hosts.begin(), hosts.end(), storer);
-    handler(last_error);
+    if (stopped_)
+    {
+        mutex_.unlock_upgrade();
+        //---------------------------------------------------------------------
+        handler(error::service_stopped);
+        return;
+    }
+
+    // Accept between 1 and all of this peer's addresses up to capacity.
+    const auto capacity = buffer_.capacity();
+    const auto usable = std::min(hosts.size(), capacity);
+    const auto random = static_cast<size_t>(pseudo_random(1, usable));
+
+    // But always accept at least the amount we are short if available.
+    const auto gap = capacity - buffer_.size();
+    const auto accept = std::max(gap, random);
+
+    // Convert minimum desired to step for iteration, no less than 1.
+    const auto step = std::max(usable / accept, size_t(1));
+    size_t accepted = 0;
+
+    mutex_.unlock_upgrade_and_lock();
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    for (size_t index = 0; index < usable; index = ceiling_add(index, step))
+    {
+        const auto& host = hosts[index];
+
+        // Do not treat invalid address as an error, just log it.
+        if (!host.is_valid())
+        {
+            LOG_DEBUG(LOG_NETWORK)
+                << "Invalid host address from peer.";
+            continue;
+        }
+
+        // Do not allow duplicates in the host cache.
+        if (find(host) == buffer_.end())
+        {
+            ++accepted;
+            buffer_.push_back(host);
+        }
+    }
+
+    mutex_.unlock();
+    ///////////////////////////////////////////////////////////////////////////
+
+    LOG_DEBUG(LOG_NETWORK)
+        << "Accepted (" << accepted << " of " << hosts.size()
+        << ") host addresses from peer.";
+
+    handler(error::success);
 }
 
 } // namespace network
