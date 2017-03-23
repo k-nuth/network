@@ -99,11 +99,11 @@ settings::settings(config::settings context)
         case config::settings::testnet:
         {
 #ifdef LITECOIN
-            identifier = 0xdcb7c1fc;
-            inbound_port = 19333;
+            identifier = 4056470269;
+            inbound_port = 19335;
             seeds.reserve(2);
-            seeds.push_back({ "testnet-seed.litecointools.com", 19333 });
-            seeds.push_back({ "seed-b.litecoin.loshan.co.uk", 19333 });
+            seeds.push_back({ "testnet-seed.litecointools.com", 19335 });
+            seeds.push_back({ "seed-b.litecoin.loshan.co.uk", 19335 });
 #else
             identifier = 118034699;
             inbound_port = 18333;
