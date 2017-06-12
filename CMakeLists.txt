@@ -75,6 +75,14 @@ endfunction()
 
 # Warn on all stuff.
 #------------------------------------------------------------------------------
+if (MINGW)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+endif()
+
+
+# Warn on all stuff.
+#------------------------------------------------------------------------------
 if (NOT MSVC)
   _add_c_compile_flag(-Wall _has_all_warning_flag)
 else()
@@ -257,14 +265,19 @@ endif()
 # local: test/bitprim_network_test
 #------------------------------------------------------------------------------
 if (WITH_TESTS)
-  add_executable(bitprim_network_test
+    add_executable(bitprim_network_test
           test/main.cpp
           test/p2p.cpp)
-  target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
-  _group_sources(bitprim_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
-  _add_tests(bitprim_network_test
-          empty_tests)
+    if (MINGW)
+        target_link_libraries(bitprim_network_test PUBLIC bitprim-network wsock32)
+    else()
+        target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
+    endif()
+
+    _group_sources(bitprim_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
+
+    _add_tests(bitprim_network_test empty_tests)
 endif()
 
 # Install

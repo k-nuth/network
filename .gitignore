@@ -25,7 +25,8 @@ obj
 /configure
 /libtool
 .dirstamp
-.idea/bitprim-network.iml
-.idea/misc.xml
-.idea/modules.xml
-.idea/workspace.xml
+
+.idea/
+cmake-build-debug/
+
+CMakeSettings.json
