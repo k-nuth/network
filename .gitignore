@@ -27,5 +27,9 @@ obj
 .dirstamp
 
 .idea/
+build/
 cmake-build-debug/
 cmake-build-release/
+CMakeSettings.json
+
+
