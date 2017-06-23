@@ -174,38 +174,6 @@ if (ENABLE_SHARED)
   set(MODE SHARED)
 endif()
 
-#add_library(bitprim-network ${MODE}
-#  src/acceptor.cpp
-#  src/channel.cpp
-#  src/connections.cpp
-#  src/connector.cpp
-#  src/const_buffer.cpp
-#  src/hosts.cpp
-#  src/locked_socket.cpp
-#  src/logging.cpp
-#  src/message_subscriber.cpp
-#  src/p2p.cpp
-#  src/pending_channels.cpp
-#  src/pending_sockets.cpp
-#  src/proxy.cpp
-#  src/settings.cpp
-#  src/socket.cpp
-#  src/protocols/protocol.cpp
-#  src/protocols/protocol_address_31402.cpp
-#  src/protocols/protocol_events.cpp
-#  src/protocols/protocol_ping_31402.cpp
-#  src/protocols/protocol_ping_60001.cpp
-#  src/protocols/protocol_seed_31402.cpp
-#  src/protocols/protocol_timer.cpp
-#  src/protocols/protocol_version_31402.cpp
-#  src/protocols/protocol_version_70002.cpp
-#  src/sessions/session.cpp
-#  src/sessions/session_batch.cpp
-#  src/sessions/session_inbound.cpp
-#  src/sessions/session_manual.cpp
-#  src/sessions/session_outbound.cpp
-#  src/sessions/session_seed.cpp)
-
 add_library(bitprim-network ${MODE}
         src/protocols/protocol.cpp
         src/protocols/protocol_address_31402.cpp
@@ -233,6 +201,8 @@ add_library(bitprim-network ${MODE}
         src/p2p.cpp
         src/proxy.cpp
         src/settings.cpp)
+
+set_property(TARGET bitprim-network PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(bitprim-network PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
