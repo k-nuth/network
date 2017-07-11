@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bitprim/bitprim-network.svg?branch=master)](https://travis-ci.org/bitprim/bitprim-network)
+[![Build Status](https://travis-ci.org/bitprim/bitprim-network.svg?branch=c-api)](https://travis-ci.org/bitprim/bitprim-network)
 
 # Bitprim Network
 
