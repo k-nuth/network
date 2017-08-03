@@ -178,6 +178,10 @@ target_include_directories(bitprim-network PUBLIC
 target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC)
 
 #target_link_libraries(bitprim-network bitprim-core)
+
+message("CONAN_LIBS:")
+message(${CONAN_LIBS})
+
 target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
 
 _group_sources(bitprim-network "${CMAKE_CURRENT_LIST_DIR}")

@@ -21,10 +21,6 @@ class BitprimNetworkConan(ConanFile):
     def build(self):
         cmake = CMake(self)
         cmake.configure(source_dir=self.conanfile_directory)
-
-        print "CONAN_LIBS:"
-        print os.environ["CONAN_LIBS"]
-
         cmake.build()
 
     def imports(self):
