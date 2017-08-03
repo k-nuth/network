@@ -11,7 +11,7 @@ class BitprimNetworkConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=False"
     generators = "cmake"
-    exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "bitprim-networkConfig.cmake.in", "include/*"
+    exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "bitprim-networkConfig.cmake.in", "include/*", "test/*"
     package_files = "build/lbitprim-network.a"
     build_policy = "missing"
 
