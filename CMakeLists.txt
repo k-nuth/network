@@ -5,6 +5,10 @@ cmake_minimum_required(VERSION 3.4)
 project(bitprim-network
         VERSION 3.0.0
         LANGUAGES CXX C)
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Check for baseline language coverage in the compiler for the C++11 standard.
@@ -36,9 +40,9 @@ endif()
 if (NOT ENABLE_SHARED)
   set(Boost_USE_STATIC_LIBS ON)
 endif()
-find_package(
-        Boost 1.54.0 REQUIRED
-        COMPONENTS unit_test_framework)
+#find_package(
+#        Boost 1.54.0 REQUIRED
+#        COMPONENTS unit_test_framework)
 
 # Require bitprim-core of at least version 3.0.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
 #------------------------------------------------------------------------------
@@ -48,9 +52,9 @@ elseif (WIN32)
   set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "cmake")
 endif()
 
-if (NOT TARGET bitprim-core)
-  find_package(bitprim-core 3.0.0 REQUIRED)
-endif()
+#if (NOT TARGET bitprim-core)
+#  find_package(bitprim-core 3.0.0 REQUIRED)
+#endif()
 
 # Set flags.
 #==============================================================================
@@ -173,7 +177,8 @@ target_include_directories(bitprim-network PUBLIC
 
 target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC)
 
-target_link_libraries(bitprim-network bitprim-core)
+#target_link_libraries(bitprim-network bitprim-core)
+target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
 
 _group_sources(bitprim-network "${CMAKE_CURRENT_LIST_DIR}")
 
@@ -207,45 +212,6 @@ endif()
 install(TARGETS bitprim-network
         EXPORT bitprim-network
         ARCHIVE DESTINATION lib)
-
-#set(_bitprim_headers
-#  # include_bitcoin_HEADERS =
-#  bitcoin/network.hpp
-#  # include_bitcoin_network_HEADERS =
-#  bitcoin/network/acceptor.hpp
-#  bitcoin/network/channel.hpp
-#  bitcoin/network/connections.hpp
-#  bitcoin/network/connector.hpp
-#  bitcoin/network/const_buffer.hpp
-#  bitcoin/network/define.hpp
-#  bitcoin/network/hosts.hpp
-#  bitcoin/network/locked_socket.hpp
-#  bitcoin/network/logging.hpp
-#  bitcoin/network/message_subscriber.hpp
-#  bitcoin/network/p2p.hpp
-#  bitcoin/network/pending_channels.hpp
-#  bitcoin/network/pending_sockets.hpp
-#  bitcoin/network/proxy.hpp
-#  bitcoin/network/settings.hpp
-#  bitcoin/network/socket.hpp
-#  bitcoin/network/version.hpp
-#  # include_bitcoin_network_protocols_HEADERS =
-#  bitcoin/network/protocols/protocol.hpp
-#  bitcoin/network/protocols/protocol_address_31402.hpp
-#  bitcoin/network/protocols/protocol_events.hpp
-#  bitcoin/network/protocols/protocol_ping_31402.hpp
-#  bitcoin/network/protocols/protocol_ping_60001.hpp
-#  bitcoin/network/protocols/protocol_seed_31402.hpp
-#  bitcoin/network/protocols/protocol_timer.hpp
-#  bitcoin/network/protocols/protocol_version_31402.hpp
-#  bitcoin/network/protocols/protocol_version_70002.hpp
-#  # include_bitcoin_network_sessions_HEADERS =
-#  bitcoin/network/sessions/session.hpp
-#  bitcoin/network/sessions/session_batch.hpp
-#  bitcoin/network/sessions/session_inbound.hpp
-#  bitcoin/network/sessions/session_manual.hpp
-#  bitcoin/network/sessions/session_outbound.hpp
-#  bitcoin/network/sessions/session_seed.hpp)
 
 set(_bitprim_headers
         bitcoin/network/protocols/protocol.hpp
