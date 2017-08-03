@@ -20,7 +20,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #==============================================================================
 # Implement --with-tests and declare WITH_TESTS.
 #------------------------------------------------------------------------------
-option(WITH_TESTS "Compile with unit tests." OFF)
+option(WITH_TESTS "Compile with unit tests." ON)
 
 # Inherit --enable-shared and define BOOST_TEST_DYN_LINK.
 #------------------------------------------------------------------------------
