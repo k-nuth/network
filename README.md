@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bitprim/bitprim-network.svg?branch=c-api)](https://travis-ci.org/bitprim/bitprim-network) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/bitprim/bitprim-network?branch=c-api&svg=true)](https://ci.appveyor.com/project/hanchon/bitprim-network?branch=c-api)
+[![Build Status](https://travis-ci.org/bitprim/bitprim-network.svg?branch=conan-build)](https://travis-ci.org/bitprim/bitprim-network) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/bitprim/bitprim-network?branch=conan-build&svg=true)](https://ci.appveyor.com/project/bitprim/bitprim-network?branch=conan-build)
 
 # Bitprim Network
 
