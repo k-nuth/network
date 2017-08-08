@@ -1,8 +1,10 @@
-[![Build Status](https://travis-ci.org/bitprim/bitprim-network.svg?branch=conan-build)](https://travis-ci.org/bitprim/bitprim-network) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/bitprim/bitprim-network?branch=conan-build&svg=true)](https://ci.appveyor.com/project/bitprim/bitprim-network?branch=conan-build)
-
 # Bitprim Network
 
 *Bitcoin P2P Network Library*
+
+| **master(linux/osx)** | **conan-build-win(linux/osx)**   | **master(windows)**   | **conan-build-win(windows)** |
+|:------:|:-:|:-:|:-:|
+| [![Build Status](https://travis-ci.org/bitprim/bitprim-network.svg)](https://travis-ci.org/bitprim/bitprim-network)       | [![Build StatusB](https://travis-ci.org/bitprim/bitprim-network.svg?branch=conan-build-win)](https://travis-ci.org/bitprim/bitprim-network?branch=conan-build-win)  | [![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/bitprim/bitprim-network?svg=true)](https://ci.appveyor.com/project/bitprim/bitprim-network)  | [![Appveyor StatusB](https://ci.appveyor.com/api/projects/status/github/bitprim/bitprim-network?branch=conan-build-win&svg=true)](https://ci.appveyor.com/project/bitprim/bitprim-network?branch=conan-build-win)  |
 
 Make sure you have installed [bitprim-core](https://github.com/bitprim/bitprim-core) beforehand according to its build instructions. 
 
