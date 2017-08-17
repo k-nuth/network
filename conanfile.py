@@ -11,9 +11,8 @@ class BitprimNetworkConan(ConanFile):
     description = "Bitcoin P2P Network Library"
     settings = "os", "compiler", "build_type", "arch"
     
-    options = {"shared": [True, False]}
-    default_options = "shared=False"
-
+    # options = {"shared": [True, False]}
+    # default_options = "shared=False"
 
     options = {"shared": [True, False],
                "fPIC": [True, False],

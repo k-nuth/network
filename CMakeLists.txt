@@ -49,24 +49,28 @@ endif()
 #==============================================================================
 # Require Boost of at least version 1.56.0 and output ${boost_CPPFLAGS/LDFLAGS}.
 #------------------------------------------------------------------------------
-if (NOT ENABLE_SHARED)
-  set(Boost_USE_STATIC_LIBS ON)
-endif()
+# if (NOT ENABLE_SHARED)
+#   set(Boost_USE_STATIC_LIBS ON)
+# endif()
+
 #find_package(
 #        Boost 1.54.0 REQUIRED
 #        COMPONENTS unit_test_framework)
 
-# Require bitprim-core of at least version 3.0.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
-#------------------------------------------------------------------------------
+if (NOT USE_CONAN)
+  # Require bitprim-core of at least version 3.0.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+  #------------------------------------------------------------------------------
+  if (NOT TARGET bitprim-core)
+    find_package(bitprim-core 3.0.0 REQUIRED)
+  endif()
+endif()
+
+
 if (UNIX)
   set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/usr/local/lib/cmake")
 elseif (WIN32)
   set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "cmake")
 endif()
-
-#if (NOT TARGET bitprim-core)
-#  find_package(bitprim-core 3.0.0 REQUIRED)
-#endif()
 
 # Set flags.
 #==============================================================================
@@ -189,18 +193,15 @@ target_include_directories(bitprim-network PUBLIC
 
 target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
 
-#target_link_libraries(bitprim-network bitprim-core)
-
-message("CONAN_LIBS:")
-message(${CONAN_LIBS})
-
+if (NOT USE_CONAN)
+  target_link_libraries(bitprim-network bitprim-core)
+endif()
 target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
 
 _group_sources(bitprim-network "${CMAKE_CURRENT_LIST_DIR}")
 
 # Tests
 #==============================================================================
-
 if (WITH_TESTS)
   enable_testing()
 endif()
