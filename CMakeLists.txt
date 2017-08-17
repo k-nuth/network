@@ -18,17 +18,29 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Process options.
 #==============================================================================
-# Implement --with-tests and declare WITH_TESTS.
+
+# Implement --use-conan
 #------------------------------------------------------------------------------
-option(WITH_TESTS "Compile with unit tests." ON)
+option(USE_CONAN "Use Conan Build Tool." OFF)
 
 # Inherit --enable-shared and define BOOST_TEST_DYN_LINK.
 #------------------------------------------------------------------------------
 option(ENABLE_SHARED "" OFF)
 
+# Implement POSITION_INDEPENDENT_CODE
+#------------------------------------------------------------------------------
+option(ENABLE_POSITION_INDEPENDENT_CODE "Enable POSITION_INDEPENDENT_CODE property" ON)
+
+# Implement --with-tests and declare WITH_TESTS.
+#------------------------------------------------------------------------------
+option(WITH_TESTS "Compile with unit tests." ON)
+
 # Implement --with-litecoin.
 #------------------------------------------------------------------------------
 option(WITH_LITECOIN "Compile with Litecoin support." OFF)
+
+
+
 if (WITH_LITECOIN)
   add_definitions(-DLITECOIN)
 endif()
