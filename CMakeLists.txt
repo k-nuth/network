@@ -175,7 +175,7 @@ target_include_directories(bitprim-network PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC)
+target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
 
 #target_link_libraries(bitprim-network bitprim-core)
 
