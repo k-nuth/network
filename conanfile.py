@@ -50,7 +50,7 @@ class BitprimNetworkConan(ConanFile):
     build_policy = "missing"
 
     requires = (("bitprim-conan-boost/1.64.0@bitprim/stable"),
-                ("bitprim-core/0.1@bitprim/testing"))
+                ("bitprim-core/0.1@bitprim/stable"))
 
     def build(self):
         cmake = CMake(self)
