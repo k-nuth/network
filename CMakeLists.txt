@@ -111,10 +111,11 @@ include(BitprimTools)
 # Warn on all stuff.
 #------------------------------------------------------------------------------
 if (MINGW)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.9")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+  endif()
 endif()
-
 
 # Warn on all stuff.
 #------------------------------------------------------------------------------
