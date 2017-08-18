@@ -227,6 +227,13 @@ if (NOT USE_CONAN)
 endif()
 target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
 
+if (USE_CONAN)
+  if (MINGW)
+    target_link_libraries(bitprim-network PUBLIC ws2_32 wsock32) #TODO(fernando): manage with Conan
+  endif()
+endif()
+
+
 _group_sources(bitprim-network "${CMAKE_CURRENT_LIST_DIR}")
 
 # Tests
@@ -242,16 +249,18 @@ if (WITH_TESTS)
           test/main.cpp
           test/p2p.cpp)
 
-    if (MINGW)
-        target_link_libraries(bitprim_network_test PUBLIC bitprim-network wsock32)
-    else()
-        target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
-    endif()
+    target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
 
     _group_sources(bitprim_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
     _add_tests(bitprim_network_test empty_tests)
 endif()
+
+
+
+
+
+
 
 # Install
 #==============================================================================
