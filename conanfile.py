@@ -1,3 +1,22 @@
+#
+# Copyright (c) 2017 Bitprim developers (see AUTHORS)
+#
+# This file is part of Bitprim.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
 from conans import ConanFile, CMake
 
 def option_on_off(option):
@@ -24,12 +43,6 @@ class BitprimNetworkConan(ConanFile):
         "fPIC=True", \
         "with_tests=True", \
         "with_litecoin=False"
-
-# option(USE_CONAN "Use Conan Build Tool." OFF)
-# option(ENABLE_SHARED "" OFF)
-# option(WITH_TESTS "Compile with unit tests." ON)
-# option(WITH_LITECOIN "Compile with Litecoin support." OFF)
-
 
     generators = "cmake"
     exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "bitprim-networkConfig.cmake.in", "include/*", "test/*"
