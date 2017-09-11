@@ -1,3 +1,22 @@
+#
+# Copyright (c) 2017 Bitprim developers (see AUTHORS)
+#
+# This file is part of Bitprim.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
 cmake_minimum_required(VERSION 3.4)
 
 # bitprim-network
@@ -5,6 +24,13 @@ cmake_minimum_required(VERSION 3.4)
 project(bitprim-network
         VERSION 3.0.0
         LANGUAGES CXX C)
+
+if(USE_CPP11_ABI)
+  add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+else()
+  add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+endif()
+        
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Check for baseline language coverage in the compiler for the C++11 standard.
@@ -14,72 +40,109 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Process options.
 #==============================================================================
-# Implement --with-tests and declare WITH_TESTS.
+
+# Implement --use-conan
 #------------------------------------------------------------------------------
-option(WITH_TESTS "Compile with unit tests." OFF)
+option(USE_CONAN "Use Conan Build Tool." OFF)
+option(NO_CONAN_AT_ALL "Conan totally disabled." OFF)
+
+if (NO_CONAN_AT_ALL)
+  set(USE_CONAN OFF)
+endif()
 
 # Inherit --enable-shared and define BOOST_TEST_DYN_LINK.
 #------------------------------------------------------------------------------
 option(ENABLE_SHARED "" OFF)
 
+# Implement POSITION_INDEPENDENT_CODE
+#------------------------------------------------------------------------------
+option(ENABLE_POSITION_INDEPENDENT_CODE "Enable POSITION_INDEPENDENT_CODE property" ON)
+
+# Implement --with-tests and declare WITH_TESTS.
+#------------------------------------------------------------------------------
+option(WITH_TESTS "Compile with unit tests." ON)
+
 # Implement --with-litecoin.
 #------------------------------------------------------------------------------
 option(WITH_LITECOIN "Compile with Litecoin support." OFF)
+
+
+
 if (WITH_LITECOIN)
   add_definitions(-DLITECOIN)
 endif()
 
+# Conan infrastructure.
+#==============================================================================
+# Only if enabled
+#------------------------------------------------------------------------------
+if (NOT NO_CONAN_AT_ALL)
+  if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+      include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+      conan_basic_setup()
+  else()
+      message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
+  endif()
+endif()
+
 # Check dependencies.
 #==============================================================================
-# Require Boost of at least version 1.56.0 and output ${boost_CPPFLAGS/LDFLAGS}.
-#------------------------------------------------------------------------------
-if (NOT ENABLE_SHARED)
-  set(Boost_USE_STATIC_LIBS ON)
-endif()
-find_package(
-        Boost 1.54.0 REQUIRED
-        COMPONENTS unit_test_framework)
+if (NO_CONAN_AT_ALL)
+  # Require Boost of at least version 1.56.0 and output ${boost_CPPFLAGS/LDFLAGS}.
+  #------------------------------------------------------------------------------
+  if (NOT ENABLE_SHARED)
+    set(Boost_USE_STATIC_LIBS ON)
+  endif()
 
-# Require bitprim-core of at least version 3.0.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
-#------------------------------------------------------------------------------
-if (NOT TARGET bitprim-core)
-  find_package(bitprim-core 3.0.0 REQUIRED)
+  if (MSVC)
+    find_package(
+      Boost 1.56.0 REQUIRED
+      COMPONENTS atomic chrono date_time filesystem iostreams locale log log_setup program_options regex system thread unit_test_framework
+    )
+  else()
+    find_package(
+      Boost 1.56.0 REQUIRED
+      COMPONENTS chrono date_time filesystem iostreams locale log program_options regex system thread unit_test_framework
+    )
+  endif()
+endif()
+
+if (NOT USE_CONAN)
+  # Require bitprim-core of at least version 3.0.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+  #------------------------------------------------------------------------------
+  if (NOT TARGET bitprim-core)
+    find_package(bitprim-core 3.0.0 REQUIRED)
+  endif()
+endif()
+
+
+if (UNIX)
+  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/usr/local/lib/cmake")
+elseif (WIN32)
+  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "cmake")
 endif()
 
 # Set flags.
 #==============================================================================
 include(CheckCXXCompilerFlag)
 
-function(_add_c_compile_flag _Flag _Var)
-  check_cxx_compiler_flag(${_Flag} ${_Var})
-  if (${_Var})
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_Flag}" )
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_Flag}" )
-  endif()
-endfunction()
+# Including common functions
+#------------------------------------------------------------------------------
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(BitprimTools)
 
-function(_add_cxx_compile_flag _Flag _Var)
-  check_cxx_compiler_flag(${_Flag} ${_Var})
-  if (${_Var})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_Flag}" )
-  endif()
-endfunction()
-
-function(_add_link_flag _Flag _Var)
-  check_cxx_compiler_flag(${_Flag} ${_Var})
-  if (${_Var})
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_Flag}" )
-    set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} ${_Flag}" )
-  endif()
-endfunction()
 
 # Warn on all stuff.
 #------------------------------------------------------------------------------
-if (MINGW)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
-endif()
+# message("CMAKE_CXX_COMPILER_VERSION")
+# message(CMAKE_CXX_COMPILER_VERSION)
 
+if (MINGW)
+  # if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.9")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+  # endif()
+endif()
 
 # Warn on all stuff.
 #------------------------------------------------------------------------------
@@ -140,26 +203,6 @@ endif()
 
 # Build
 #==============================================================================
-function(_group_sources target sources_dir)
-  file(GLOB_RECURSE _headers
-          ${sources_dir}/include/*.h ${sources_dir}/include/*.hpp)
-  target_sources(${target} PRIVATE ${_headers})
-
-  get_target_property(sources ${target} SOURCES)
-  foreach (source ${sources})
-    get_filename_component(group ${source} ABSOLUTE)
-    get_filename_component(group ${group} DIRECTORY)
-    file(RELATIVE_PATH group "${sources_dir}" "${group}")
-    if (group)
-      if (MSVC)
-        string(REPLACE "/" "\\" group "${group}")
-      endif()
-      source_group("${group}" FILES "${source}")
-    endif()
-  endforeach()
-
-  set_target_properties(${target} PROPERTIES FOLDER "network")
-endfunction()
 
 # src/bitprim-network.la => ${libdir}
 #------------------------------------------------------------------------------
@@ -167,7 +210,6 @@ set(MODE STATIC)
 if (ENABLE_SHARED)
   set(MODE SHARED)
 endif()
-
 
 add_library(bitprim-network ${MODE}
         src/protocols/protocol.cpp
@@ -197,39 +239,34 @@ add_library(bitprim-network ${MODE}
         src/proxy.cpp
         src/settings.cpp)
 
-set_property(TARGET bitprim-network PROPERTY POSITION_INDEPENDENT_CODE ON)
-  
+
+if (ENABLE_POSITION_INDEPENDENT_CODE)
+  set_property(TARGET bitprim-network PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif(ENABLE_POSITION_INDEPENDENT_CODE)
+
 target_include_directories(bitprim-network PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC)
+target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
 
-target_link_libraries(bitprim-network bitprim-core)
+if (NOT NO_CONAN_AT_ALL)
+  target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
+else()
+  target_link_libraries(bitprim-network bitprim-core)
+endif()
+
+if (USE_CONAN)
+  if (MINGW)
+    target_link_libraries(bitprim-network PUBLIC ws2_32 wsock32) #TODO(fernando): manage with Conan
+  endif()
+endif()
+
 
 _group_sources(bitprim-network "${CMAKE_CURRENT_LIST_DIR}")
 
 # Tests
 #==============================================================================
-function(_add_tests target)
-  if (ENABLE_SHARED)
-    target_compile_definitions(${target} PRIVATE -DBOOST_TEST_DYN_LINK)
-  endif()
-  target_include_directories(${target} SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-  target_link_libraries(${target} PUBLIC ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-
-  foreach (_test_name ${ARGN})
-    add_test(
-            NAME test.network.${_test_name}
-            COMMAND ${target}
-            --run_test=${_test_name}
-            --show_progress=no
-            --detect_memory_leak=0
-            --report_level=no
-            --build_info=yes)
-  endforeach()
-endfunction()
-
 if (WITH_TESTS)
   enable_testing()
 endif()
@@ -241,61 +278,24 @@ if (WITH_TESTS)
           test/main.cpp
           test/p2p.cpp)
 
-    if (MINGW)
-        target_link_libraries(bitprim_network_test PUBLIC bitprim-network wsock32)
-    else()
-        target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
-    endif()
+    target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
 
     _group_sources(bitprim_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
     _add_tests(bitprim_network_test empty_tests)
 endif()
 
+
+
+
+
+
+
 # Install
 #==============================================================================
 install(TARGETS bitprim-network
         EXPORT bitprim-network
         ARCHIVE DESTINATION lib)
-
-#set(_bitprim_headers
-#  # include_bitcoin_HEADERS =
-#  bitcoin/network.hpp
-#  # include_bitcoin_network_HEADERS =
-#  bitcoin/network/acceptor.hpp
-#  bitcoin/network/channel.hpp
-#  bitcoin/network/connections.hpp
-#  bitcoin/network/connector.hpp
-#  bitcoin/network/const_buffer.hpp
-#  bitcoin/network/define.hpp
-#  bitcoin/network/hosts.hpp
-#  bitcoin/network/locked_socket.hpp
-#  bitcoin/network/logging.hpp
-#  bitcoin/network/message_subscriber.hpp
-#  bitcoin/network/p2p.hpp
-#  bitcoin/network/pending_channels.hpp
-#  bitcoin/network/pending_sockets.hpp
-#  bitcoin/network/proxy.hpp
-#  bitcoin/network/settings.hpp
-#  bitcoin/network/socket.hpp
-#  bitcoin/network/version.hpp
-#  # include_bitcoin_network_protocols_HEADERS =
-#  bitcoin/network/protocols/protocol.hpp
-#  bitcoin/network/protocols/protocol_address_31402.hpp
-#  bitcoin/network/protocols/protocol_events.hpp
-#  bitcoin/network/protocols/protocol_ping_31402.hpp
-#  bitcoin/network/protocols/protocol_ping_60001.hpp
-#  bitcoin/network/protocols/protocol_seed_31402.hpp
-#  bitcoin/network/protocols/protocol_timer.hpp
-#  bitcoin/network/protocols/protocol_version_31402.hpp
-#  bitcoin/network/protocols/protocol_version_70002.hpp
-#  # include_bitcoin_network_sessions_HEADERS =
-#  bitcoin/network/sessions/session.hpp
-#  bitcoin/network/sessions/session_batch.hpp
-#  bitcoin/network/sessions/session_inbound.hpp
-#  bitcoin/network/sessions/session_manual.hpp
-#  bitcoin/network/sessions/session_outbound.hpp
-#  bitcoin/network/sessions/session_seed.hpp)
 
 set(_bitprim_headers
         bitcoin/network/protocols/protocol.hpp
