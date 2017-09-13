@@ -62,9 +62,15 @@ class BitprimNetworkConan(ConanFile):
         cmake.definitions["CMAKE_VERBOSE_MAKEFILE"] = "ON"
         cmake.definitions["ENABLE_SHARED"] = option_on_off(self.options.shared)
         cmake.definitions["ENABLE_POSITION_INDEPENDENT_CODE"] = option_on_off(self.options.fPIC)
-        cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(self.options.not_use_cpp11_abi)
+        # cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(self.options.not_use_cpp11_abi)
         cmake.definitions["WITH_TESTS"] = option_on_off(self.options.with_tests)
         cmake.definitions["WITH_LITECOIN"] = option_on_off(self.options.with_litecoin)
+
+        if self.settings.compiler == "gcc":
+            if float(str(self.settings.compiler.version)) >= 5:
+                cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(False)
+            else:
+                cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(True)
 
         cmake.configure(source_dir=self.conanfile_directory)
         cmake.build()
