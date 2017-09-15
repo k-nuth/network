@@ -2,13 +2,13 @@ from conans import ConanFile, CMake
 import os
 
 
-channel = os.getenv("CONAN_CHANNEL", "stable")
+channel = os.getenv("CONAN_CHANNEL", "testing")
 username = os.getenv("CONAN_USERNAME", "bitprim")
 
 
 class BitprimnetworkTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    requires = "bitprim-network/0.1@%s/%s" % (username, channel)
+    requires = "bitprim-network/0.2@%s/%s" % (username, channel)
     generators = "cmake"
 
     def build(self):
