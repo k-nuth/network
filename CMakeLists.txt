@@ -250,11 +250,19 @@ target_include_directories(bitprim-network PUBLIC
 
 target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
 
+if (NOT USE_CONAN)
+  target_link_libraries(bitprim-network PUBLIC bitprim-core)
+endif()
+
 if (NOT NO_CONAN_AT_ALL)
   target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
-else()
-  target_link_libraries(bitprim-network bitprim-core)
 endif()
+
+# if (NOT NO_CONAN_AT_ALL)
+#   target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
+# else()
+#   target_link_libraries(bitprim-network bitprim-core)
+# endif()
 
 if (USE_CONAN)
   if (MINGW)
