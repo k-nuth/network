@@ -59,6 +59,7 @@ public:
     config::authority::list blacklists;
     config::endpoint::list peers;
     config::endpoint::list seeds;
+    bool bitcoin_cash;
 
     // [log]
     boost::filesystem::path debug_file;
