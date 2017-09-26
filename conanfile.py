@@ -24,7 +24,7 @@ def option_on_off(option):
 
 class BitprimNetworkConan(ConanFile):
     name = "bitprim-network"
-    version = "0.1"
+    version = "0.2"
     license = "http://www.boost.org/users/license.html"
     url = "https://github.com/bitprim/bitprim-network"
     description = "Bitcoin P2P Network Library"
@@ -37,14 +37,14 @@ class BitprimNetworkConan(ConanFile):
                "fPIC": [True, False],
                "with_tests": [True, False],
                "with_litecoin": [True, False],
-               "use_cpp11_abi": [True, False]
+               "not_use_cpp11_abi": [True, False]
     }
 
     default_options = "shared=False", \
         "fPIC=True", \
         "with_tests=True", \
         "with_litecoin=False", \
-        "use_cpp11_abi=True"
+        "not_use_cpp11_abi=False"
 
     generators = "cmake"
     exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "bitprim-networkConfig.cmake.in", "include/*", "test/*"
@@ -52,7 +52,7 @@ class BitprimNetworkConan(ConanFile):
     build_policy = "missing"
 
     requires = (("bitprim-conan-boost/1.64.0@bitprim/stable"),
-                ("bitprim-core/0.1@bitprim/stable"))
+                ("bitprim-core/0.2@bitprim/testing"))
 
     def build(self):
         cmake = CMake(self)
@@ -62,9 +62,15 @@ class BitprimNetworkConan(ConanFile):
         cmake.definitions["CMAKE_VERBOSE_MAKEFILE"] = "ON"
         cmake.definitions["ENABLE_SHARED"] = option_on_off(self.options.shared)
         cmake.definitions["ENABLE_POSITION_INDEPENDENT_CODE"] = option_on_off(self.options.fPIC)
-        cmake.definitions["USE_CPP11_ABI"] = option_on_off(self.options.use_cpp11_abi)
+        # cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(self.options.not_use_cpp11_abi)
         cmake.definitions["WITH_TESTS"] = option_on_off(self.options.with_tests)
         cmake.definitions["WITH_LITECOIN"] = option_on_off(self.options.with_litecoin)
+
+        if self.settings.compiler == "gcc":
+            if float(str(self.settings.compiler.version)) >= 5:
+                cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(False)
+            else:
+                cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(True)
 
         cmake.configure(source_dir=self.conanfile_directory)
         cmake.build()

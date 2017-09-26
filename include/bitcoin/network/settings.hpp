@@ -39,6 +39,7 @@ public:
     uint32_t protocol_maximum;
     uint32_t protocol_minimum;
     uint64_t services;
+    uint64_t invalid_services;
     bool relay_transactions;
     bool validate_checksum;
     uint32_t identifier;
@@ -59,6 +60,7 @@ public:
     config::authority::list blacklists;
     config::endpoint::list peers;
     config::endpoint::list seeds;
+    bool bitcoin_cash;
 
     // [log]
     boost::filesystem::path debug_file;

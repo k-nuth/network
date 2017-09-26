@@ -36,6 +36,9 @@ namespace network {
 #define CLASS session_seed
 #define NAME "session_seed"
 
+/// If seeding occurs it must generate an increase of 100 hosts or will fail.
+static const size_t minimum_host_increase = 100;
+
 using namespace std::placeholders;
 session_seed::session_seed(p2p& network)
   : session(network, false),
@@ -98,6 +101,7 @@ void session_seed::attach_handshake_protocols(channel::ptr channel,
     const auto relay = false;
     const auto own_version = settings_.protocol_maximum;
     const auto own_services = message::version::service::none;
+    const auto invalid_services = settings_.invalid_services;
     const auto minimum_version = settings_.protocol_minimum;
     const auto minimum_services = message::version::service::none;
 
@@ -105,10 +109,12 @@ void session_seed::attach_handshake_protocols(channel::ptr channel,
     // The negotiated_version is initialized to the configured maximum.
     if (channel->negotiated_version() >= message::version::level::bip61)
         attach<protocol_version_70002>(channel, own_version, own_services,
-            minimum_version, minimum_services, relay)->start(handle_started);
+            invalid_services, minimum_version, minimum_services, relay)
+            ->start(handle_started);
     else
         attach<protocol_version_31402>(channel, own_version, own_services,
-            minimum_version, minimum_services)->start(handle_started);
+            invalid_services, minimum_version, minimum_services)
+            ->start(handle_started);
 }
 
 // Seed sequence.
@@ -216,11 +222,12 @@ void session_seed::handle_channel_stop(const code& ec)
 // This accepts no error code because individual seed errors are suppressed.
 void session_seed::handle_complete(size_t start_size, result_handler handler)
 {
-    // We succeed only if there is a host count increase.
-    const auto increase = address_count() > start_size;
+    // We succeed only if there is a host count increase of at least 100.
+    const auto increase = address_count() >=
+        ceiling_add(start_size, minimum_host_increase);
 
     // This is the end of the seed sequence.
-    handler(increase ? error::success : error::operation_failed);
+    handler(increase ? error::success : error::peer_throttling);
 }
 
 } // namespace network

@@ -40,7 +40,7 @@ using namespace std::placeholders;
 using namespace boost::asio;
 using namespace bc::message;
 
-// Dump up to 1k of payload as hex in order to diagnore failure.
+// Dump up to 1k of payload as hex in order to diagnose failure.
 static const size_t invalid_payload_dump_size = 1024;
 
 // payload_buffer_ sizing assumes monotonically increasing size by version.
@@ -153,7 +153,8 @@ void proxy::handle_read_heading(const boost_code& ec, size_t)
 
     if (head.magic() != protocol_magic_)
     {
-        LOG_WARNING(LOG_NETWORK)
+        // These are common, with magic 542393671 coming from http requests.
+        LOG_DEBUG(LOG_NETWORK)
             << "Invalid heading magic (" << head.magic() << ") from ["
             << authority() << "]";
         stop(error::bad_stream);
@@ -225,7 +226,7 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
         const auto size = std::min(payload_size, invalid_payload_dump_size);
         const auto begin = payload_buffer_.begin();
 
-        LOG_DEBUG(LOG_NETWORK)
+        LOG_VERBOSE(LOG_NETWORK)
             << "Invalid payload from [" << authority() << "] "
             << encode_base16(data_chunk{ begin, begin + size });
         stop(code);
@@ -250,12 +251,9 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size,
         return;
     }
 
-    if (verbose_)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Valid " << head.command() << " payload from [" << authority()
-            << "] (" << payload_size << " bytes)";
-    }
+    LOG_VERBOSE(LOG_NETWORK)
+        << "Received " << head.command() << " from [" << authority()
+        << "] (" << payload_size << " bytes)";
 
     signal_activity();
     read_heading();
@@ -288,19 +286,16 @@ void proxy::handle_send(const boost_code& ec, size_t, command_ptr command,
     if (error)
     {
         LOG_DEBUG(LOG_NETWORK)
-            << "Failure sending " << *command << " payload to [" << authority()
+            << "Failure sending " << *command << " to [" << authority()
             << "] (" << size << " bytes) " << error.message();
         stop(error);
         handler(error);
         return;
     }
 
-    if (verbose_)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Sent " << *command << " payload to [" << authority() << "] ("
-            << size << " bytes)";
-    }
+    LOG_VERBOSE(LOG_NETWORK)
+        << "Sent " << *command << " to [" << authority() << "] (" << size
+        << " bytes)";
 
     handler(error);
 }
