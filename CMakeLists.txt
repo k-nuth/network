@@ -245,7 +245,9 @@ add_library(bitprim-network ${MODE}
         src/message_subscriber.cpp
         src/p2p.cpp
         src/proxy.cpp
-        src/settings.cpp)
+        src/settings.cpp
+        src/version.cpp
+)
 
 
 if (ENABLE_POSITION_INDEPENDENT_CODE)
