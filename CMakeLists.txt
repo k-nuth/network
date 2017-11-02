@@ -71,6 +71,10 @@ option(WITH_TESTS "Compile with unit tests." ON)
 option(WITH_LITECOIN "Compile with Litecoin support." OFF)
 
 
+set(BITPRIM_BUILD_NUMBER "-" CACHE STRING "Specify the Bitprim Build Number.")
+# message(${BITPRIM_BUILD_NUMBER})
+
+
 
 if (WITH_LITECOIN)
   add_definitions(-DLITECOIN)
@@ -252,6 +256,8 @@ target_include_directories(bitprim-network PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
+
+target_compile_definitions(bitprim-network PUBLIC -DBITPRIM_BUILD_NUMBER="\\"${BITPRIM_BUILD_NUMBER}\\"")
 target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
 
 if (NOT USE_CONAN)
