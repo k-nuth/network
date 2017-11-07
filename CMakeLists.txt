@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 3.4)
 # bitprim-network
 #==============================================================================
 project(bitprim-network
-        VERSION 3.0.0
+        VERSION 0.3.0
         LANGUAGES CXX C)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -71,6 +71,10 @@ option(WITH_TESTS "Compile with unit tests." ON)
 option(WITH_LITECOIN "Compile with Litecoin support." OFF)
 
 
+set(BITPRIM_BUILD_NUMBER "-" CACHE STRING "Specify the Bitprim Build Number.")
+# message(${BITPRIM_BUILD_NUMBER})
+
+
 
 if (WITH_LITECOIN)
   add_definitions(-DLITECOIN)
@@ -112,10 +116,10 @@ if (NO_CONAN_AT_ALL)
 endif()
 
 if (NOT USE_CONAN)
-  # Require bitprim-core of at least version 3.0.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+  # Require bitprim-core of at least version 0.3.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
   #------------------------------------------------------------------------------
   if (NOT TARGET bitprim-core)
-    find_package(bitprim-core 3.0.0 REQUIRED)
+    find_package(bitprim-core 0.3.0 REQUIRED)
   endif()
 endif()
 
@@ -241,7 +245,9 @@ add_library(bitprim-network ${MODE}
         src/message_subscriber.cpp
         src/p2p.cpp
         src/proxy.cpp
-        src/settings.cpp)
+        src/settings.cpp
+        src/version.cpp
+)
 
 
 if (ENABLE_POSITION_INDEPENDENT_CODE)
@@ -252,6 +258,8 @@ target_include_directories(bitprim-network PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
+
+target_compile_definitions(bitprim-network PUBLIC -DBITPRIM_BUILD_NUMBER="\\"${BITPRIM_BUILD_NUMBER}\\"")
 target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
 
 if (NOT USE_CONAN)

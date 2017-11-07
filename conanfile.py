@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import os
 from conans import ConanFile, CMake
 
 def option_on_off(option):
@@ -24,7 +25,7 @@ def option_on_off(option):
 
 class BitprimNetworkConan(ConanFile):
     name = "bitprim-network"
-    version = "0.2"
+    version = "0.3"
     license = "http://www.boost.org/users/license.html"
     url = "https://github.com/bitprim/bitprim-network"
     description = "Bitcoin P2P Network Library"
@@ -35,16 +36,20 @@ class BitprimNetworkConan(ConanFile):
 
     options = {"shared": [True, False],
                "fPIC": [True, False],
-               "with_tests": [True, False],
-               "with_litecoin": [True, False],
-               "not_use_cpp11_abi": [True, False]
+               "with_litecoin": [True, False]
     }
+
+    # "with_tests": [True, False],
+    # "not_use_cpp11_abi": [True, False]
 
     default_options = "shared=False", \
         "fPIC=True", \
-        "with_tests=True", \
-        "with_litecoin=False", \
-        "not_use_cpp11_abi=False"
+        "with_litecoin=False"
+
+    # "with_tests=True", \
+    # "not_use_cpp11_abi=False"
+
+    with_tests = False
 
     generators = "cmake"
     exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "bitprim-networkConfig.cmake.in", "include/*", "test/*"
@@ -52,18 +57,20 @@ class BitprimNetworkConan(ConanFile):
     build_policy = "missing"
 
     requires = (("bitprim-conan-boost/1.64.0@bitprim/stable"),
-                ("bitprim-core/0.2@bitprim/stable"))
+                ("bitprim-core/0.3@bitprim/stable"))
 
     def build(self):
         cmake = CMake(self)
 
-        cmake.definitions["USE_CONAN"] = "ON"
-        cmake.definitions["NO_CONAN_AT_ALL"] = "OFF"
-        cmake.definitions["CMAKE_VERBOSE_MAKEFILE"] = "ON"
+        cmake.definitions["USE_CONAN"] = option_on_off(True)
+        cmake.definitions["NO_CONAN_AT_ALL"] = option_on_off(False)
+        cmake.definitions["CMAKE_VERBOSE_MAKEFILE"] = option_on_off(False)
         cmake.definitions["ENABLE_SHARED"] = option_on_off(self.options.shared)
         cmake.definitions["ENABLE_POSITION_INDEPENDENT_CODE"] = option_on_off(self.options.fPIC)
+
         # cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(self.options.not_use_cpp11_abi)
-        cmake.definitions["WITH_TESTS"] = option_on_off(self.options.with_tests)
+        # cmake.definitions["WITH_TESTS"] = option_on_off(self.options.with_tests)
+        cmake.definitions["WITH_TESTS"] = option_on_off(self.with_tests)
         cmake.definitions["WITH_LITECOIN"] = option_on_off(self.options.with_litecoin)
 
         if self.settings.compiler == "gcc":
@@ -72,6 +79,7 @@ class BitprimNetworkConan(ConanFile):
             else:
                 cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(True)
 
+        cmake.definitions["BITPRIM_BUILD_NUMBER"] = os.getenv('BITPRIM_BUILD_NUMBER', '-')
         cmake.configure(source_dir=self.conanfile_directory)
         cmake.build()
 

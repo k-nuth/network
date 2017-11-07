@@ -81,7 +81,7 @@ void protocol_version_31402::start(event_handler handler)
     // The handler is invoked in the context of the last message receipt.
     protocol_timer::start(period, join_handler);
 
-    SUBSCRIBE2(version, handle_receive_version, _1, _2);
+    SUBSCRIBE2(message::version, handle_receive_version, _1, _2);
     SUBSCRIBE2(verack, handle_receive_verack, _1, _2);
     SEND2(version_factory(), handle_send, _1, version::command);
 }

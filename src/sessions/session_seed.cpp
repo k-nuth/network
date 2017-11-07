@@ -36,8 +36,8 @@ namespace network {
 #define CLASS session_seed
 #define NAME "session_seed"
 
-/// If seeding occurs it must generate an increase of 100 hosts or will fail.
-static const size_t minimum_host_increase = 100;
+/// If seeding occurs it must generate an increase hosts or will fail.
+static const size_t minimum_host_increase = 1;
 
 using namespace std::placeholders;
 session_seed::session_seed(p2p& network)
@@ -222,7 +222,7 @@ void session_seed::handle_channel_stop(const code& ec)
 // This accepts no error code because individual seed errors are suppressed.
 void session_seed::handle_complete(size_t start_size, result_handler handler)
 {
-    // We succeed only if there is a host count increase of at least 100.
+    // We succeed only if there is a host count increase.
     const auto increase = address_count() >=
         ceiling_add(start_size, minimum_host_increase);
 
