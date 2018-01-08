@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 3.4)
 # bitprim-network
 #==============================================================================
 project(bitprim-network
-        VERSION 0.4.0
+        VERSION 0.5.0
         LANGUAGES CXX C)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -119,7 +119,7 @@ if (NOT USE_CONAN)
   # Require bitprim-core of at least version 4.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
   #------------------------------------------------------------------------------
   if (NOT TARGET bitprim-core)
-    find_package(bitprim-core 0.4.0 REQUIRED)
+    find_package(bitprim-core 0.5.0 REQUIRED)
   endif()
 endif()
 
