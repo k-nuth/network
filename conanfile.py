@@ -25,7 +25,7 @@ def option_on_off(option):
 
 class BitprimNetworkConan(ConanFile):
     name = "bitprim-network"
-    version = "0.5"
+    version = "0.6"
     license = "http://www.boost.org/users/license.html"
     url = "https://github.com/bitprim/bitprim-network"
     description = "Bitcoin P2P Network Library"
@@ -57,7 +57,7 @@ class BitprimNetworkConan(ConanFile):
     build_policy = "missing"
 
     requires = (("bitprim-conan-boost/1.64.0@bitprim/stable"),
-                ("bitprim-core/0.5@bitprim/stable"))
+                ("bitprim-core/0.6@bitprim/stable"))
 
     def build(self):
         cmake = CMake(self)
