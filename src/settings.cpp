@@ -19,7 +19,7 @@
 #include <bitcoin/network/settings.hpp>
 
 #include <bitcoin/bitcoin.hpp>
-#include <bitcoin/bitcoin/bitcoin_cash_support.hpp>
+#include <bitcoin/bitcoin/multi_crypto_support.hpp>
 
 namespace libbitcoin {
 namespace network {
