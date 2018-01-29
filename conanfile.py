@@ -36,20 +36,20 @@ class BitprimNetworkConan(ConanFile):
 
     options = {"shared": [True, False],
                "fPIC": [True, False],
-               "with_litecoin": [True, False]
+               "with_litecoin": [True, False],
+               "with_tests": [True, False],
     }
 
-    # "with_tests": [True, False],
     # "not_use_cpp11_abi": [True, False]
 
     default_options = "shared=False", \
         "fPIC=True", \
-        "with_litecoin=False"
+        "with_litecoin=False", \
+        "with_tests=True"
 
-    # "with_tests=True", \
     # "not_use_cpp11_abi=False"
 
-    with_tests = False
+    # with_tests = False
 
     generators = "cmake"
     exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "bitprim-networkConfig.cmake.in", "include/*", "test/*"
@@ -58,6 +58,9 @@ class BitprimNetworkConan(ConanFile):
 
     requires = (("bitprim-conan-boost/1.66.0@bitprim/stable"),
                 ("bitprim-core/0.7@bitprim/testing"))
+
+    def package_id(self):
+        self.info.options.with_tests = "ANY"
 
     def build(self):
         cmake = CMake(self)
@@ -69,8 +72,8 @@ class BitprimNetworkConan(ConanFile):
         cmake.definitions["ENABLE_POSITION_INDEPENDENT_CODE"] = option_on_off(self.options.fPIC)
 
         # cmake.definitions["NOT_USE_CPP11_ABI"] = option_on_off(self.options.not_use_cpp11_abi)
-        # cmake.definitions["WITH_TESTS"] = option_on_off(self.options.with_tests)
-        cmake.definitions["WITH_TESTS"] = option_on_off(self.with_tests)
+        cmake.definitions["WITH_TESTS"] = option_on_off(self.options.with_tests)
+        # cmake.definitions["WITH_TESTS"] = option_on_off(self.with_tests)
         cmake.definitions["WITH_LITECOIN"] = option_on_off(self.options.with_litecoin)
 
         if self.settings.compiler == "gcc":
