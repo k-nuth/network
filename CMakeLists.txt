@@ -25,16 +25,6 @@ project(bitprim-network
         VERSION 0.7.0
         LANGUAGES CXX C)
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  if (NOT NOT_USE_CPP11_ABI)
-    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
-  else()
-    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
-  endif()
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-macro-redefined")
-endif()
-
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Check for baseline language coverage in the compiler for the C++11 standard.
@@ -82,16 +72,13 @@ endif()
 
 # Conan infrastructure.
 #==============================================================================
-# Only if enabled
-#------------------------------------------------------------------------------
-if (NOT NO_CONAN_AT_ALL)
-  if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-      include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-      conan_basic_setup()
-  else()
-      message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
-  endif()
+if (EXISTS ${CMAKE_SOURCE_DIR}/bitprimbuildinfo.cmake)
+    include(${CMAKE_SOURCE_DIR}/bitprimbuildinfo.cmake)
+else()
+    message( STATUS "bitprimbuildinfo doent exists")
 endif()
+
+
 
 # Check dependencies.
 #==============================================================================
@@ -123,12 +110,12 @@ if (NOT USE_CONAN)
   endif()
 endif()
 
+#if (UNIX)
+#  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/usr/local/lib/cmake")
+#elseif (WIN32)
+#  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "cmake")
+#endif()
 
-if (UNIX)
-  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/usr/local/lib/cmake")
-elseif (WIN32)
-  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "cmake")
-endif()
 
 # Set flags.
 #==============================================================================
