@@ -289,7 +289,10 @@ if (WITH_TESTS)
 
     _group_sources(bitprim_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
-    _add_tests(bitprim_network_test empty_tests)
+    _add_tests(bitprim_network_test 
+      empty_tests 
+      p2p_tests
+    )
 endif()
 
 
