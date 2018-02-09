@@ -291,7 +291,7 @@ if (WITH_TESTS)
 
     _add_tests(bitprim_network_test 
       empty_tests 
-      p2p_tests
+      # p2p_tests
     )
 endif()
 
