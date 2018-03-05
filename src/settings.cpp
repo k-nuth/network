@@ -34,7 +34,7 @@ settings::settings()
     protocol_minimum(version::level::minimum),
     services(version::service::none),
     invalid_services(version::service::none),
-    relay_transactions(false),
+    relay_transactions(true),
     validate_checksum(false),
     inbound_connections(0),
     outbound_connections(8),
