@@ -25,7 +25,7 @@ def option_on_off(option):
 
 class BitprimNetworkConan(ConanFile):
     name = "bitprim-network"
-    version = "0.7"
+    version = "0.8"
     license = "http://www.boost.org/users/license.html"
     url = "https://github.com/bitprim/bitprim-network"
     description = "Bitcoin P2P Network Library"
@@ -48,7 +48,7 @@ class BitprimNetworkConan(ConanFile):
     build_policy = "missing"
 
     requires = (("boost/1.66.0@bitprim/stable"),
-                ("bitprim-core/0.7@bitprim/testing"))
+                ("bitprim-core/0.8@bitprim/testing"))
 
     @property
     def msvc_mt_build(self):
