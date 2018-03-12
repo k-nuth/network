@@ -103,10 +103,10 @@ if (NO_CONAN_AT_ALL)
 endif()
 
 if (NOT USE_CONAN)
-  # Require bitprim-core of at least version 4.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+  # Require bitprim-core of at least version 0.8.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
   #------------------------------------------------------------------------------
   if (NOT TARGET bitprim-core)
-    find_package(bitprim-core 0.7.0 REQUIRED)
+    find_package(bitprim-core 0.8.0 REQUIRED)
   endif()
 endif()
 

@@ -12,9 +12,9 @@
  * For interpretation of the versioning scheme see: http://semver.org
  */
 
-#define LIBBITCOIN_NETWORK_VERSION "0.7.0"
+#define LIBBITCOIN_NETWORK_VERSION "0.8.0"
 #define LIBBITCOIN_NETWORK_MAJOR_VERSION 0
-#define LIBBITCOIN_NETWORK_MINOR_VERSION 7
+#define LIBBITCOIN_NETWORK_MINOR_VERSION 8
 #define LIBBITCOIN_NETWORK_PATCH_VERSION 0
 
 // #define STR_HELPER(x) #x
