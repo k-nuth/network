@@ -58,7 +58,7 @@ option(WITH_TESTS "Compile with unit tests." ON)
 
 # Implement --with-litecoin.
 #------------------------------------------------------------------------------
-option(WITH_LITECOIN "Compile with Litecoin support." OFF)
+# option(WITH_LITECOIN "Compile with Litecoin support." OFF)
 
 
 set(BITPRIM_BUILD_NUMBER "-" CACHE STRING "Specify the Bitprim Build Number.")
@@ -66,9 +66,25 @@ set(BITPRIM_BUILD_NUMBER "-" CACHE STRING "Specify the Bitprim Build Number.")
 
 
 
-if (WITH_LITECOIN)
-  add_definitions(-DLITECOIN)
+# if (WITH_LITECOIN)
+#   add_definitions(-DLITECOIN)
+# endif()
+
+
+set(CURRENCY "BCH" CACHE STRING "Specify the Cryptocurrency (BCH|BTC|LTC).")
+
+if (${CURRENCY} STREQUAL "BCH")
+  add_definitions(-DBITPRIM_CURRENCY_BCH)
+elseif (${CURRENCY} STREQUAL "BTC")
+  add_definitions(-DBITPRIM_CURRENCY_BTC)
+elseif (${CURRENCY} STREQUAL "LTC")
+  add_definitions(-DBITPRIM_CURRENCY_LTC)
+else()
+  message(FATAL_ERROR "Invalid Cryptocurrency: ${CURRENCY}")
 endif()
+
+message(STATUS "Bitprim: Cryptocurrency: ${CURRENCY}")
+
 
 # Conan infrastructure.
 #==============================================================================
