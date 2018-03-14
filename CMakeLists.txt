@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 3.4)
 # bitprim-network
 #==============================================================================
 project(bitprim-network
-        VERSION 0.7.0
+        VERSION 0.8.0
         LANGUAGES CXX C)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -58,7 +58,7 @@ option(WITH_TESTS "Compile with unit tests." ON)
 
 # Implement --with-litecoin.
 #------------------------------------------------------------------------------
-option(WITH_LITECOIN "Compile with Litecoin support." OFF)
+# option(WITH_LITECOIN "Compile with Litecoin support." OFF)
 
 
 set(BITPRIM_BUILD_NUMBER "-" CACHE STRING "Specify the Bitprim Build Number.")
@@ -66,9 +66,25 @@ set(BITPRIM_BUILD_NUMBER "-" CACHE STRING "Specify the Bitprim Build Number.")
 
 
 
-if (WITH_LITECOIN)
-  add_definitions(-DLITECOIN)
+# if (WITH_LITECOIN)
+#   add_definitions(-DLITECOIN)
+# endif()
+
+
+set(CURRENCY "BCH" CACHE STRING "Specify the Cryptocurrency (BCH|BTC|LTC).")
+
+if (${CURRENCY} STREQUAL "BCH")
+  add_definitions(-DBITPRIM_CURRENCY_BCH)
+elseif (${CURRENCY} STREQUAL "BTC")
+  add_definitions(-DBITPRIM_CURRENCY_BTC)
+elseif (${CURRENCY} STREQUAL "LTC")
+  add_definitions(-DBITPRIM_CURRENCY_LTC)
+else()
+  message(FATAL_ERROR "Invalid Cryptocurrency: ${CURRENCY}")
 endif()
+
+message(STATUS "Bitprim: Cryptocurrency: ${CURRENCY}")
+
 
 # Conan infrastructure.
 #==============================================================================
@@ -103,10 +119,10 @@ if (NO_CONAN_AT_ALL)
 endif()
 
 if (NOT USE_CONAN)
-  # Require bitprim-core of at least version 4.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+  # Require bitprim-core of at least version 0.8.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
   #------------------------------------------------------------------------------
   if (NOT TARGET bitprim-core)
-    find_package(bitprim-core 0.7.0 REQUIRED)
+    find_package(bitprim-core 0.8.0 REQUIRED)
   endif()
 endif()
 
