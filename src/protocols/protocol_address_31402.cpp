@@ -96,9 +96,7 @@ bool protocol_address_31402::handle_receive_address(const code& ec,
     return true;
 }
 
-bool protocol_address_31402::handle_receive_get_address(const code& ec,
-    get_address_const_ptr message)
-{
+bool protocol_address_31402::handle_receive_get_address(const code& ec, get_address_const_ptr message) {
     if (stopped(ec))
         return false;
 
