@@ -33,7 +33,7 @@ settings::settings()
     protocol_maximum(version::level::maximum),
     protocol_minimum(version::level::minimum),
     services(version::service::none),
-    invalid_services(version::service::none),
+    invalid_services(176),
     relay_transactions(false),
     validate_checksum(false),
     inbound_connections(0),
@@ -148,6 +148,15 @@ settings::settings(config::settings context)
             seeds.push_back({ "testnet-seed.voskuil.org", 18333 });
     #endif //BITPRIM_CURRENCY_BCH
 #endif //BITPRIM_CURRENCY_LTC
+            break;
+        }
+
+        case config::settings::regtest:
+        {
+            identifier = 3669344250;
+            inbound_port = 18444;
+
+            // Regtest is private network only, so there is no seeding.
             break;
         }
 
