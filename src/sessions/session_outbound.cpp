@@ -152,9 +152,13 @@ void session_outbound::attach_handshake_protocols(channel::ptr channel,
     const auto invalid_services = settings_.invalid_services;
     const auto minimum_version = settings_.protocol_minimum;
 
+#ifdef BITPRIM_CURRENCY_BCH
+    const auto minimum_services = serve::node_network;
+#else
     // Require peer to serve network (and witness if configured on self).
     const auto minimum_services = (own_services & serve::node_witness) |
         serve::node_network;
+#endif
 
     // Reject messages are not handled until bip61 (70002).
     // The negotiated_version is initialized to the configured maximum.
