@@ -33,7 +33,11 @@ settings::settings()
     protocol_maximum(version::level::maximum),
     protocol_minimum(version::level::minimum),
     services(version::service::none),
+#ifdef BITPRIM_CURRENCY_BCH
+    invalid_services(0),
+#else
     invalid_services(176),
+#endif    
     relay_transactions(false),
     validate_checksum(false),
     inbound_connections(0),
