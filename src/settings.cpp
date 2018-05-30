@@ -38,7 +38,7 @@ settings::settings()
 #else
     invalid_services(176),
 #endif    
-    relay_transactions(false),
+    relay_transactions(true),
     validate_checksum(false),
     inbound_connections(0),
     outbound_connections(8),
