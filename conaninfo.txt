@@ -1,0 +1,116 @@
+[settings]
+    arch=x86_64
+    build_type=Release
+    compiler=Visual Studio
+    compiler.runtime=MD
+    compiler.version=15
+    os=Windows
+
+[requires]
+    bitprim-node-exe/0.3
+
+[options]
+
+
+[full_settings]
+    arch=x86_64
+    build_type=Release
+    compiler=Visual Studio
+    compiler.runtime=MD
+    compiler.version=15
+    os=Windows
+
+[full_requires]
+    bitprim-blockchain/0.3@bitprim/testing:faeef505e2bc8fa22a44634427bba7736885e2a6
+    bitprim-conan-boost/1.64.0@bitprim/stable:5c04b405c7d7ad0fc5d44c379047a57557192311
+    bitprim-consensus/0.3@bitprim/testing:bac04c9402be22b7faab10ea22aa426dec5fa3a0
+    bitprim-core/0.3@bitprim/testing:128193762c731305579d7cba6c479ee7331ee16e
+    bitprim-database/0.3@bitprim/testing:1dca40c83f2ce9303f0316ffb25e8105750684c8
+    bitprim-network/0.3@bitprim/testing:1dca40c83f2ce9303f0316ffb25e8105750684c8
+    bitprim-node/0.3@bitprim/testing:e84ee349f7facb690bc2f8a7974a16afea1d427e
+    bitprim-node-exe/0.3@bitprim/testing:f2060bb7a8c88303c915fe0db924923213ec542c
+    mpir/3.0.0@bitprim/stable:780332b533eeec4361a213be321d6c064c428dd6
+    secp256k1/0.3@bitprim/testing:fa4e4a47ed851914b3b0c67f7c981f48141f828a
+    zlib/1.2.8@bitprim/stable:6cc50b139b9c3d27b3e9042d5f5372d327b3a9f7
+
+[full_options]
+    bitprim-blockchain:fPIC=True
+    bitprim-blockchain:shared=False
+    bitprim-blockchain:with_consensus=True
+    bitprim-blockchain:with_litecoin=False
+    bitprim-conan-boost:header_only=False
+    bitprim-conan-boost:python=True
+    bitprim-conan-boost:shared=False
+    bitprim-conan-boost:without_atomic=False
+    bitprim-conan-boost:without_chrono=False
+    bitprim-conan-boost:without_container=True
+    bitprim-conan-boost:without_context=True
+    bitprim-conan-boost:without_coroutine=True
+    bitprim-conan-boost:without_date_time=False
+    bitprim-conan-boost:without_exception=False
+    bitprim-conan-boost:without_fiber=True
+    bitprim-conan-boost:without_filesystem=False
+    bitprim-conan-boost:without_graph=True
+    bitprim-conan-boost:without_graph_parallel=True
+    bitprim-conan-boost:without_iostreams=False
+    bitprim-conan-boost:without_locale=False
+    bitprim-conan-boost:without_log=False
+    bitprim-conan-boost:without_math=True
+    bitprim-conan-boost:without_metaparse=True
+    bitprim-conan-boost:without_mpi=True
+    bitprim-conan-boost:without_program_options=False
+    bitprim-conan-boost:without_random=False
+    bitprim-conan-boost:without_regex=False
+    bitprim-conan-boost:without_serialization=True
+    bitprim-conan-boost:without_signals=True
+    bitprim-conan-boost:without_system=False
+    bitprim-conan-boost:without_test=False
+    bitprim-conan-boost:without_thread=False
+    bitprim-conan-boost:without_timer=False
+    bitprim-conan-boost:without_type_erasure=True
+    bitprim-conan-boost:without_wave=True
+    bitprim-consensus:fPIC=True
+    bitprim-consensus:shared=False
+    bitprim-core:fPIC=True
+    bitprim-core:shared=False
+    bitprim-core:with_icu=False
+    bitprim-core:with_litecoin=False
+    bitprim-core:with_png=False
+    bitprim-core:with_qrencode=False
+    bitprim-database:fPIC=True
+    bitprim-database:shared=False
+    bitprim-network:fPIC=True
+    bitprim-network:shared=False
+    bitprim-network:with_litecoin=False
+    bitprim-node:fPIC=True
+    bitprim-node:shared=False
+    bitprim-node:with_litecoin=False
+    bitprim-node:with_remote_blockchain=False
+    bitprim-node:with_remote_database=False
+    bitprim-node-exe:microarchitecture=skylake
+    bitprim-node-exe:with_litecoin=False
+    mpir:disable-fft=False
+    mpir:disable_assembly=False
+    mpir:enable-assert=False
+    mpir:enable_cxx=True
+    mpir:enable_fat=False
+    mpir:microarchitecture=skylake
+    mpir:shared=False
+    secp256k1:enable_ecmult_static_precomputation=False
+    secp256k1:enable_endomorphism=False
+    secp256k1:enable_experimental=False
+    secp256k1:enable_module_ecdh=False
+    secp256k1:enable_module_recovery=True
+    secp256k1:enable_module_schnorr=False
+    secp256k1:fPIC=True
+    secp256k1:shared=False
+    zlib:shared=False
+
+[scope]
+    dev=True
+
+[recipe_hash]
+
+
+[env]
+
