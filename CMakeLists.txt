@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 3.4)
 # bitprim-network
 #==============================================================================
 project(bitprim-network
-        VERSION 0.10.1
+        VERSION 0.10.2
         LANGUAGES CXX C)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -119,10 +119,10 @@ if (NO_CONAN_AT_ALL)
 endif()
 
 if (NOT USE_CONAN)
-  # Require bitprim-core of at least version 0.10.1 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+  # Require bitprim-core of at least version 0.10.2 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
   #------------------------------------------------------------------------------
   if (NOT TARGET bitprim-core)
-    find_package(bitprim-core 0.10.1 REQUIRED)
+    find_package(bitprim-core 0.10.2 REQUIRED)
   endif()
 endif()
 
