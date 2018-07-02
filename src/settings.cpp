@@ -64,7 +64,8 @@ settings::settings()
     maximum_archive_size(0),
     maximum_archive_files(0),
     statistics_server(unspecified_network_address),
-    verbose(false)
+    verbose(false),
+    use_ip_v6(true)
 {}
 
 // Use push_back due to initializer_list bug:
