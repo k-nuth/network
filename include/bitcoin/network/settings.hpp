@@ -72,7 +72,7 @@ public:
     size_t maximum_archive_files;
     config::authority statistics_server;
     bool verbose;
-    bool use_ip_v6;
+    bool use_ipv6;
 
     /// Helpers.
     asio::duration connect_timeout() const;

@@ -96,7 +96,7 @@ code acceptor::listen(uint16_t port)
     }
 
     boost_code error;
-    asio::endpoint endpoint(settings_.use_ip_v6 ? asio::tcp::v6() : asio::tcp::v4(), settings_.inbound_port);
+    asio::endpoint endpoint(settings_.use_ipv6 ? asio::tcp::v6() : asio::tcp::v4(), settings_.inbound_port);
 
     mutex_.unlock_upgrade_and_lock();
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
