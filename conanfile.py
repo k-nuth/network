@@ -133,7 +133,7 @@ class BitprimNetworkConan(ConanFile):
             cmake.definitions["CONAN_CXX_FLAGS"] = cmake.definitions.get("CONAN_CXX_FLAGS", "") + " /DBOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE"
 
         cmake.definitions["MICROARCHITECTURE"] = self.options.microarchitecture
-        cmake.definitions["BITPRIM_PROJECT_VERSION"] = get_version()
+        cmake.definitions["BITPRIM_PROJECT_VERSION"] = self.version
 
         if self.settings.compiler == "gcc":
             if float(str(self.settings.compiler.version)) >= 5:
@@ -146,7 +146,6 @@ class BitprimNetworkConan(ConanFile):
 
         pass_march_to_compiler(self, cmake)
 
-        cmake.definitions["BITPRIM_BUILD_NUMBER"] = os.getenv('BITPRIM_BUILD_NUMBER', '-')
         cmake.configure(source_dir=self.source_folder)
         cmake.build()
 
