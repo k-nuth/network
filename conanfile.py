@@ -97,7 +97,7 @@ class BitprimNetworkConan(ConanFile):
         if self.settings.arch == "x86_64" and self.options.microarchitecture == "_DUMMY_":
             del self.options.fix_march
             # self.options.remove("fix_march")
-            raise Exception ("fix_march option is for using together with microarchitecture option.")
+            # raise Exception ("fix_march option is for using together with microarchitecture option.")
 
         if self.settings.arch == "x86_64":
             march_conan_manip(self)
