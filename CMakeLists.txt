@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 3.4)
 # bitprim-network
 #==============================================================================
 project(bitprim-network
-        VERSION 0.11.0
+        VERSION 0
         LANGUAGES CXX C)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -61,14 +61,14 @@ option(WITH_TESTS "Compile with unit tests." ON)
 # option(WITH_LITECOIN "Compile with Litecoin support." OFF)
 
 
-set(BITPRIM_BUILD_NUMBER "-" CACHE STRING "Specify the Bitprim Build Number.")
-# message(${BITPRIM_BUILD_NUMBER})
+set(BITPRIM_PROJECT_VERSION "-" CACHE STRING "Specify the Bitprim Project Version.")
+# message(${BITPRIM_PROJECT_VERSION})
 
 
-
-# if (WITH_LITECOIN)
-#   add_definitions(-DLITECOIN)
-# endif()
+set(MICROARCHITECTURE "x86_64" CACHE STRING "Specify the Cryptocurrency (x86_64|...).")
+message( STATUS "Bitprim: Compiling for ${MICROARCHITECTURE}")
+# add_definitions(-DBITPRIM_MICROARCHITECTURE=${MICROARCHITECTURE})
+# add_definitions(-DBITPRIM_MICROARCHITECTURE_STR="${MICROARCHITECTURE}")
 
 
 set(CURRENCY "BCH" CACHE STRING "Specify the Cryptocurrency (BCH|BTC|LTC).")
@@ -86,10 +86,10 @@ endif()
 message(STATUS "Bitprim: Cryptocurrency: ${CURRENCY}")
 
 
-# Conan infrastructure.
+# Conan infrastructure
 #==============================================================================
-if (EXISTS ${CMAKE_SOURCE_DIR}/bitprimbuildinfo.cmake)
-    include(${CMAKE_SOURCE_DIR}/bitprimbuildinfo.cmake)
+if(EXISTS ${CMAKE_SOURCE_DIR}/ci_utils/cmake/bitprimbuildinfo.cmake)
+    include(${CMAKE_SOURCE_DIR}/ci_utils/cmake/bitprimbuildinfo.cmake)
 else()
     message( STATUS "bitprimbuildinfo doent exists")
 endif()
@@ -98,6 +98,7 @@ endif()
 
 # Check dependencies.
 #==============================================================================
+#------------------------------------------------------------------------------
 if (NO_CONAN_AT_ALL)
   # Require Boost of at least version 1.56.0 and output ${boost_CPPFLAGS/LDFLAGS}.
   #------------------------------------------------------------------------------
@@ -119,18 +120,12 @@ if (NO_CONAN_AT_ALL)
 endif()
 
 if (NOT USE_CONAN)
-  # Require bitprim-core of at least version 0.11.0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
-  #------------------------------------------------------------------------------
-  if (NOT TARGET bitprim-core)
-    find_package(bitprim-core 0.11.0 REQUIRED)
-  endif()
+    # Require bitprim-core of at least version 0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+    #------------------------------------------------------------------------------
+    if (NOT TARGET bitprim-core)
+            find_package(bitprim-core 0 REQUIRED)
+    endif()
 endif()
-
-#if (UNIX)
-#  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/usr/local/lib/cmake")
-#elseif (WIN32)
-#  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "cmake")
-#endif()
 
 
 # Set flags.
@@ -139,7 +134,8 @@ include(CheckCXXCompilerFlag)
 
 # Including common functions
 #------------------------------------------------------------------------------
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/ci_utils/cmake)
+
 include(BitprimTools)
 
 
@@ -208,7 +204,7 @@ _add_cxx_compile_flag(-fvisibility-inlines-hidden _has_visibility_inlines_hidden
 
 # Target Windows Vista. Enabled in msvc only.
 #------------------------------------------------------------------------------
-if (MSVC)
+if (MSVC) # OR MINGW)
   add_definitions(-D_WIN32_WINNT=0x0600)
 endif()
 
@@ -262,8 +258,11 @@ target_include_directories(bitprim-network PUBLIC
         $<INSTALL_INTERFACE:include>)
 
 
-target_compile_definitions(bitprim-network PUBLIC -DBITPRIM_BUILD_NUMBER="\\"${BITPRIM_BUILD_NUMBER}\\"")
-target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
+target_compile_definitions(bitprim-network PUBLIC -DBITPRIM_PROJECT_VERSION="\\"${BITPRIM_PROJECT_VERSION}\\"") #TODO(fernando): manage with Conan????
+
+if (NOT ENABLE_SHARED)
+    target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
+endif()
 
 if (NOT USE_CONAN)
   target_link_libraries(bitprim-network PUBLIC bitprim-core)
