@@ -48,7 +48,7 @@ class BitprimNetworkConan(BitprimConanFile):
         "currency=BCH", \
         "microarchitecture=_DUMMY_",  \
         "fix_march=False", \
-        "verbose=True"
+        "verbose=False"
 
     generators = "cmake"
     exports = "conan_*", "ci_utils/*"
