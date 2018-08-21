@@ -26,6 +26,7 @@
 #include <bitcoin/network/p2p.hpp>
 #include <bitcoin/network/protocols/protocol_timer.hpp>
 #include <bitcoin/network/settings.hpp>
+#include <bitcoin/network/user_agent.hpp>
 
 namespace libbitcoin {
 namespace network {
@@ -98,7 +99,7 @@ message::version protocol_version_31402::version_factory() const
     version.set_address_receiver(authority().to_network_address());
     version.set_address_sender(settings.self.to_network_address());
     version.set_nonce(nonce());
-    version.set_user_agent(BC_USER_AGENT);
+    version.set_user_agent(get_user_agent());
     version.set_start_height(static_cast<uint32_t>(height));
 
     // The peer's services cannot be reflected, so zero it.

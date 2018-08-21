@@ -298,7 +298,8 @@ endif()
 if (WITH_TESTS)
     add_executable(bitprim_network_test
           test/main.cpp
-          test/p2p.cpp)
+          test/p2p.cpp
+          test/user_agent_dummy.cpp)
 
     target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
 
