@@ -39,7 +39,8 @@ class BitprimNetworkConan(BitprimConanFile):
                "currency": ['BCH', 'BTC', 'LTC'],
                "microarchitecture": "ANY", #["x86_64", "haswell", "ivybridge", "sandybridge", "bulldozer", ...]
                "fix_march": [True, False],
-               "verbose": [True, False]
+               "verbose": [True, False],
+               "use_domain": [True, False]
     }
 
     default_options = "shared=False", \
@@ -48,7 +49,8 @@ class BitprimNetworkConan(BitprimConanFile):
         "currency=BCH", \
         "microarchitecture=_DUMMY_",  \
         "fix_march=False", \
-        "verbose=False"
+        "verbose=False", \
+        "use_domain=False"
 
     generators = "cmake"
     exports = "conan_*", "ci_utils/*"
@@ -59,8 +61,12 @@ class BitprimNetworkConan(BitprimConanFile):
 
     def requirements(self):
         self.requires("boost/1.66.0@bitprim/stable")
-        self.requires("bitprim-core/0.X@%s/%s" % (self.user, self.channel))
-        # self.bitprim_requires(["bitprim-core/0.X@%s/%s"])
+
+        if self.options.use_domain:
+            self.requires("bitprim-domain/0.X@%s/%s" % (self.user, self.channel))
+        else:
+            self.requires("bitprim-core/0.X@%s/%s" % (self.user, self.channel))
+
 
     def config_options(self):
         if self.settings.arch != "x86_64":
