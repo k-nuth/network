@@ -111,6 +111,10 @@ void session_outbound::handle_connect(const code& ec, channel::ptr channel)
 void session_outbound::handle_channel_start(const code& ec,
     channel::ptr channel)
 {
+    //throw 1;        //TODO(fernando): remover
+    // asm("int $3");  //TODO(fernando): remover
+
+
     // The start failure is also caught by handle_channel_stop.
     if (ec)
     {

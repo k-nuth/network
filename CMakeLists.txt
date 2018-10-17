@@ -61,6 +61,15 @@ option(WITH_TESTS "Compile with unit tests." ON)
 # option(WITH_LITECOIN "Compile with Litecoin support." OFF)
 
 
+# Implement --use-domain and declare USE_DOMAIN.
+#------------------------------------------------------------------------------
+option(USE_DOMAIN "Domain enabled." OFF)
+if (USE_DOMAIN)
+  message(STATUS "Bitprim: Using Domain enabled")
+  add_definitions(-DBITPRIM_USE_DOMAIN)
+endif()
+
+
 set(BITPRIM_PROJECT_VERSION "-" CACHE STRING "Specify the Bitprim Project Version.")
 # message(${BITPRIM_PROJECT_VERSION})
 
