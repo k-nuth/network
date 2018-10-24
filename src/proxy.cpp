@@ -62,11 +62,11 @@ proxy::proxy(threadpool& pool, socket::ptr socket, const settings& settings)
     stop_subscriber_(std::make_shared<stop_subscriber>(pool, NAME "_sub")),
     dispatch_(pool, NAME "_dispatch")
 {
-    LOG_INFO(LOG_NETWORK) << "proxy::proxy";
+    //LOG_INFO(LOG_NETWORK) << "proxy::proxy";
 }
 
 proxy::~proxy() {
-    LOG_INFO(LOG_NETWORK) << "proxy::~proxy";
+    //LOG_INFO(LOG_NETWORK) << "proxy::~proxy";
     BITCOIN_ASSERT_MSG(stopped(), "The channel was not stopped.");
 }
 
@@ -89,7 +89,7 @@ void proxy::set_negotiated_version(uint32_t value) {
 // ----------------------------------------------------------------------------
 
 void proxy::start(result_handler handler) {
-    LOG_INFO(LOG_NETWORK) << "proxy::start()";
+    //LOG_INFO(LOG_NETWORK) << "proxy::start()";
     if ( ! stopped()) {
         handler(error::operation_failed);
         return;
@@ -110,7 +110,7 @@ void proxy::start(result_handler handler) {
 // ----------------------------------------------------------------------------
 
 void proxy::subscribe_stop(result_handler handler) {
-    LOG_INFO(LOG_NETWORK) << "proxy::subscribe_stop()";
+    //LOG_INFO(LOG_NETWORK) << "proxy::subscribe_stop()";
     stop_subscriber_->subscribe(handler, error::channel_stopped);
 }
 
@@ -118,7 +118,7 @@ void proxy::subscribe_stop(result_handler handler) {
 // ----------------------------------------------------------------------------
 
 void proxy::read_heading() {
-    LOG_INFO(LOG_NETWORK) << "proxy::read_heading()";
+    //LOG_INFO(LOG_NETWORK) << "proxy::read_heading()";
     if (stopped())
         return;
 
@@ -128,7 +128,7 @@ void proxy::read_heading() {
 }
 
 void proxy::handle_read_heading(const boost_code& ec, size_t) {
-    LOG_INFO(LOG_NETWORK) << "proxy::handle_read_heading()";
+    // LOG_INFO(LOG_NETWORK) << "proxy::handle_read_heading()";
     if (stopped())
         return;
 
@@ -174,7 +174,7 @@ void proxy::handle_read_heading(const boost_code& ec, size_t) {
 }
 
 void proxy::read_payload(const heading& head) {
-    LOG_INFO(LOG_NETWORK) << "proxy::read_payload()";
+    //LOG_INFO(LOG_NETWORK) << "proxy::read_payload()";
     if (stopped())
         return;
 
@@ -187,7 +187,7 @@ void proxy::read_payload(const heading& head) {
 }
 
 void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const heading& head) {
-    LOG_INFO(LOG_NETWORK) << "proxy::handle_read_payload()";
+    //LOG_INFO(LOG_NETWORK) << "proxy::handle_read_payload()";
     if (stopped())
         return;
 
@@ -261,7 +261,7 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
 // ----------------------------------------------------------------------------
 
 void proxy::do_send(command_ptr command, payload_ptr payload, result_handler handler) {
-    LOG_INFO(LOG_NETWORK) << "proxy::do_send()";
+    // LOG_INFO(LOG_NETWORK) << "proxy::do_send()";
 
     async_write(socket_->get(), buffer(*payload),
         std::bind(&proxy::handle_send,
@@ -269,7 +269,7 @@ void proxy::do_send(command_ptr command, payload_ptr payload, result_handler han
 }
 
 void proxy::handle_send(const boost_code& ec, size_t, command_ptr command, payload_ptr payload, result_handler handler) {
-    LOG_INFO(LOG_NETWORK) << "proxy::handle_send()";
+    // LOG_INFO(LOG_NETWORK) << "proxy::handle_send()";
 
     dispatch_.unlock();
     const auto size = payload->size();
@@ -306,7 +306,7 @@ void proxy::handle_send(const boost_code& ec, size_t, command_ptr command, paylo
 // lock be taken around the entire section, which poses a deadlock risk.
 // Instead this is thread safe and idempotent, allowing it to be unguarded.
 void proxy::stop(const code& ec) {
-    LOG_INFO(LOG_NETWORK) << "proxy::stop()";
+    // LOG_INFO(LOG_NETWORK) << "proxy::stop()";
 
     BITCOIN_ASSERT_MSG(ec, "The stop code must be an error code.");
 
@@ -328,12 +328,12 @@ void proxy::stop(const code& ec) {
 }
 
 void proxy::stop(const boost_code& ec) {
-    LOG_INFO(LOG_NETWORK) << "proxy::stop() - 1";
+    // LOG_INFO(LOG_NETWORK) << "proxy::stop() - 1";
     stop(error::boost_to_error_code(ec));
 }
 
 bool proxy::stopped() const {
-    LOG_INFO(LOG_NETWORK) << "proxy::stopped()";
+    // LOG_INFO(LOG_NETWORK) << "proxy::stopped()";
     return stopped_;
 }
 
