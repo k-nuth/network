@@ -64,11 +64,11 @@ class BitprimNetworkConan(BitprimConanFile):
 
 
     def requirements(self):
-        self.requires("boost/1.66.0@bitprim/stable")
-
         if self.options.use_domain:
+            self.requires("boost/1.68.0@bitprim/stable")
             self.requires("bitprim-domain/0.X@%s/%s" % (self.user, self.channel))
         else:
+            self.requires("boost/1.66.0@bitprim/stable")
             self.requires("bitprim-core/0.X@%s/%s" % (self.user, self.channel))
 
 
