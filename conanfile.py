@@ -43,6 +43,7 @@ class BitprimNetworkConan(BitprimConanFile):
                "use_domain": [True, False],
                "cxxflags": "ANY",
                "cflags": "ANY",
+               "glibcxx_supports_cxx11_abi": "ANY",
     }
 
     default_options = "shared=False", \
@@ -54,7 +55,8 @@ class BitprimNetworkConan(BitprimConanFile):
         "verbose=False", \
         "use_domain=False", \
         "cxxflags=_DUMMY_", \
-        "cflags=_DUMMY_"
+        "cflags=_DUMMY_", \
+        "glibcxx_supports_cxx11_abi=_DUMMY_"
 
     generators = "cmake"
     exports = "conan_*", "ci_utils/*"
