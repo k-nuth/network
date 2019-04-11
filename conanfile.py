@@ -53,7 +53,7 @@ class BitprimNetworkConan(BitprimConanFile):
         "microarchitecture=_DUMMY_",  \
         "fix_march=False", \
         "verbose=False", \
-        "use_domain=False", \
+        "use_domain=True", \
         "cxxflags=_DUMMY_", \
         "cflags=_DUMMY_", \
         "glibcxx_supports_cxx11_abi=_DUMMY_"
@@ -67,7 +67,7 @@ class BitprimNetworkConan(BitprimConanFile):
 
     def requirements(self):
         if self.options.use_domain:
-            self.requires("boost/1.68.0@bitprim/stable")
+            self.requires("boost/1.69.0@bitprim/stable")
             self.requires("bitprim-domain/0.X@%s/%s" % (self.user, self.channel))
         else:
             self.requires("boost/1.66.0@bitprim/stable")
