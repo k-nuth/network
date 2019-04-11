@@ -63,7 +63,7 @@ option(WITH_TESTS "Compile with unit tests." ON)
 
 # Implement --use-domain and declare USE_DOMAIN.
 #------------------------------------------------------------------------------
-option(USE_DOMAIN "Domain enabled." OFF)
+option(USE_DOMAIN "Domain enabled." ON)
 if (USE_DOMAIN)
   message(STATUS "Bitprim: Using Domain enabled")
   add_definitions(-DBITPRIM_USE_DOMAIN)
