@@ -54,24 +54,6 @@ install:
 
   - conan user # It creates the conan data directory
 
-
-install:
-  
-  # - git config core.autocrlf
-
-  - set PATH=%PYTHON%;%PYTHON%/Scripts/;%PATH%;
-  - python.exe --version
-  - python.exe -m pip install --upgrade pip
-  - pip.exe install conan --upgrade > NUL
-  - pip.exe install conan_package_tools --upgrade > NUL
-
-  # - pip.exe install conan==1.9.1 > NUL
-  # - pip.exe install conan_package_tools==0.20.0 > NUL
-  # - pip.exe install conan_package_tools > NUL
-
-  - pip.exe install cpuid --upgrade > NUL
-  - conan user # It creates the conan data directory
-
 test_script:
   - git submodule init
   # - git submodule update --remote
