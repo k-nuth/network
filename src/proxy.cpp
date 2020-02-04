@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/proxy.hpp>
 
 #define BOOST_BIND_NO_PLACEHOLDERS
@@ -140,7 +126,7 @@ void proxy::handle_read_heading(const boost_code& ec, size_t) {
         return;
     }
 
-    const auto head = heading::factory_from_data(heading_buffer_);
+    auto const head = heading::factory_from_data(heading_buffer_);
 
     if (!head.is_valid())
     {
@@ -216,13 +202,13 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
     payload_stream istream(source);
 
     // Failures are not forwarded to subscribers and channel is stopped below.
-    const auto code = message_subscriber_.load(head.type(), version_, istream);
-    const auto consumed = istream.peek() == std::istream::traits_type::eof();
+    auto const code = message_subscriber_.load(head.type(), version_, istream);
+    auto const consumed = istream.peek() == std::istream::traits_type::eof();
 
     if (verbose_ && code)
     {
-        const auto size = std::min(payload_size, invalid_payload_dump_size);
-        const auto begin = payload_buffer_.begin();
+        auto const size = std::min(payload_size, invalid_payload_dump_size);
+        auto const begin = payload_buffer_.begin();
 
         LOG_VERBOSE(LOG_NETWORK)
             << "Invalid payload from [" << authority() << "] "
@@ -272,8 +258,8 @@ void proxy::handle_send(const boost_code& ec, size_t, command_ptr command, paylo
     // LOG_INFO(LOG_NETWORK) << "proxy::handle_send()";
 
     dispatch_.unlock();
-    const auto size = payload->size();
-    const auto error = code(error::boost_to_error_code(ec));
+    auto const size = payload->size();
+    auto const error = code(error::boost_to_error_code(ec));
 
     if (stopped())
     {
@@ -338,4 +324,4 @@ bool proxy::stopped() const {
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

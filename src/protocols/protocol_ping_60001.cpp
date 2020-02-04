@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/protocols/protocol_ping_60001.hpp>
 
 #include <cstdint>
@@ -67,7 +53,7 @@ void protocol_ping_60001::send_ping(const code& ec)
     }
 
     pending_ = true;
-    const auto nonce = pseudo_random::next();
+    auto const nonce = pseudo_random::next();
     SUBSCRIBE3(pong, handle_receive_pong, _1, _2, nonce);
     SEND2(ping{ nonce }, handle_send_ping, _1, ping::command);
 }
@@ -135,4 +121,4 @@ bool protocol_ping_60001::handle_receive_pong(const code& ec,
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

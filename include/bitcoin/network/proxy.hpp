@@ -1,23 +1,9 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-#ifndef LIBBITCOIN_NETWORK_PROXY_HPP
-#define LIBBITCOIN_NETWORK_PROXY_HPP
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef KTH_NETWORK_PROXY_HPP
+#define KTH_NETWORK_PROXY_HPP
 
 #include <atomic>
 #include <cstddef>
@@ -54,8 +40,8 @@ public:
     void send(const Message& message, result_handler handler)
     {
         auto data = message::serialize(version_, message, protocol_magic_);
-        const auto payload = std::make_shared<data_chunk>(std::move(data));
-        const auto command = std::make_shared<std::string>(message.command);
+        auto const payload = std::make_shared<data_chunk>(std::move(data));
+        auto const command = std::make_shared<std::string>(message.command);
 
         // Sequential dispatch is required because write may occur in multiple
         // asynchronous steps invoked on different threads, causing deadlocks.
@@ -138,7 +124,7 @@ private:
 };
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth
 
 #endif
 

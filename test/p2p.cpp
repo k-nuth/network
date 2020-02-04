@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <cstdio>
 #include <future>
 #include <iostream>
@@ -73,21 +59,21 @@ using namespace bc::network;
 
 std::string get_log_path(const std::string& test, const std::string& file)
 {
-    const auto path = test + "." + file + ".log";
+    auto const path = test + "." + file + ".log";
     boost::filesystem::remove_all(path);
     return path;
 }
 
 static void print_headers(const std::string& test)
 {
-    const auto header = "=========== " + test + " ==========";
+    auto const header = "=========== " + test + " ==========";
     LOG_INFO(TEST_SET_NAME) << header;
 }
 
 static int start_result(p2p& network)
 {
     std::promise<code> promise;
-    const auto handler = [&promise](code ec)
+    auto const handler = [&promise](code ec)
     {
         promise.set_value(ec);
     };
@@ -98,7 +84,7 @@ static int start_result(p2p& network)
 static int connect_result(p2p& network, const config::endpoint& host)
 {
     std::promise<code> promise;
-    const auto handler = [&promise](code ec, channel::ptr)
+    auto const handler = [&promise](code ec, channel::ptr)
     {
         promise.set_value(ec);
     };
@@ -109,7 +95,7 @@ static int connect_result(p2p& network, const config::endpoint& host)
 static int run_result(p2p& network)
 {
     std::promise<code> promise;
-    const auto handler = [&promise](code ec)
+    auto const handler = [&promise](code ec)
     {
         promise.set_value(ec);
     };
@@ -120,7 +106,7 @@ static int run_result(p2p& network)
 static int subscribe_result(p2p& network)
 {
     std::promise<code> promise;
-    const auto handler = [&promise](code ec, channel::ptr)
+    auto const handler = [&promise](code ec, channel::ptr)
     {
         promise.set_value(ec);
         return false;
@@ -132,7 +118,7 @@ static int subscribe_result(p2p& network)
 static int subscribe_connect1_result(p2p& network, const config::endpoint& host)
 {
     std::promise<code> promise;
-    const auto handler = [&promise](code ec, channel::ptr)
+    auto const handler = [&promise](code ec, channel::ptr)
     {
         promise.set_value(ec);
         return false;
@@ -145,7 +131,7 @@ static int subscribe_connect1_result(p2p& network, const config::endpoint& host)
 static int subscribe_connect2_result(p2p& network, const config::endpoint& host)
 {
     std::promise<code> promise;
-    const auto handler = [&promise](code ec, channel::ptr)
+    auto const handler = [&promise](code ec, channel::ptr)
     {
         promise.set_value(ec);
         return false;
@@ -158,20 +144,20 @@ static int subscribe_connect2_result(p2p& network, const config::endpoint& host)
 template<class Message>
 static int send_result(const Message& message, p2p& network, int channels)
 {
-    const auto channel_counter = [&channels](code ec, channel::ptr channel)
+    auto const channel_counter = [&channels](code ec, channel::ptr channel)
     {
         BOOST_REQUIRE_EQUAL(ec, error::success);
         --channels;
     };
 
     std::promise<code> promise;
-    const auto completion_handler = [&promise](code ec)
+    auto const completion_handler = [&promise](code ec)
     {
         promise.set_value(ec);
     };
 
     network.broadcast(message, channel_counter, completion_handler);
-    const auto result = promise.get_future().get().value();
+    auto const result = promise.get_future().get().value();
 
     BOOST_REQUIRE_EQUAL(channels, 0);
     return result;
@@ -204,7 +190,7 @@ BOOST_AUTO_TEST_CASE(p2p__set_top_block1__values__expected)
     const network::settings configuration;
     p2p network(configuration);
     const size_t expected_height = 42;
-    const auto expected_hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
+    auto const expected_hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
     network.set_top_block({ expected_hash, expected_height });
     BOOST_REQUIRE(network.top_block().hash() == expected_hash);
     BOOST_REQUIRE_EQUAL(network.top_block().height(), expected_height);
@@ -216,7 +202,7 @@ BOOST_AUTO_TEST_CASE(p2p__set_top_block2__values__expected)
     const network::settings configuration;
     p2p network(configuration);
     const size_t expected_height = 42;
-    const auto hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
+    auto const hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
     const config::checkpoint expected{ hash, expected_height };
     network.set_top_block(expected);
     BOOST_REQUIRE(network.top_block().hash() == expected.hash());
@@ -391,7 +377,7 @@ BOOST_AUTO_TEST_CASE(p2p__subscribe__started_stop__service_stopped)
     BOOST_REQUIRE_EQUAL(start_result(network), error::success);
 
     std::promise<code> promise;
-    const auto handler = [](code ec, channel::ptr channel)
+    auto const handler = [](code ec, channel::ptr channel)
     {
         BOOST_REQUIRE(!channel);
         BOOST_REQUIRE_EQUAL(ec, error::service_stopped);
@@ -444,7 +430,7 @@ BOOST_AUTO_TEST_CASE(p2p__broadcast__ping_two_distinct_hosts__two_sends_and_succ
 ////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
 ////
 ////    std::promise<code> subscribe;
-////    const auto subscribe_handler = [&subscribe, &network](code ec, channel::ptr)
+////    auto const subscribe_handler = [&subscribe, &network](code ec, channel::ptr)
 ////    {
 ////        // Fires on first connection.
 ////        subscribe.set_value(ec);
@@ -453,7 +439,7 @@ BOOST_AUTO_TEST_CASE(p2p__broadcast__ping_two_distinct_hosts__two_sends_and_succ
 ////    network.subscribe_connection(subscribe_handler);
 ////
 ////    std::promise<code> run;
-////    const auto run_handler = [&run, &network](code ec)
+////    auto const run_handler = [&run, &network](code ec)
 ////    {
 ////        // Fires once the session is started.
 ////        run.set_value(ec);

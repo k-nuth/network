@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/hosts.hpp>
 
 #include <algorithm>
@@ -46,7 +32,7 @@ hosts::hosts(const settings& settings)
 // private
 hosts::iterator hosts::find(const address& host)
 {
-    const auto found = [&host](const address& entry)
+    auto const found = [&host](const address& entry)
     {
         return entry.port() == host.port() && entry.ip() == host.ip();
     };
@@ -80,8 +66,8 @@ code hosts::fetch(address& out) const
         return error::not_found;
 
     // Randomly select an address from the buffer.
-    const auto random = pseudo_random::next(0, buffer_.size() - 1);
-    const auto index = static_cast<size_t>(random);
+    auto const random = pseudo_random::next(0, buffer_.size() - 1);
+    auto const index = static_cast<size_t>(random);
     out = buffer_[index];
     return error::success;
     ///////////////////////////////////////////////////////////////////////////
@@ -103,7 +89,7 @@ code hosts::fetch(address::list& out) const
         if (buffer_.empty())
             return error::not_found;
 
-        const auto out_count = std::min(buffer_.size(), capacity_) /
+        auto const out_count = std::min(buffer_.size(), capacity_) /
             static_cast<size_t>(pseudo_random::next(1, 20));
 
         if (out_count == 0)
@@ -140,7 +126,7 @@ code hosts::start()
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     stopped_ = false;
     bc::ifstream file(file_path_.string());
-    const auto file_error = file.bad();
+    auto const file_error = file.bad();
 
     if (!file_error)
     {
@@ -191,11 +177,11 @@ code hosts::stop()
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     stopped_ = true;
     bc::ofstream file(file_path_.string());
-    const auto file_error = file.bad();
+    auto const file_error = file.bad();
 
     if (!file_error)
     {
-        for (const auto& entry: buffer_)
+        for (auto const& entry: buffer_)
         {
             // TODO: create full space-delimited network_address serialization.
             // Use to/from string format as opposed to wire serialization.
@@ -320,16 +306,16 @@ void hosts::store(const address::list& hosts, result_handler handler)
     }
 
     // Accept between 1 and all of this peer's addresses up to capacity.
-    const auto capacity = buffer_.capacity();
-    const auto usable = std::min(hosts.size(), capacity);
-    const auto random = static_cast<size_t>(pseudo_random::next(1, usable));
+    auto const capacity = buffer_.capacity();
+    auto const usable = std::min(hosts.size(), capacity);
+    auto const random = static_cast<size_t>(pseudo_random::next(1, usable));
 
     // But always accept at least the amount we are short if available.
-    const auto gap = capacity - buffer_.size();
-    const auto accept = std::max(gap, random);
+    auto const gap = capacity - buffer_.size();
+    auto const accept = std::max(gap, random);
 
     // Convert minimum desired to step for iteration, no less than 1.
-    const auto step = std::max(usable / accept, size_t(1));
+    auto const step = std::max(usable / accept, size_t(1));
     size_t accepted = 0;
 
     mutex_.unlock_upgrade_and_lock();
@@ -337,7 +323,7 @@ void hosts::store(const address::list& hosts, result_handler handler)
 
     for (size_t index = 0; index < usable; index = ceiling_add(index, step))
     {
-        const auto& host = hosts[index];
+        auto const& host = hosts[index];
 
         // Do not treat invalid address as an error, just log it.
         if (!host.is_valid())
@@ -366,4 +352,4 @@ void hosts::store(const address::list& hosts, result_handler handler)
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

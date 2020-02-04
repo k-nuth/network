@@ -1,23 +1,9 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-#ifndef LIBBITCOIN_NETWORK_P2P_HPP
-#define LIBBITCOIN_NETWORK_P2P_HPP
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef KTH_NETWORK_P2P_HPP
+#define KTH_NETWORK_P2P_HPP
 
 #include <atomic>
 #include <cstddef>
@@ -66,14 +52,14 @@ public:
         result_handler handle_complete)
     {
         // Safely copy the channel collection.
-        const auto channels = pending_close_.collection();
+        auto const channels = pending_close_.collection();
 
         // Invoke the completion handler after send complete on all channels.
-        const auto join_handler = synchronize(handle_complete, channels.size(),
+        auto const join_handler = synchronize(handle_complete, channels.size(),
             "p2p_join", synchronizer_terminate::on_count);
 
         // No pre-serialize, channels may have different protocol versions.
-        for (const auto channel: channels)
+        for (auto const channel: channels)
             channel->send(message, std::bind(&p2p::handle_send, this,
                 std::placeholders::_1, channel, handle_channel, join_handler));
     }
@@ -254,6 +240,6 @@ private:
 };
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth
 
 #endif

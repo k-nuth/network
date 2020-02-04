@@ -4,8 +4,8 @@
 //        GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef LIBBITCOIN_NETWORK_HPP
-#define LIBBITCOIN_NETWORK_HPP
+#ifndef KTH_NETWORK_HPP
+#define KTH_NETWORK_HPP
 
 /**
  * API Users: Include only this header. Direct use of other headers is fragile

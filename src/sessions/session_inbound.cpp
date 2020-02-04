@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/sessions/session_inbound.hpp>
 
 #include <cstddef>
@@ -76,7 +62,7 @@ void session_inbound::handle_started(const code& ec, result_handler handler)
     subscribe_stop(BIND1(handle_stop, _1));
 
     // START LISTENING ON PORT
-    const auto error_code = acceptor_->listen(settings_.inbound_port);
+    auto const error_code = acceptor_->listen(settings_.inbound_port);
 
     if (error_code)
     {
@@ -177,7 +163,7 @@ void session_inbound::handle_channel_start(const code& ec,
 
 void session_inbound::attach_protocols(channel::ptr channel)
 {
-    const auto version = channel->negotiated_version();
+    auto const version = channel->negotiated_version();
 
     if (version >= message::version::level::bip31)
         attach<protocol_ping_60001>(channel)->start();
@@ -216,4 +202,4 @@ void session_inbound::handshake_complete(channel::ptr channel,
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

@@ -1,27 +1,13 @@
-#
-# Copyright (c) 2017 Bitprim developers (see AUTHORS)
-#
-# This file is part of Bitprim.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Copyright (c) 2016-2020 Knuth Project developers.
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 
 cmake_minimum_required(VERSION 3.4)
 
-# bitprim-network
+# kth-network
 #==============================================================================
-project(bitprim-network
+project(kth-network
         VERSION 0
         LANGUAGES CXX C)
 
@@ -29,7 +15,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Check for baseline language coverage in the compiler for the C++14 standard.
 #------------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Process options.
@@ -65,42 +51,42 @@ option(WITH_TESTS "Compile with unit tests." ON)
 #------------------------------------------------------------------------------
 option(USE_DOMAIN "Domain enabled." ON)
 if (USE_DOMAIN)
-  message(STATUS "Bitprim: Using Domain enabled")
-  add_definitions(-DBITPRIM_USE_DOMAIN)
+  message(STATUS "Knuth: Using Domain enabled")
+  add_definitions(-DKTH_USE_DOMAIN)
 endif()
 
 
-set(BITPRIM_PROJECT_VERSION "-" CACHE STRING "Specify the Bitprim Project Version.")
-# message(${BITPRIM_PROJECT_VERSION})
+set(KTH_PROJECT_VERSION "-" CACHE STRING "Specify the Bitprim Project Version.")
+# message(${KTH_PROJECT_VERSION})
 
 
 set(MICROARCHITECTURE "x86_64" CACHE STRING "Specify the Cryptocurrency (x86_64|...).")
 message( STATUS "Bitprim: Compiling for ${MICROARCHITECTURE}")
-# add_definitions(-DBITPRIM_MICROARCHITECTURE=${MICROARCHITECTURE})
-# add_definitions(-DBITPRIM_MICROARCHITECTURE_STR="${MICROARCHITECTURE}")
+# add_definitions(-DKTH_MICROARCHITECTURE=${MICROARCHITECTURE})
+# add_definitions(-DKTH_MICROARCHITECTURE_STR="${MICROARCHITECTURE}")
 
 
 set(CURRENCY "BCH" CACHE STRING "Specify the Cryptocurrency (BCH|BTC|LTC).")
 
 if (${CURRENCY} STREQUAL "BCH")
-  add_definitions(-DBITPRIM_CURRENCY_BCH)
+  add_definitions(-DKTH_CURRENCY_BCH)
 elseif (${CURRENCY} STREQUAL "BTC")
-  add_definitions(-DBITPRIM_CURRENCY_BTC)
+  add_definitions(-DKTH_CURRENCY_BTC)
 elseif (${CURRENCY} STREQUAL "LTC")
-  add_definitions(-DBITPRIM_CURRENCY_LTC)
+  add_definitions(-DKTH_CURRENCY_LTC)
 else()
   message(FATAL_ERROR "Invalid Cryptocurrency: ${CURRENCY}")
 endif()
 
-message(STATUS "Bitprim: Cryptocurrency: ${CURRENCY}")
+message(STATUS "Knuth: Cryptocurrency: ${CURRENCY}")
 
 
 # Conan infrastructure
 #==============================================================================
-if(EXISTS ${CMAKE_SOURCE_DIR}/ci_utils/cmake/bitprimbuildinfo.cmake)
-    include(${CMAKE_SOURCE_DIR}/ci_utils/cmake/bitprimbuildinfo.cmake)
+if(EXISTS ${CMAKE_SOURCE_DIR}/ci_utils/cmake/knuthbuildinfo.cmake)
+    include(${CMAKE_SOURCE_DIR}/ci_utils/cmake/knuthbuildinfo.cmake)
 else()
-    message( STATUS "bitprimbuildinfo doent exists")
+    message( STATUS "knuthbuildinfo doent exists")
 endif()
 
 
@@ -129,10 +115,10 @@ if (NO_CONAN_AT_ALL)
 endif()
 
 if (NOT USE_CONAN)
-    # Require bitprim-core of at least version 0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+    # Require kth-domain of at least version 0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
     #------------------------------------------------------------------------------
-    if (NOT TARGET bitprim-core)
-            find_package(bitprim-core 0 REQUIRED)
+    if (NOT TARGET kth-domain)
+            find_package(kth-domain 0 REQUIRED)
     endif()
 endif()
 
@@ -145,7 +131,7 @@ include(CheckCXXCompilerFlag)
 #------------------------------------------------------------------------------
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/ci_utils/cmake)
 
-include(BitprimTools)
+include(KnuthTools)
 
 
 # Warn on all stuff.
@@ -220,14 +206,14 @@ endif()
 # Build
 #==============================================================================
 
-# src/bitprim-network.la => ${libdir}
+# src/kth-network.la => ${libdir}
 #------------------------------------------------------------------------------
 set(MODE STATIC)
 if (ENABLE_SHARED)
   set(MODE SHARED)
 endif()
 
-add_library(bitprim-network ${MODE}
+add_library(kth-network ${MODE}
         src/protocols/protocol.cpp
         src/protocols/protocol_address_31402.cpp
         src/protocols/protocol_events.cpp
@@ -259,42 +245,42 @@ add_library(bitprim-network ${MODE}
 
 
 if (ENABLE_POSITION_INDEPENDENT_CODE)
-  set_property(TARGET bitprim-network PROPERTY POSITION_INDEPENDENT_CODE ON)
+  set_property(TARGET kth-network PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif(ENABLE_POSITION_INDEPENDENT_CODE)
 
-target_include_directories(bitprim-network PUBLIC
+target_include_directories(kth-network PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
 
-target_compile_definitions(bitprim-network PUBLIC -DBITPRIM_PROJECT_VERSION="\\"${BITPRIM_PROJECT_VERSION}\\"") #TODO(fernando): manage with Conan????
+target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="\\"${KTH_PROJECT_VERSION}\\"") #TODO(fernando): manage with Conan????
 
 if (NOT ENABLE_SHARED)
-    target_compile_definitions(bitprim-network PUBLIC -DBCT_STATIC -DBC_STATIC)
+    target_compile_definitions(kth-network PUBLIC -DBCT_STATIC -DBC_STATIC)
 endif()
 
 if (NOT USE_CONAN)
-  target_link_libraries(bitprim-network PUBLIC bitprim-core)
+  target_link_libraries(kth-network PUBLIC kth-domain)
 endif()
 
 if (NOT NO_CONAN_AT_ALL)
-  target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
+  target_link_libraries(kth-network PUBLIC ${CONAN_LIBS})
 endif()
 
 # if (NOT NO_CONAN_AT_ALL)
-#   target_link_libraries(bitprim-network PUBLIC ${CONAN_LIBS})
+#   target_link_libraries(kth-network PUBLIC ${CONAN_LIBS})
 # else()
-#   target_link_libraries(bitprim-network bitprim-core)
+#   target_link_libraries(kth-network kth-domain)
 # endif()
 
 if (USE_CONAN)
   if (MINGW)
-    target_link_libraries(bitprim-network PUBLIC ws2_32 wsock32) #TODO(fernando): manage with Conan
+    target_link_libraries(kth-network PUBLIC ws2_32 wsock32) #TODO(fernando): manage with Conan
   endif()
 endif()
 
 
-_group_sources(bitprim-network "${CMAKE_CURRENT_LIST_DIR}")
+_group_sources(kth-network "${CMAKE_CURRENT_LIST_DIR}")
 
 # Tests
 #==============================================================================
@@ -310,7 +296,7 @@ if (WITH_TESTS)
           test/p2p.cpp
           test/user_agent_dummy.cpp)
 
-    target_link_libraries(bitprim_network_test PUBLIC bitprim-network)
+    target_link_libraries(bitprim_network_test PUBLIC kth-network)
 
     _group_sources(bitprim_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
@@ -328,11 +314,11 @@ endif()
 
 # Install
 #==============================================================================
-install(TARGETS bitprim-network
-        EXPORT bitprim-network
+install(TARGETS kth-network
+        EXPORT kth-network
         ARCHIVE DESTINATION lib)
 
-set(_bitprim_headers
+set(_kth_headers
         bitcoin/network/protocols/protocol.hpp
         bitcoin/network/protocols/protocol_address_31402.hpp
         bitcoin/network/protocols/protocol_events.hpp
@@ -363,7 +349,7 @@ set(_bitprim_headers
         bitcoin/network/version.hpp
         bitcoin/network.hpp)
 
-foreach (_header ${_bitprim_headers})
+foreach (_header ${_kth_headers})
   get_filename_component(_directory "${_header}" DIRECTORY)
   install(FILES "include/${_header}" DESTINATION "include/${_directory}")
 endforeach()
@@ -372,9 +358,9 @@ endforeach()
 #==============================================================================
 include(CMakePackageConfigHelpers)
 
-export(EXPORT bitprim-network
-        FILE "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkTargets.cmake")
-export(PACKAGE bitprim-network)
+export(EXPORT kth-network
+        FILE "${CMAKE_CURRENT_BINARY_DIR}/kth-networkTargets.cmake")
+export(PACKAGE kth-network)
 
 if (UNIX)
   set(_config_package_location "lib/cmake")
@@ -382,21 +368,21 @@ elseif (WIN32)
   set(_config_package_location "cmake")
 endif()
 
-install(EXPORT bitprim-network
-        FILE bitprim-networkTargets.cmake
+install(EXPORT kth-network
+        FILE kth-networkTargets.cmake
         DESTINATION ${_config_package_location})
 
-configure_file(bitprim-networkConfig.cmake.in
-        "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfig.cmake"
+configure_file(kth-networkConfig.cmake.in
+        "${CMAKE_CURRENT_BINARY_DIR}/kth-networkConfig.cmake"
         @ONLY)
 
 write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/kth-networkConfigVersion.cmake"
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY AnyNewerVersion)
 
 install(
         FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/bitprim-networkConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/kth-networkConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/kth-networkConfigVersion.cmake"
         DESTINATION ${_config_package_location})

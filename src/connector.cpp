@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/connector.hpp>
 
 #include <cstddef>
@@ -148,11 +134,11 @@ void connector::handle_resolve(const boost_code& ec, asio::iterator iterator,
         return;
     }
 
-    const auto socket = std::make_shared<bc::socket>(pool_);
+    auto const socket = std::make_shared<bc::socket>(pool_);
     timer_ = std::make_shared<deadline>(pool_, settings_.connect_timeout());
 
     // Manage the timer-connect race, returning upon first completion.
-    const auto join_handler = synchronize(handler, 1, NAME,
+    auto const join_handler = synchronize(handler, 1, NAME,
         synchronizer_terminate::on_error);
 
     // timer.async_wait will not invoke the handler within this function.
@@ -181,7 +167,7 @@ void connector::handle_connect(const boost_code& ec, asio::iterator,
     }
 
     // Ensure that channel is not passed as an r-value.
-    const auto created = std::make_shared<channel>(pool_, socket, settings_);
+    auto const created = std::make_shared<channel>(pool_, socket, settings_);
     handler(error::success, created);
 }
 
@@ -193,4 +179,4 @@ void connector::handle_timer(const code& ec, socket::ptr socket,
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

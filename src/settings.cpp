@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/settings.hpp>
 
 #include <bitcoin/bitcoin.hpp>
@@ -33,7 +19,7 @@ settings::settings()
     protocol_maximum(version::level::maximum),
     protocol_minimum(version::level::minimum),
     services(version::service::none),
-#ifdef BITPRIM_CURRENCY_BCH
+#ifdef KTH_CURRENCY_BCH
     invalid_services(0),
 #else
     invalid_services(176),
@@ -77,7 +63,7 @@ settings::settings(config::settings context)
     switch (context) {
         case config::settings::mainnet: {
 // #ifdef LITECOIN
-#ifdef BITPRIM_CURRENCY_LTC
+#ifdef KTH_CURRENCY_LTC
             inbound_port = 9333;
             // identifier = 0xdbb6c0fb; 
             identifier = netmagic::ltc_mainnet; 
@@ -92,7 +78,7 @@ settings::settings(config::settings context)
             // identifier = 3652501241;
             inbound_port = 8333;
 
-    #ifdef BITPRIM_CURRENCY_BCH
+    #ifdef KTH_CURRENCY_BCH
             identifier = netmagic::bch_mainnet; 
 
             seeds.reserve(6);
@@ -112,8 +98,8 @@ settings::settings(config::settings context)
             seeds.push_back({ "seed.bitcoinstats.com", 8333 });
             seeds.push_back({ "seed.bitcoin.jonasschnelli.ch", 8333 });
             seeds.push_back({ "seed.voskuil.org", 8333 });
-    #endif // BITPRIM_CURRENCY_BCH
-#endif //BITPRIM_CURRENCY_LTC
+    #endif // KTH_CURRENCY_BCH
+#endif //KTH_CURRENCY_LTC
             break;
         }
 
@@ -121,7 +107,7 @@ settings::settings(config::settings context)
         case config::settings::testnet: {
 
 // #ifdef LITECOIN
-#ifdef BITPRIM_CURRENCY_LTC
+#ifdef KTH_CURRENCY_LTC
             // identifier = 4056470269;
             identifier = netmagic::ltc_testnet;
             inbound_port = 19335;
@@ -131,7 +117,7 @@ settings::settings(config::settings context)
 #else
             // identifier = 118034699;
             inbound_port = 18333;
-    #ifdef BITPRIM_CURRENCY_BCH
+    #ifdef KTH_CURRENCY_BCH
             identifier = netmagic::bch_testnet;
 
             seeds.reserve(6);
@@ -151,8 +137,8 @@ settings::settings(config::settings context)
             seeds.push_back({ "testnet-seed.bluematt.me", 18333 });
             seeds.push_back({ "testnet-seed.bitcoin.schildbach.de", 18333 });
             seeds.push_back({ "testnet-seed.voskuil.org", 18333 });
-    #endif //BITPRIM_CURRENCY_BCH
-#endif //BITPRIM_CURRENCY_LTC
+    #endif //KTH_CURRENCY_BCH
+#endif //KTH_CURRENCY_LTC
             break;
         }
 
@@ -201,4 +187,4 @@ duration settings::channel_germination() const
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

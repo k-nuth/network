@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/p2p.hpp>
 
 #include <algorithm>
@@ -149,7 +135,7 @@ void p2p::handle_hosts_loaded(const code& ec, result_handler handler)
     }
 
     // The instance is retained by the stop handler (until shutdown).
-    const auto seed = attach_seed_session();
+    auto const seed = attach_seed_session();
 
     // This is invoked on a new thread.
     seed->start(
@@ -188,11 +174,11 @@ void p2p::handle_started(const code& ec, result_handler handler)
 void p2p::run(result_handler handler)
 {
     // Start node.peer persistent connections.
-    for (const auto& peer: settings_.peers)
+    for (auto const& peer: settings_.peers)
         connect(peer);
 
     // The instance is retained by the stop handler (until shutdown).
-    const auto inbound = attach_inbound_session();
+    auto const inbound = attach_inbound_session();
 
     // This is invoked on a new thread.
     inbound->start(
@@ -211,7 +197,7 @@ void p2p::handle_inbound_started(const code& ec, result_handler handler)
     }
 
     // The instance is retained by the stop handler (until shutdown).
-    const auto outbound = attach_outbound_session();
+    auto const outbound = attach_outbound_session();
 
     // This is invoked on a new thread.
     outbound->start(
@@ -269,7 +255,7 @@ session_outbound::ptr p2p::attach_outbound_session()
 bool p2p::stop()
 {
     // This is the only stop operation that can fail.
-    const auto result = (hosts_.stop() == error::success);
+    auto const result = (hosts_.stop() == error::success);
 
     // Signal all current work to stop and free manual session.
     stopped_ = true;
@@ -297,7 +283,7 @@ bool p2p::stop()
 bool p2p::close()
 {
     // Signal current work to stop and threadpool to stop accepting new work.
-    const auto result = p2p::stop();
+    auto const result = p2p::stop();
 
     // Block on join of all threads in the threadpool.
     threadpool_.join();
@@ -459,7 +445,7 @@ void p2p::unpend(channel::ptr channel)
 
 bool p2p::pending(uint64_t version_nonce) const
 {
-    const auto match = [version_nonce](const channel::ptr& element)
+    auto const match = [version_nonce](const channel::ptr& element)
     {
         return element->nonce() == version_nonce;
     };
@@ -477,7 +463,7 @@ size_t p2p::connection_count() const
 
 bool p2p::connected(const address& address) const
 {
-    const auto match = [&address](const channel::ptr& element)
+    auto const match = [&address](const channel::ptr& element)
     {
         return element->authority() == address;
     };
@@ -487,14 +473,14 @@ bool p2p::connected(const address& address) const
 
 code p2p::store(channel::ptr channel)
 {
-    const auto address = channel->authority();
-    const auto match = [&address](const channel::ptr& element)
+    auto const address = channel->authority();
+    auto const match = [&address](const channel::ptr& element)
     {
         return element->authority() == address;
     };
 
     // May return error::address_in_use.
-    const auto ec = pending_close_.store(channel, match);
+    auto const ec = pending_close_.store(channel, match);
 
     if (!ec && channel->notify())
         channel_subscriber_->relay(error::success, channel);
@@ -508,4 +494,4 @@ void p2p::remove(channel::ptr channel)
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

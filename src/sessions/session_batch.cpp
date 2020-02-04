@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/sessions/session_batch.hpp>
 
 #include <cstddef>
@@ -46,7 +32,7 @@ session_batch::session_batch(p2p& network, bool notify_on_connect)
 // protected:
 void session_batch::connect(channel_handler handler)
 {
-    const auto join_handler = synchronize(handler, batch_size_, NAME "_join",
+    auto const join_handler = synchronize(handler, batch_size_, NAME "_join",
         synchronizer_terminate::on_success);
 
     for (size_t host = 0; host < batch_size_; ++host)
@@ -64,7 +50,7 @@ void session_batch::new_connect(channel_handler handler)
     }
 
     network_address address;
-    const auto ec = fetch_address(address);
+    auto const ec = fetch_address(address);
     start_connect(ec, address, handler);
 }
 
@@ -100,7 +86,7 @@ void session_batch::start_connect(const code& ec, const authority& host,
     LOG_DEBUG(LOG_NETWORK)
         << "Connecting to [" << host << "]";
 
-    const auto connector = create_connector();
+    auto const connector = create_connector();
     pend(connector);
 
     // CONNECT
@@ -127,4 +113,4 @@ void session_batch::handle_connect(const code& ec, channel::ptr channel,
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

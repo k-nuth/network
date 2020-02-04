@@ -6,7 +6,7 @@ from ci_utils import get_builder, handle_microarchs, copy_env_vars, filter_valid
 
 if __name__ == "__main__":
 
-    full_build = os.getenv('BITPRIM_FULL_BUILD', '0') == '1'
+    full_build = os.getenv('KTH_FULL_BUILD', '0') == '1'
     builder, name = get_builder()
     builder.add_common_builds(shared_option_name="%s:shared" % name)
 
@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
             copy_env_vars(env_vars)
 
-            if os.getenv('BITPRIM_RUN_TESTS', 'false') == 'true':
+            if os.getenv('KTH_RUN_TESTS', 'false') == 'true':
                 options["%s:with_tests" % name] = "True"
 
             if full_build:

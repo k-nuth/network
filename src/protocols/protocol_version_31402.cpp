@@ -1,21 +1,7 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <bitcoin/network/protocols/protocol_version_31402.hpp>
 
 #include <cstdint>
@@ -73,9 +59,9 @@ protocol_version_31402::protocol_version_31402(p2p& network,
 
 void protocol_version_31402::start(event_handler handler)
 {
-    const auto period = network_.network_settings().channel_handshake();
+    auto const period = network_.network_settings().channel_handshake();
 
-    const auto join_handler = synchronize(handler, 2, NAME,
+    auto const join_handler = synchronize(handler, 2, NAME,
         synchronizer_terminate::on_error);
 
     // The handler is invoked in the context of the last message receipt.
@@ -88,8 +74,8 @@ void protocol_version_31402::start(event_handler handler)
 
 message::version protocol_version_31402::version_factory() const
 {
-    const auto& settings = network_.network_settings();
-    const auto height = network_.top_block().height();
+    auto const& settings = network_.network_settings();
+    auto const height = network_.top_block().height();
     BITCOIN_ASSERT_MSG(height <= max_uint32, "Time to upgrade the protocol.");
 
     message::version version;
@@ -135,7 +121,7 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
     // TODO: move these three checks to initialization.
     //-------------------------------------------------------------------------
 
-    const auto& settings = network_.network_settings();
+    auto const& settings = network_.network_settings();
 
     if (settings.protocol_minimum < version::level::minimum)
     {
@@ -172,7 +158,7 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
         return false;
     }
 
-    const auto version = std::min(message->value(), own_version_);
+    auto const version = std::min(message->value(), own_version_);
     set_negotiated_version(version);
     set_peer_version(message);
 
@@ -237,4 +223,4 @@ bool protocol_version_31402::handle_receive_verack(const code& ec,
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

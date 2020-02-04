@@ -1,32 +1,18 @@
-#
-# Copyright (c) 2017-2018 Bitprim Inc.
-#
-# This file is part of Bitprim.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Copyright (c) 2016-2020 Knuth Project developers.
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 
 import os
 from conans import CMake
 from ci_utils import option_on_off, get_version, get_conan_req_version, march_conan_manip, pass_march_to_compiler
-from ci_utils import BitprimConanFile
+from ci_utils import KnuthConanFile
 
-class BitprimNetworkConan(BitprimConanFile):
-    name = "bitprim-network"
+class KnuthNetworkConan(KnuthConanFile):
+    name = "network"
     # version = get_version()
     license = "http://www.boost.org/users/license.html"
-    url = "https://github.com/bitprim/bitprim-network"
+    url = "https://github.com/k-nuth/network"
     description = "Bitcoin P2P Network Library"
     settings = "os", "compiler", "build_type", "arch"
 
@@ -60,18 +46,18 @@ class BitprimNetworkConan(BitprimConanFile):
 
     generators = "cmake"
     exports = "conan_*", "ci_utils/*"
-    exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "bitprim-networkConfig.cmake.in", "bitprimbuildinfo.cmake", "include/*", "test/*"
-    package_files = "build/lbitprim-network.a"
+    exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "kth-networkConfig.cmake.in", "knuthbuildinfo.cmake", "include/*", "test/*"
+    package_files = "build/lkth-network.a"
     build_policy = "missing"
 
 
     def requirements(self):
         if self.options.use_domain:
-            self.requires("boost/1.69.0@bitprim/stable")
+            self.requires("boost/1.69.0@kth/stable")
             self.requires("bitprim-domain/0.X@%s/%s" % (self.user, self.channel))
         else:
-            self.requires("boost/1.66.0@bitprim/stable")
-            self.requires("bitprim-core/0.X@%s/%s" % (self.user, self.channel))
+            self.requires("boost/1.66.0@kth/stable")
+            self.requires("kth-domain/0.X@%s/%s" % (self.user, self.channel))
 
 
     def config_options(self):
@@ -86,7 +72,7 @@ class BitprimNetworkConan(BitprimConanFile):
                 self.options.remove("shared")
 
     def configure(self):
-        BitprimConanFile.configure(self)
+        KnuthConanFile.configure(self)
 
         if self.settings.arch == "x86_64" and self.options.microarchitecture == "_DUMMY_":
             del self.options.fix_march
@@ -103,7 +89,7 @@ class BitprimNetworkConan(BitprimConanFile):
         self.output.info("Compiling for currency: %s" % (self.options.currency,))
 
     def package_id(self):
-        BitprimConanFile.package_id(self)
+        KnuthConanFile.package_id(self)
 
         self.info.options.with_tests = "ANY"
         self.info.options.verbose = "ANY"
@@ -142,7 +128,7 @@ class BitprimNetworkConan(BitprimConanFile):
 
 
         cmake.definitions["MICROARCHITECTURE"] = self.options.microarchitecture
-        cmake.definitions["BITPRIM_PROJECT_VERSION"] = self.version
+        cmake.definitions["KTH_PROJECT_VERSION"] = self.version
 
         if self.settings.compiler == "gcc":
             if float(str(self.settings.compiler.version)) >= 5:
@@ -176,4 +162,4 @@ class BitprimNetworkConan(BitprimConanFile):
 
     def package_info(self):
         self.cpp_info.includedirs = ['include']
-        self.cpp_info.libs = ["bitprim-network"]
+        self.cpp_info.libs = ["kth-network"]
