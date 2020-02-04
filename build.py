@@ -8,6 +8,7 @@ if __name__ == "__main__":
     full_build = os.getenv('KTH_FULL_BUILD', '0') == '1'
     builder, name = get_builder(os.path.dirname(os.path.abspath(__file__)))
     builder.add_common_builds(shared_option_name="%s:shared" % name)
+    march_ids = get_base_march_ids()
 
     filtered_builds = []
     for settings, options, env_vars, build_requires, reference in builder.items:
@@ -24,7 +25,8 @@ if __name__ == "__main__":
             opts_btc = copy.deepcopy(options)
             # opts_ltc = copy.deepcopy(options)
 
-            march_ids = get_base_march_ids()
+            opts_btc["%s:currency" % name] = "BTC"
+
 
             # opts_bch_new = copy.deepcopy(opts_bch)
             # opts_bch_new["%s:use_domain" % name] = "True"
