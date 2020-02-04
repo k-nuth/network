@@ -6,10 +6,10 @@
 #define KTH_NETWORK_PROTOCOL_SEED_31402_HPP
 
 #include <memory>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/protocols/protocol_timer.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/protocols/protocol_timer.hpp>
 
 namespace kth {
 namespace network {

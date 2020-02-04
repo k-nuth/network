@@ -2,14 +2,14 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/hosts.hpp>
+#include <kth/network/hosts.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <string>
 #include <vector>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {

@@ -7,11 +7,11 @@
 
 #include <cstddef>
 #include <memory>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/sessions/session_batch.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/sessions/session_batch.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {

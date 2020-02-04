@@ -2,17 +2,17 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/protocols/protocol_version_31402.hpp>
+#include <kth/network/protocols/protocol_version_31402.hpp>
 
 #include <cstdint>
 #include <functional>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/protocols/protocol_timer.hpp>
-#include <bitcoin/network/settings.hpp>
-#include <bitcoin/network/user_agent.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/p2p.hpp>
+#include <kth/network/protocols/protocol_timer.hpp>
+#include <kth/network/settings.hpp>
+#include <kth/network/user_agent.hpp>
 
 namespace kth {
 namespace network {
@@ -76,7 +76,7 @@ message::version protocol_version_31402::version_factory() const
 {
     auto const& settings = network_.network_settings();
     auto const height = network_.top_block().height();
-    BITCOIN_ASSERT_MSG(height <= max_uint32, "Time to upgrade the protocol.");
+    KTH_ASSERT_MSG(height <= max_uint32, "Time to upgrade the protocol.");
 
     message::version version;
     version.set_value(own_version_);

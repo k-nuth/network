@@ -2,10 +2,10 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/settings.hpp>
+#include <kth/network/settings.hpp>
 
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/bitcoin/multi_crypto_support.hpp>
+#include <kth/domain.hpp>
+#include <kth/domain/multi_crypto_support.hpp>
 
 namespace kth {
 namespace network {
@@ -57,7 +57,7 @@ settings::settings()
 // Use push_back due to initializer_list bug:
 // stackoverflow.com/a/20168627/1172329
 settings::settings(config::settings context)
-  : settings()
+    : settings()
 {
     // Handle deviations from common defaults.
     switch (context) {
@@ -67,7 +67,6 @@ settings::settings(config::settings context)
             inbound_port = 9333;
             // identifier = 0xdbb6c0fb; 
             identifier = netmagic::ltc_mainnet; 
-
             seeds.reserve(5);
             seeds.push_back({ "seed-a.litecoin.loshan.co.uk", 9333 });
             seeds.push_back({ "dnsseed.thrasher.io", 9333 });
@@ -138,8 +137,7 @@ settings::settings(config::settings context)
             break;
         }
 
-        case config::settings::regtest:
-        {
+        case config::settings::regtest: {
             identifier = 3669344250;
             inbound_port = 18444;
 
@@ -152,33 +150,27 @@ settings::settings(config::settings context)
     }
 }
 
-duration settings::connect_timeout() const
-{
+duration settings::connect_timeout() const {
     return seconds(connect_timeout_seconds);
 }
 
-duration settings::channel_handshake() const
-{
+duration settings::channel_handshake() const {
     return seconds(channel_handshake_seconds);
 }
 
-duration settings::channel_heartbeat() const
-{
+duration settings::channel_heartbeat() const {
     return minutes(channel_heartbeat_minutes);
 }
 
-duration settings::channel_inactivity() const
-{
+duration settings::channel_inactivity() const {
     return minutes(channel_inactivity_minutes);
 }
 
-duration settings::channel_expiration() const
-{
+duration settings::channel_expiration() const {
     return minutes(channel_expiration_minutes);
 }
 
-duration settings::channel_germination() const
-{
+duration settings::channel_germination() const {
     return seconds(channel_germination_seconds);
 }
 

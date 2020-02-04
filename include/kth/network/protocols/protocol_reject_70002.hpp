@@ -6,10 +6,10 @@
 #define KTH_NETWORK_PROTOCOL_REJECT_70002_HPP
 
 #include <memory>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/protocols/protocol_events.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/protocols/protocol_events.hpp>
 
 namespace kth {
 namespace network {

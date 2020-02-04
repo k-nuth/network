@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/proxy.hpp>
+#include <kth/network/proxy.hpp>
 
 #define BOOST_BIND_NO_PLACEHOLDERS
 
@@ -13,9 +13,9 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {
@@ -53,7 +53,7 @@ proxy::proxy(threadpool& pool, socket::ptr socket, const settings& settings)
 
 proxy::~proxy() {
     //LOG_INFO(LOG_NETWORK) << "proxy::~proxy";
-    BITCOIN_ASSERT_MSG(stopped(), "The channel was not stopped.");
+    KTH_ASSERT_MSG(stopped(), "The channel was not stopped.");
 }
 
 // Properties.
@@ -187,9 +187,7 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
     }
 
     // This is a pointless test but we allow it as an option for completeness.
-    if (validate_checksum_ &&
-        head.checksum() != bitcoin_checksum(payload_buffer_))
-    {
+    if (validate_checksum_ && head.checksum() != bitcoin_checksum(payload_buffer_)) {
         LOG_WARNING(LOG_NETWORK)
             << "Invalid " << head.command() << " payload from [" << authority()
             << "] bad checksum.";
@@ -205,8 +203,7 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
     auto const code = message_subscriber_.load(head.type(), version_, istream);
     auto const consumed = istream.peek() == std::istream::traits_type::eof();
 
-    if (verbose_ && code)
-    {
+    if (verbose_ && code) {
         auto const size = std::min(payload_size, invalid_payload_dump_size);
         auto const begin = payload_buffer_.begin();
 
@@ -217,8 +214,7 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
         return;
     }
 
-    if (code)
-    {
+    if (code) {
         LOG_WARNING(LOG_NETWORK)
             << "Invalid " << head.command() << " payload from [" << authority()
             << "] " << code.message();
@@ -226,8 +222,7 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
         return;
     }
 
-    if (!consumed)
-    {
+    if (!consumed) {
         LOG_WARNING(LOG_NETWORK)
             << "Invalid " << head.command() << " payload from [" << authority()
             << "] trailing bytes.";
@@ -261,14 +256,12 @@ void proxy::handle_send(const boost_code& ec, size_t, command_ptr command, paylo
     auto const size = payload->size();
     auto const error = code(error::boost_to_error_code(ec));
 
-    if (stopped())
-    {
+    if (stopped()) {
         handler(error);
         return;
     }
 
-    if (error)
-    {
+    if (error) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure sending " << *command << " to [" << authority()
             << "] (" << size << " bytes) " << error.message();
@@ -294,7 +287,7 @@ void proxy::handle_send(const boost_code& ec, size_t, command_ptr command, paylo
 void proxy::stop(const code& ec) {
     // LOG_INFO(LOG_NETWORK) << "proxy::stop()";
 
-    BITCOIN_ASSERT_MSG(ec, "The stop code must be an error code.");
+    KTH_ASSERT_MSG(ec, "The stop code must be an error code.");
 
     stopped_ = true;
 

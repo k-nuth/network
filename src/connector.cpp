@@ -2,17 +2,17 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/connector.hpp>
+#include <kth/network/connector.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/proxy.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/proxy.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {
@@ -34,7 +34,7 @@ connector::connector(threadpool& pool, const settings& settings)
 
 connector::~connector()
 {
-    BITCOIN_ASSERT_MSG(stopped(), "The connector was not stopped.");
+    KTH_ASSERT_MSG(stopped(), "The connector was not stopped.");
 }
 
 void connector::stop(const code&)

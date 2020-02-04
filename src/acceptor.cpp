@@ -2,16 +2,16 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/acceptor.hpp>
+#include <kth/network/acceptor.hpp>
 
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/proxy.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/proxy.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {
@@ -34,7 +34,7 @@ acceptor::acceptor(threadpool& pool, const settings& settings)
 
 acceptor::~acceptor()
 {
-    BITCOIN_ASSERT_MSG(stopped(), "The acceptor was not stopped.");
+    KTH_ASSERT_MSG(stopped(), "The acceptor was not stopped.");
 }
 
 void acceptor::stop(const code&)

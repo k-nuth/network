@@ -5,12 +5,12 @@
 #ifndef KTH_NETWORK_SESSION_BATCH_HPP
 #define KTH_NETWORK_SESSION_BATCH_HPP
 
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/connector.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/sessions/session.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/connector.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/sessions/session.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {

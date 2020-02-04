@@ -11,11 +11,11 @@
 #include <memory>
 #include <utility>
 #include <string>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/message_subscriber.hpp>
-#include <bitcoin/network/proxy.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/message_subscriber.hpp>
+#include <kth/network/proxy.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {

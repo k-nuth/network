@@ -5,19 +5,18 @@
 
 import os
 from conans import CMake
-from ci_utils import option_on_off, get_version, get_conan_req_version, march_conan_manip, pass_march_to_compiler
-from ci_utils import KnuthConanFile
+from kthbuild import option_on_off, march_conan_manip, pass_march_to_compiler
+from kthbuild import KnuthConanFile
 
 class KnuthNetworkConan(KnuthConanFile):
+    def recipe_dir(self):
+        return os.path.dirname(os.path.abspath(__file__))
+
     name = "network"
-    # version = get_version()
     license = "http://www.boost.org/users/license.html"
     url = "https://github.com/k-nuth/network"
-    description = "Bitcoin P2P Network Library"
+    description = "Crypto P2P Network Library"
     settings = "os", "compiler", "build_type", "arch"
-
-    # if Version(conan_version) < Version(get_conan_req_version()):
-    #     raise Exception ("Conan version should be greater or equal than %s. Detected: %s." % (get_conan_req_version(), conan_version))
 
     options = {"shared": [True, False],
                "fPIC": [True, False],

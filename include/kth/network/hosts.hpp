@@ -10,9 +10,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {

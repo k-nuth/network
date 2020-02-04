@@ -6,7 +6,6 @@
 *.pyc
 Makefile
 Makefile.in
-libbitcoin-network.pc
 
 bin
 obj

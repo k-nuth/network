@@ -12,16 +12,16 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/hosts.hpp>
-#include <bitcoin/network/message_subscriber.hpp>
-#include <bitcoin/network/sessions/session_inbound.hpp>
-#include <bitcoin/network/sessions/session_manual.hpp>
-#include <bitcoin/network/sessions/session_outbound.hpp>
-#include <bitcoin/network/sessions/session_seed.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/hosts.hpp>
+#include <kth/network/message_subscriber.hpp>
+#include <kth/network/sessions/session_inbound.hpp>
+#include <kth/network/sessions/session_manual.hpp>
+#include <kth/network/sessions/session_outbound.hpp>
+#include <kth/network/sessions/session_seed.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {

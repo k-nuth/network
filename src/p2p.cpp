@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/p2p.hpp>
+#include <kth/network/p2p.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -12,21 +12,21 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/hosts.hpp>
-#include <bitcoin/network/protocols/protocol_address_31402.hpp>
-#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
-#include <bitcoin/network/protocols/protocol_ping_60001.hpp>
-#include <bitcoin/network/protocols/protocol_seed_31402.hpp>
-#include <bitcoin/network/protocols/protocol_version_31402.hpp>
-#include <bitcoin/network/protocols/protocol_version_70002.hpp>
-#include <bitcoin/network/sessions/session_inbound.hpp>
-#include <bitcoin/network/sessions/session_manual.hpp>
-#include <bitcoin/network/sessions/session_outbound.hpp>
-#include <bitcoin/network/sessions/session_seed.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/hosts.hpp>
+#include <kth/network/protocols/protocol_address_31402.hpp>
+#include <kth/network/protocols/protocol_ping_31402.hpp>
+#include <kth/network/protocols/protocol_ping_60001.hpp>
+#include <kth/network/protocols/protocol_seed_31402.hpp>
+#include <kth/network/protocols/protocol_version_31402.hpp>
+#include <kth/network/protocols/protocol_version_70002.hpp>
+#include <kth/network/sessions/session_inbound.hpp>
+#include <kth/network/sessions/session_manual.hpp>
+#include <kth/network/sessions/session_outbound.hpp>
+#include <kth/network/sessions/session_seed.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {

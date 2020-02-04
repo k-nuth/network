@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/channel.hpp>
+#include <kth/network/channel.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -10,9 +10,9 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/proxy.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/proxy.hpp>
+#include <kth/network/settings.hpp>
 
 namespace kth {
 namespace network {
@@ -82,7 +82,7 @@ void channel::set_nonce(uint64_t value)
 version_const_ptr channel::peer_version() const
 {
     auto const version = peer_version_.load();
-    BITCOIN_ASSERT_MSG(version, "Read peer version before set.");
+    KTH_ASSERT_MSG(version, "Read peer version before set.");
     return version;
 }
 

@@ -1,15 +1,14 @@
-// Copyright (c) 2016-2020 Knuth Project developers.
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// // Copyright (c) 2016-2020 Knuth Project developers.
+// // Distributed under the MIT software license, see the accompanying
+// // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+// #include <kth/network/version.hpp>
 
-#include <bitcoin/network/version.hpp>
+// namespace kth { namespace network {
 
-namespace kth { namespace network {
+// char const* version() {
+//     return KTH_NETWORK_VERSION;
+// }
 
-char const* version() {
-    return KTH_NETWORK_VERSION;
-}
-
-}} /*namespace libbitcoin::network*/
+// }} // namespace kth::network
 

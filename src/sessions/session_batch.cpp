@@ -2,13 +2,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/sessions/session_batch.hpp>
+#include <kth/network/sessions/session_batch.hpp>
 
 #include <cstddef>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/connector.hpp>
-#include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/sessions/session.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/connector.hpp>
+#include <kth/network/p2p.hpp>
+#include <kth/network/sessions/session.hpp>
 
 namespace kth {
 namespace network {

@@ -2,13 +2,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/protocols/protocol.hpp>
+#include <kth/network/protocols/protocol.hpp>
 
 #include <cstdint>
 #include <string>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/p2p.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/p2p.hpp>
 
 namespace kth {
 namespace network {

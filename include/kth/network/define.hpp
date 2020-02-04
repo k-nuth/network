@@ -5,9 +5,9 @@
 #ifndef KTH_NETWORK_DEFINE_HPP
 #define KTH_NETWORK_DEFINE_HPP
 
-#include <bitcoin/bitcoin.hpp>
+#include <kth/domain.hpp>
 
-// We use the generic helper definitions in libbitcoin to define BCT_API
+// We use the generic helper definitions to define BCT_API
 // and BCT_INTERNAL. BCT_API is used for the public API symbols. It either DLL
 // imports or DLL exports (or does nothing for static build) BCT_INTERNAL is
 // used for non-api symbols.

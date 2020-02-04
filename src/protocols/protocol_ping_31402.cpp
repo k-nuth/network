@@ -2,14 +2,14 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
+#include <kth/network/protocols/protocol_ping_31402.hpp>
 
 #include <functional>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/protocols/protocol_timer.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/p2p.hpp>
+#include <kth/network/protocols/protocol_timer.hpp>
 
 namespace kth {
 namespace network {

@@ -1,6 +1,6 @@
 # Knuth Network <a target="_blank" href="http://semver.org">![Version][badge.version]</a> <a target="_blank" href="https://travis-ci.org/k-nuth/network">![Travis status][badge.Travis]</a> <a target="_blank" href="https://ci.appveyor.com/project/k-nuth/network">![Appveyor status][badge.Appveyor]</a> <a target="_blank" href="https://gitter.im/k-nuth/Lobby">![Gitter Chat][badge.Gitter]</a>
 
-> Bitcoin P2P Network Library
+> Crypto P2P Network Library
 
 ## Installation Requirements
 

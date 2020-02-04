@@ -319,35 +319,35 @@ install(TARGETS kth-network
         ARCHIVE DESTINATION lib)
 
 set(_kth_headers
-        bitcoin/network/protocols/protocol.hpp
-        bitcoin/network/protocols/protocol_address_31402.hpp
-        bitcoin/network/protocols/protocol_events.hpp
-        bitcoin/network/protocols/protocol_ping_31402.hpp
-        bitcoin/network/protocols/protocol_ping_60001.hpp
-        bitcoin/network/protocols/protocol_reject_70002.hpp
-        bitcoin/network/protocols/protocol_seed_31402.hpp
-        bitcoin/network/protocols/protocol_timer.hpp
-        bitcoin/network/protocols/protocol_version_31402.hpp
-        bitcoin/network/protocols/protocol_version_70002.hpp
+        kth/network/protocols/protocol.hpp
+        kth/network/protocols/protocol_address_31402.hpp
+        kth/network/protocols/protocol_events.hpp
+        kth/network/protocols/protocol_ping_31402.hpp
+        kth/network/protocols/protocol_ping_60001.hpp
+        kth/network/protocols/protocol_reject_70002.hpp
+        kth/network/protocols/protocol_seed_31402.hpp
+        kth/network/protocols/protocol_timer.hpp
+        kth/network/protocols/protocol_version_31402.hpp
+        kth/network/protocols/protocol_version_70002.hpp
 
-        bitcoin/network/sessions/session.hpp
-        bitcoin/network/sessions/session_batch.hpp
-        bitcoin/network/sessions/session_inbound.hpp
-        bitcoin/network/sessions/session_manual.hpp
-        bitcoin/network/sessions/session_outbound.hpp
-        bitcoin/network/sessions/session_seed.hpp
+        kth/network/sessions/session.hpp
+        kth/network/sessions/session_batch.hpp
+        kth/network/sessions/session_inbound.hpp
+        kth/network/sessions/session_manual.hpp
+        kth/network/sessions/session_outbound.hpp
+        kth/network/sessions/session_seed.hpp
 
-        bitcoin/network/acceptor.hpp
-        bitcoin/network/channel.hpp
-        bitcoin/network/connector.hpp
-        bitcoin/network/define.hpp
-        bitcoin/network/hosts.hpp
-        bitcoin/network/message_subscriber.hpp
-        bitcoin/network/p2p.hpp
-        bitcoin/network/proxy.hpp
-        bitcoin/network/settings.hpp
-        bitcoin/network/version.hpp
-        bitcoin/network.hpp)
+        kth/network/acceptor.hpp
+        kth/network/channel.hpp
+        kth/network/connector.hpp
+        kth/network/define.hpp
+        kth/network/hosts.hpp
+        kth/network/message_subscriber.hpp
+        kth/network/p2p.hpp
+        kth/network/proxy.hpp
+        kth/network/settings.hpp
+        kth/network/version.hpp
+        kth/network.hpp)
 
 foreach (_header ${_kth_headers})
   get_filename_component(_directory "${_header}" DIRECTORY)

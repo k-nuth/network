@@ -2,12 +2,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bitcoin/network/message_subscriber.hpp>
+#include <kth/network/message_subscriber.hpp>
 
 #include <istream>
 #include <memory>
 #include <string>
-#include <bitcoin/bitcoin.hpp>
+#include <kth/domain.hpp>
 
 #define INITIALIZE_SUBSCRIBER(pool, value) \
     value##_subscriber_(std::make_shared<value##_subscriber_type>( \
