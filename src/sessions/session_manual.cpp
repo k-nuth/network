@@ -1,35 +1,21 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-#include <bitcoin/network/sessions/session_manual.hpp>
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include <kth/network/sessions/session_manual.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/protocols/protocol_address_31402.hpp>
-#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
-#include <bitcoin/network/protocols/protocol_ping_60001.hpp>
-#include <bitcoin/network/protocols/protocol_reject_70002.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/p2p.hpp>
+#include <kth/network/protocols/protocol_address_31402.hpp>
+#include <kth/network/protocols/protocol_ping_31402.hpp>
+#include <kth/network/protocols/protocol_ping_60001.hpp>
+#include <kth/network/protocols/protocol_reject_70002.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define CLASS session_manual
@@ -72,7 +58,7 @@ void session_manual::handle_started(const code& ec, result_handler handler)
 
 void session_manual::connect(const std::string& hostname, uint16_t port)
 {
-    const auto unhandled = [](code, channel::ptr) {};
+    auto const unhandled = [](code, channel::ptr) {};
     connect(hostname, port, unhandled);
 }
 
@@ -96,8 +82,8 @@ void session_manual::start_connect(const code&, const std::string& hostname,
         return;
     }
 
-    const auto retries = floor_subtract(attempts, 1u);
-    const auto connector = create_connector();
+    auto const retries = floor_subtract(attempts, 1u);
+    auto const connector = create_connector();
     pend(connector);
 
     // MANUAL CONNECT OUTBOUND
@@ -170,7 +156,7 @@ void session_manual::handle_channel_start(const code& ec,
 
 void session_manual::attach_protocols(channel::ptr channel)
 {
-    const auto version = channel->negotiated_version();
+    auto const version = channel->negotiated_version();
 
     if (version >= message::version::level::bip31)
         attach<protocol_ping_60001>(channel)->start();
@@ -196,4 +182,4 @@ void session_manual::handle_channel_stop(const code& ec,
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

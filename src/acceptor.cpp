@@ -1,40 +1,26 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-#include <bitcoin/network/acceptor.hpp>
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include <kth/network/acceptor.hpp>
 
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/proxy.hpp>
-#include <bitcoin/network/settings.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/proxy.hpp>
+#include <kth/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "acceptor"
 
 using namespace std::placeholders;
 
-static const auto reuse_address = asio::acceptor::reuse_address(true);
+static auto const reuse_address = asio::acceptor::reuse_address(true);
 
 acceptor::acceptor(threadpool& pool, const settings& settings)
   : stopped_(true),
@@ -48,7 +34,7 @@ acceptor::acceptor(threadpool& pool, const settings& settings)
 
 acceptor::~acceptor()
 {
-    BITCOIN_ASSERT_MSG(stopped(), "The acceptor was not stopped.");
+    KTH_ASSERT_MSG(stopped(), "The acceptor was not stopped.");
 }
 
 void acceptor::stop(const code&)
@@ -133,7 +119,7 @@ void acceptor::accept(accept_handler handler)
         return;
     }
 
-    const auto socket = std::make_shared<bc::socket>(pool_);
+    auto const socket = std::make_shared<bc::socket>(pool_);
 
     mutex_.unlock_upgrade_and_lock();
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -161,9 +147,9 @@ void acceptor::handle_accept(const boost_code& ec, socket::ptr socket,
     }
 
     // Ensure that channel is not passed as an r-value.
-    const auto created = std::make_shared<channel>(pool_, socket, settings_);
+    auto const created = std::make_shared<channel>(pool_, socket, settings_);
     handler(error::success, created);
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

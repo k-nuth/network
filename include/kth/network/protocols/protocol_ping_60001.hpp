@@ -1,0 +1,55 @@
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef KTH_NETWORK_PROTOCOL_PING_60001_HPP
+#define KTH_NETWORK_PROTOCOL_PING_60001_HPP
+
+#include <atomic>
+#include <cstdint>
+#include <memory>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/protocols/protocol_ping_31402.hpp>
+#include <kth/network/protocols/protocol_timer.hpp>
+#include <kth/network/settings.hpp>
+
+namespace kth {
+namespace network {
+
+class p2p;
+
+/**
+ * Ping-pong protocol.
+ * Attach this to a channel immediately following handshake completion.
+ */
+class BCT_API protocol_ping_60001
+  : public protocol_ping_31402, track<protocol_ping_60001>
+{
+public:
+    typedef std::shared_ptr<protocol_ping_60001> ptr;
+
+    /**
+     * Construct a ping protocol instance.
+     * @param[in]  network   The network interface.
+     * @param[in]  channel   The channel on which to start the protocol.
+     */
+    protocol_ping_60001(p2p& network, channel::ptr channel);
+
+protected:
+    void send_ping(const code& ec) override;
+
+    void handle_send_ping(const code& ec, const std::string& command);
+    bool handle_receive_ping(const code& ec, ping_const_ptr message) override;
+    virtual bool handle_receive_pong(const code& ec, pong_const_ptr message,
+        uint64_t nonce);
+
+private:
+    std::atomic<bool> pending_;
+};
+
+} // namespace network
+} // namespace kth
+
+#endif

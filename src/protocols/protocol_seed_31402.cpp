@@ -1,31 +1,17 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-#include <bitcoin/network/protocols/protocol_seed_31402.hpp>
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include <kth/network/protocols/protocol_seed_31402.hpp>
 
 #include <functional>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/channel.hpp>
-#include <bitcoin/network/define.hpp>
-#include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/protocols/protocol_timer.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/channel.hpp>
+#include <kth/network/define.hpp>
+#include <kth/network/p2p.hpp>
+#include <kth/network/protocols/protocol_timer.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "seed"
@@ -47,7 +33,7 @@ protocol_seed_31402::protocol_seed_31402(p2p& network, channel::ptr channel)
 
 void protocol_seed_31402::start(event_handler handler)
 {
-    const auto& settings = network_.network_settings();
+    auto const& settings = network_.network_settings();
     const event_handler complete = BIND2(handle_seeding_complete, _1, handler);
 
     if (settings.host_pool_capacity == 0)
@@ -56,7 +42,7 @@ void protocol_seed_31402::start(event_handler handler)
         return;
     }
 
-    const auto join_handler = synchronize(complete, 3, NAME,
+    auto const join_handler = synchronize(complete, 3, NAME,
         synchronizer_terminate::on_error);
 
     protocol_timer::start(settings.channel_germination(), join_handler);
@@ -154,4 +140,4 @@ void protocol_seed_31402::handle_store_addresses(const code& ec)
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth

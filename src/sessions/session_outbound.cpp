@@ -1,35 +1,21 @@
-/**
- * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
- *
- * This file is part of libbitcoin.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-#include <bitcoin/network/sessions/session_outbound.hpp>
+// Copyright (c) 2016-2020 Knuth Project developers.
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include <kth/network/sessions/session_outbound.hpp>
 
 #include <cstddef>
 #include <functional>
-#include <bitcoin/bitcoin.hpp>
-#include <bitcoin/network/p2p.hpp>
-#include <bitcoin/network/protocols/protocol_address_31402.hpp>
-#include <bitcoin/network/protocols/protocol_ping_31402.hpp>
-#include <bitcoin/network/protocols/protocol_ping_60001.hpp>
-#include <bitcoin/network/protocols/protocol_reject_70002.hpp>
-#include <bitcoin/network/protocols/protocol_version_31402.hpp>
-#include <bitcoin/network/protocols/protocol_version_70002.hpp>
+#include <kth/domain.hpp>
+#include <kth/network/p2p.hpp>
+#include <kth/network/protocols/protocol_address_31402.hpp>
+#include <kth/network/protocols/protocol_ping_31402.hpp>
+#include <kth/network/protocols/protocol_ping_60001.hpp>
+#include <kth/network/protocols/protocol_reject_70002.hpp>
+#include <kth/network/protocols/protocol_version_31402.hpp>
+#include <kth/network/protocols/protocol_version_70002.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define CLASS session_outbound
@@ -133,7 +119,7 @@ void session_outbound::handle_channel_start(const code& ec,
 
 void session_outbound::attach_protocols(channel::ptr channel)
 {
-    const auto version = channel->negotiated_version();
+    auto const version = channel->negotiated_version();
 
     if (version >= message::version::level::bip31)
         attach<protocol_ping_60001>(channel)->start();
@@ -150,17 +136,17 @@ void session_outbound::attach_handshake_protocols(channel::ptr channel,
     result_handler handle_started)
 {
     using serve = message::version::service;
-    const auto relay = settings_.relay_transactions;
-    const auto own_version = settings_.protocol_maximum;
-    const auto own_services = settings_.services;
-    const auto invalid_services = settings_.invalid_services;
-    const auto minimum_version = settings_.protocol_minimum;
+    auto const relay = settings_.relay_transactions;
+    auto const own_version = settings_.protocol_maximum;
+    auto const own_services = settings_.services;
+    auto const invalid_services = settings_.invalid_services;
+    auto const minimum_version = settings_.protocol_minimum;
 
-#ifdef BITPRIM_CURRENCY_BCH
-    const auto minimum_services = serve::node_network;
+#ifdef KTH_CURRENCY_BCH
+    auto const minimum_services = serve::node_network;
 #else
     // Require peer to serve network (and witness if configured on self).
-    const auto minimum_services = (own_services & serve::node_witness) |
+    auto const minimum_services = (own_services & serve::node_witness) |
         serve::node_network;
 #endif
 
@@ -196,7 +182,7 @@ void session_outbound::start_channel(channel::ptr channel,
     const result_handler unpend_handler =
         BIND3(do_unpend, _1, channel, handle_started);
 
-    const auto ec = pend(channel);
+    auto const ec = pend(channel);
 
     if (ec)
     {
@@ -215,4 +201,4 @@ void session_outbound::do_unpend(const code& ec, channel::ptr channel,
 }
 
 } // namespace network
-} // namespace libbitcoin
+} // namespace kth
