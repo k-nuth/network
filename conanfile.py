@@ -2,7 +2,6 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-
 import os
 from conans import CMake
 from kthbuild import option_on_off, march_conan_manip, pass_march_to_compiler
@@ -18,18 +17,20 @@ class KnuthNetworkConan(KnuthConanFile):
     description = "Crypto P2P Network Library"
     settings = "os", "compiler", "build_type", "arch"
 
-    options = {"shared": [True, False],
-               "fPIC": [True, False],
-               "tests": [True, False],
-               "currency": ['BCH', 'BTC', 'LTC'],
-               "microarchitecture": "ANY",
-               "fix_march": [True, False],
-               "march_id": "ANY",
+    options = {
+        "shared": [True, False],
+        "fPIC": [True, False],
+        "tests": [True, False],
+        "currency": ['BCH', 'BTC', 'LTC'],
+        "microarchitecture": "ANY",
+        "fix_march": [True, False],
+        "march_id": "ANY",
 
-               "verbose": [True, False],
-               "cxxflags": "ANY",
-               "cflags": "ANY",
-               "glibcxx_supports_cxx11_abi": "ANY",
+        "verbose": [True, False],
+        "cxxflags": "ANY",
+        "cflags": "ANY",
+        "glibcxx_supports_cxx11_abi": "ANY",
+        "cmake_export_compile_commands": [True, False],
     }
 
     default_options = {
