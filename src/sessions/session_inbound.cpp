@@ -13,7 +13,7 @@
 #include <bitcoin/network/protocols/protocol_ping_60001.hpp>
 #include <bitcoin/network/protocols/protocol_reject_70002.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define CLASS session_inbound

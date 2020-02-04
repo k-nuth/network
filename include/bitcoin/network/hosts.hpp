@@ -14,7 +14,7 @@
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 /// This class is thread safe.

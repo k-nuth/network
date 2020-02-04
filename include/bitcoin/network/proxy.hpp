@@ -17,7 +17,7 @@
 #include <bitcoin/network/message_subscriber.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 /// Manages all socket communication, thread safe.

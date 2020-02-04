@@ -14,7 +14,7 @@
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/define.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define DEFINE_SUBSCRIBER_TYPE(value) \

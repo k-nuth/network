@@ -12,7 +12,7 @@
 #include <bitcoin/network/protocols/protocol.hpp>
 #include <bitcoin/network/protocols/protocol_events.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "address"

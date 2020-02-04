@@ -19,7 +19,7 @@
 #define KTH_NETWORK_VERSION "0.0.0"
 #endif
 
-namespace libbitcoin { namespace network {
+namespace kth { namespace network {
 char const* version();
 }} /*namespace libbitcoin::network*/
 

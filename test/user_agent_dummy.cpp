@@ -4,7 +4,7 @@
 
 #include <bitcoin/network/user_agent.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 std::string get_user_agent() {

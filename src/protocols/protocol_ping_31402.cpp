@@ -11,7 +11,7 @@
 #include <bitcoin/network/p2p.hpp>
 #include <bitcoin/network/protocols/protocol_timer.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "ping"

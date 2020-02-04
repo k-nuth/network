@@ -31,7 +31,7 @@
 #define STOP_SUBSCRIBER(value) \
     value##_subscriber_->stop()
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 using namespace message;

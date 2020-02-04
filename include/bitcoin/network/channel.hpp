@@ -17,7 +17,7 @@
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 /// A concrete proxy with timers and state, mostly thread safe.

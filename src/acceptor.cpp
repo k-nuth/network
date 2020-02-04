@@ -13,7 +13,7 @@
 #include <bitcoin/network/proxy.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "acceptor"

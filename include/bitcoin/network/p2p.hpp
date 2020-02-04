@@ -23,7 +23,7 @@
 #include <bitcoin/network/sessions/session_seed.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 /// Top level public networking interface, partly thread safe.

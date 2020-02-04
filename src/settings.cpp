@@ -7,7 +7,7 @@
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/bitcoin/multi_crypto_support.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 using namespace bc::asio;

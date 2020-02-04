@@ -5,7 +5,7 @@
 
 #include <bitcoin/network/version.hpp>
 
-namespace libbitcoin { namespace network {
+namespace kth { namespace network {
 
 char const* version() {
     return KTH_NETWORK_VERSION;

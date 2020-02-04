@@ -17,7 +17,7 @@
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "proxy"

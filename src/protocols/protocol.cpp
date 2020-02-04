@@ -10,7 +10,7 @@
 #include <bitcoin/network/channel.hpp>
 #include <bitcoin/network/p2p.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "protocol"

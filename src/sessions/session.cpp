@@ -19,7 +19,7 @@
 #include <bitcoin/network/protocols/protocol_version_70002.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define CLASS session

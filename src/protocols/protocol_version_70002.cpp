@@ -11,7 +11,7 @@
 #include <bitcoin/network/protocols/protocol_version_31402.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "version"

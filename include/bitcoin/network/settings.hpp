@@ -10,7 +10,7 @@
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/define.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 /// Common database configuration settings, properties not thread safe.

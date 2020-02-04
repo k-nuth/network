@@ -11,7 +11,7 @@
 #include <bitcoin/bitcoin.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 using namespace bc::config;

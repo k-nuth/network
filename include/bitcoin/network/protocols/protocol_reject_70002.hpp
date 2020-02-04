@@ -11,7 +11,7 @@
 #include <bitcoin/network/define.hpp>
 #include <bitcoin/network/protocols/protocol_events.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 class p2p;

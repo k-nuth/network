@@ -10,7 +10,7 @@
 #include <bitcoin/network/p2p.hpp>
 #include <bitcoin/network/sessions/session.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define CLASS session_batch

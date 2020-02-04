@@ -14,7 +14,7 @@
 #include <bitcoin/network/settings.hpp>
 #include <bitcoin/network/user_agent.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 #define NAME "version"

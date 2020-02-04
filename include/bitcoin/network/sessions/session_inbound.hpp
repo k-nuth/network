@@ -15,7 +15,7 @@
 #include <bitcoin/network/sessions/session.hpp>
 #include <bitcoin/network/settings.hpp>
 
-namespace libbitcoin {
+namespace kth {
 namespace network {
 
 class p2p;
