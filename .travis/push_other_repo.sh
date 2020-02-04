@@ -12,14 +12,14 @@ echo "Knuth branch: ${KTH_PUSH_BRANCH}"
 
 
 # TODO(fernando): put in another place
-export KTH_PUSH_ACCOUNT=bitprim
+export KTH_PUSH_ACCOUNT=kth
 
 # ------------------------------------------------------
-export KTH_PUSH_PROJECT=bitprim-node
+export KTH_PUSH_PROJECT=node
 
 # body="{
-#     \"accountName\": \"bitprim\",
-#     \"projectSlug\": \"kth-network\",
+#     \"accountName\": \"kth\",
+#     \"projectSlug\": \"network\",
 #     \"branch\": \"${KTH_PUSH_BRANCH}\",
 #     \"environmentVariables\": {
 #        \"SKIP_NUGET\": \"true\"

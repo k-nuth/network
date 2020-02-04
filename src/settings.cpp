@@ -80,17 +80,15 @@ settings::settings(config::settings context)
 
     #ifdef KTH_CURRENCY_BCH
             identifier = netmagic::bch_mainnet; 
-
             seeds.reserve(6);
             seeds.push_back({ "seed.bitcoinabc.org", 8333 });
             seeds.push_back({ "seed-abc.bitcoinforks.org", 8333 });
             seeds.push_back({ "btccash-seeder.bitcoinunlimited.info", 8333 });
             seeds.push_back({ "seed.bitprim.org", 8333 });
             seeds.push_back({ "seed.deadalnix.me", 8333 });
-            seeds.push_back({ "seeder.criptolayer.net", 8333 });
+            seeds.push_back({ "seed.bchd.cash", 8333 });
     #else
             identifier = netmagic::btc_mainnet; 
-
             seeds.reserve(6);
             seeds.push_back({ "seed.bitcoin.sipa.be", 8333 });
             seeds.push_back({ "dnsseed.bluematt.me", 8333 });
@@ -119,17 +117,15 @@ settings::settings(config::settings context)
             inbound_port = 18333;
     #ifdef KTH_CURRENCY_BCH
             identifier = netmagic::bch_testnet;
-
             seeds.reserve(6);
             seeds.push_back({ "testnet-seed.bitcoinabc.org", 18333 });
             seeds.push_back({ "testnet-seed-abc.bitcoinforks.org", 18333 });
             seeds.push_back({ "testnet-seed.bitcoinunlimited.info", 18333 });
             seeds.push_back({ "testnet-seed.bitprim.org", 18333 });
             seeds.push_back({ "testnet-seed.deadalnix.me", 18333 });
-            seeds.push_back({ "testnet-seeder.criptolayer.net", 18333 });
+            seeds.push_back({ "testnet-seed.bchd.cash", 18333 });
     #else
             identifier = netmagic::btc_testnet;
-
             // Seeds based on satoshi client v0.14.0 plus voskuil.org.
             seeds.reserve(5);
             seeds.push_back({ "testnet-seed.bitcoin.jonasschnelli.ch", 18333 });

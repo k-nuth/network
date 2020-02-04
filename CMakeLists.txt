@@ -56,12 +56,12 @@ if (USE_DOMAIN)
 endif()
 
 
-set(KTH_PROJECT_VERSION "-" CACHE STRING "Specify the Bitprim Project Version.")
+set(KTH_PROJECT_VERSION "-" CACHE STRING "Specify the Knuth Project Version.")
 # message(${KTH_PROJECT_VERSION})
 
 
 set(MICROARCHITECTURE "x86_64" CACHE STRING "Specify the Cryptocurrency (x86_64|...).")
-message( STATUS "Bitprim: Compiling for ${MICROARCHITECTURE}")
+message( STATUS "Knuth: Compiling for ${MICROARCHITECTURE}")
 # add_definitions(-DKTH_MICROARCHITECTURE=${MICROARCHITECTURE})
 # add_definitions(-DKTH_MICROARCHITECTURE_STR="${MICROARCHITECTURE}")
 
@@ -115,7 +115,7 @@ if (NO_CONAN_AT_ALL)
 endif()
 
 if (NOT USE_CONAN)
-    # Require kth-domain of at least version 0 and output ${bitprim_core_CPPFLAGS/LIBS/PKG}.
+    # Require kth-domain of at least version 0 and output ${kth_domain_CPPFLAGS/LIBS/PKG}.
     #------------------------------------------------------------------------------
     if (NOT TARGET kth-domain)
             find_package(kth-domain 0 REQUIRED)
@@ -288,19 +288,19 @@ if (WITH_TESTS)
   enable_testing()
 endif()
 
-# local: test/bitprim_network_test
+# local: test/kth_network_test
 #------------------------------------------------------------------------------
 if (WITH_TESTS)
-    add_executable(bitprim_network_test
+    add_executable(kth_network_test
           test/main.cpp
           test/p2p.cpp
           test/user_agent_dummy.cpp)
 
-    target_link_libraries(bitprim_network_test PUBLIC kth-network)
+    target_link_libraries(kth_network_test PUBLIC kth-network)
 
-    _group_sources(bitprim_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
+    _group_sources(kth_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
-    _add_tests(bitprim_network_test 
+    _add_tests(kth_network_test 
       empty_tests 
       # p2p_tests
     )

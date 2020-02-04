@@ -8,8 +8,8 @@ namespace libbitcoin {
 namespace network {
 
 std::string get_user_agent() {
-    //return "/bitprim:" KTH_VERSION "/";
-    return "/bitprim:0.0.0/";
+    //return "/kth:" KTH_VERSION "/";
+    return "/kth-dummy:0.0.0/";
 }
 
 } // namespace network
