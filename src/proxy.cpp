@@ -174,11 +174,9 @@ void proxy::read_payload(const heading& head) {
 
 void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const heading& head) {
     //LOG_INFO(LOG_NETWORK) << "proxy::handle_read_payload()";
-    if (stopped())
-        return;
+    if (stopped()) return;
 
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Payload read failure [" << authority() << "] "
             << code(error::boost_to_error_code(ec)).message();

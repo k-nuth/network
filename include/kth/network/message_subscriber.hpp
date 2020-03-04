@@ -14,8 +14,7 @@
 #include <kth/domain.hpp>
 #include <kth/network/define.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define DEFINE_SUBSCRIBER_TYPE(value) \
     typedef resubscriber<code, message::value::const_ptr> \
@@ -23,8 +22,7 @@ namespace network {
 
 #define DEFINE_SUBSCRIBER_OVERLOAD(value) \
     template <typename Handler> \
-    void subscribe(message::value&&, Handler&& handler) \
-    { \
+    void subscribe(message::value&&, Handler&& handler) { \
         value##_subscriber_->subscribe(std::forward<Handler>(handler), \
             error::channel_stopped, {}); \
     }
@@ -33,13 +31,10 @@ namespace network {
     value##_subscriber_type::ptr value##_subscriber_
 
 template <class Message>
-using message_handler =
-    std::function<bool(const code&, std::shared_ptr<const Message>)>;
+using message_handler = std::function<bool(const code&, std::shared_ptr<const Message>)>;
 
 /// Aggregation of subscribers by messasge type, thread safe.
-class BCT_API message_subscriber
-  : noncopyable
-{
+class BCT_API message_subscriber : noncopyable {
 public:
     DEFINE_SUBSCRIBER_TYPE(address);
     DEFINE_SUBSCRIBER_TYPE(alert);
@@ -68,6 +63,8 @@ public:
     DEFINE_SUBSCRIBER_TYPE(transaction);
     DEFINE_SUBSCRIBER_TYPE(verack);
     DEFINE_SUBSCRIBER_TYPE(version);
+    DEFINE_SUBSCRIBER_TYPE(xverack);
+    DEFINE_SUBSCRIBER_TYPE(xversion);
 
     /**
      * Create an instance of this class.
@@ -82,8 +79,7 @@ public:
      * @param[in]  handler  The handler to register.
      */
     template <class Message, typename Handler>
-    void subscribe(Handler&& handler)
-    {
+    void subscribe(Handler&& handler) {
         subscribe(Message(), std::forward<Handler>(handler));
     }
 
@@ -95,14 +91,13 @@ public:
      * @return                 Returns error::bad_stream if failed.
      */
     template <class Message, class Subscriber>
-    code relay(std::istream& stream, uint32_t version,
-        Subscriber& subscriber) const
-    {
+    code relay(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
         auto const message = std::make_shared<Message>();
 
         // Subscribers are invoked only with stop and success codes.
-        if (!message->from_data(version, stream))
+        if ( ! message->from_data(version, stream)) {
             return error::bad_stream;
+        }
 
         ////auto const const_ptr = std::const_pointer_cast<const Message>(message);
         subscriber->relay(error::success, message);
@@ -117,14 +112,13 @@ public:
      * @return                 Returns error::bad_stream if failed.
      */
     template <class Message, class Subscriber>
-    code handle(std::istream& stream, uint32_t version,
-        Subscriber& subscriber) const
-    {
+    code handle(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
         auto const message = std::make_shared<Message>();
 
         // Subscribers are invoked only with stop and success codes.
-        if (!message->from_data(version, stream))
+        if ( ! message->from_data(version, stream)) {
             return error::bad_stream;
+        }
 
         ////auto const const_ptr = std::const_pointer_cast<const Message>(message);
         subscriber->invoke(error::success, message);
@@ -146,8 +140,7 @@ public:
      * @param[in]  stream   The stream from which to load the message.
      * @return              Returns error::bad_stream if failed.
      */
-    virtual code load(message::message_type type, uint32_t version,
-        std::istream& stream) const;
+    virtual code load(message::message_type type, uint32_t version, std::istream& stream) const;
 
     /**
      * Start all subscribers so that they accept subscription.
@@ -187,6 +180,8 @@ private:
     DEFINE_SUBSCRIBER_OVERLOAD(transaction);
     DEFINE_SUBSCRIBER_OVERLOAD(verack);
     DEFINE_SUBSCRIBER_OVERLOAD(version);
+    DEFINE_SUBSCRIBER_OVERLOAD(xverack);
+    DEFINE_SUBSCRIBER_OVERLOAD(xversion);
 
     DECLARE_SUBSCRIBER(address);
     DECLARE_SUBSCRIBER(alert);
@@ -215,13 +210,14 @@ private:
     DECLARE_SUBSCRIBER(transaction);
     DECLARE_SUBSCRIBER(verack);
     DECLARE_SUBSCRIBER(version);
+    DECLARE_SUBSCRIBER(xverack);
+    DECLARE_SUBSCRIBER(xversion);
 };
 
 #undef DEFINE_SUBSCRIBER_TYPE
 #undef DEFINE_SUBSCRIBER_OVERLOAD
 #undef DECLARE_SUBSCRIBER
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

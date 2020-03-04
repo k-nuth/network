@@ -15,26 +15,22 @@
 #include <kth/network/protocols/protocol_version_31402.hpp>
 #include <kth/network/protocols/protocol_version_70002.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define CLASS session_outbound
 
 using namespace std::placeholders;
 
 session_outbound::session_outbound(p2p& network, bool notify_on_connect)
-  : session_batch(network, notify_on_connect),
-    CONSTRUCT_TRACK(session_outbound)
-{
-}
+    : session_batch(network, notify_on_connect)
+    , CONSTRUCT_TRACK(session_outbound)
+{}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
 
-void session_outbound::start(result_handler handler)
-{
-    if (settings_.outbound_connections == 0)
-    {
+void session_outbound::start(result_handler handler) {
+    if (settings_.outbound_connections == 0) {
         LOG_INFO(LOG_NETWORK)
             << "Not configured for generating outbound connections.";
         handler(error::success);
@@ -47,16 +43,15 @@ void session_outbound::start(result_handler handler)
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
 
-void session_outbound::handle_started(const code& ec, result_handler handler)
-{
-    if (ec)
-    {
+void session_outbound::handle_started(const code& ec, result_handler handler) {
+    if (ec) {
         handler(ec);
         return;
     }
 
-    for (size_t peer = 0; peer < settings_.outbound_connections; ++peer)
+    for (size_t peer = 0; peer < settings_.outbound_connections; ++peer) {
         new_connection(error::success);
+    }
 
     // This is the end of the start sequence.
     handler(error::success);
@@ -65,10 +60,8 @@ void session_outbound::handle_started(const code& ec, result_handler handler)
 // Connnect cycle.
 // ----------------------------------------------------------------------------
 
-void session_outbound::new_connection(const code&)
-{
-    if (stopped())
-    {
+void session_outbound::new_connection(const code&) {
+    if (stopped()) {
         LOG_DEBUG(LOG_NETWORK)
             << "Suspended outbound connection.";
         return;
@@ -77,10 +70,8 @@ void session_outbound::new_connection(const code&)
     session_batch::connect(BIND2(handle_connect, _1, _2));
 }
 
-void session_outbound::handle_connect(const code& ec, channel::ptr channel)
-{
-    if (ec)
-    {
+void session_outbound::handle_connect(const code& ec, channel::ptr channel) {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure connecting outbound: " << ec.message();
 
@@ -94,16 +85,13 @@ void session_outbound::handle_connect(const code& ec, channel::ptr channel)
         BIND2(handle_channel_stop, _1, channel));
 }
 
-void session_outbound::handle_channel_start(const code& ec,
-    channel::ptr channel)
-{
+void session_outbound::handle_channel_start(const code& ec, channel::ptr channel) {
     //throw 1;        //TODO(fernando): remover
     // asm("int $3");  //TODO(fernando): remover
 
 
     // The start failure is also caught by handle_channel_stop.
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Outbound channel failed to start ["
             << channel->authority() << "] " << ec.message();
@@ -115,26 +103,25 @@ void session_outbound::handle_channel_start(const code& ec,
         << connection_count() << ")";
 
     attach_protocols(channel);
-};
+}
 
-void session_outbound::attach_protocols(channel::ptr channel)
-{
+void session_outbound::attach_protocols(channel::ptr channel) {
     auto const version = channel->negotiated_version();
 
-    if (version >= message::version::level::bip31)
+    if (version >= message::version::level::bip31) {
         attach<protocol_ping_60001>(channel)->start();
-    else
+    } else {
         attach<protocol_ping_31402>(channel)->start();
+    }
 
-    if (version >= message::version::level::bip61)
+    if (version >= message::version::level::bip61) {
         attach<protocol_reject_70002>(channel)->start();
+    }
 
     attach<protocol_address_31402>(channel)->start();
 }
 
-void session_outbound::attach_handshake_protocols(channel::ptr channel,
-    result_handler handle_started)
-{
+void session_outbound::attach_handshake_protocols(channel::ptr channel, result_handler handle_started) {
     using serve = message::version::service;
     auto const relay = settings_.relay_transactions;
     auto const own_version = settings_.protocol_maximum;
@@ -152,19 +139,18 @@ void session_outbound::attach_handshake_protocols(channel::ptr channel,
 
     // Reject messages are not handled until bip61 (70002).
     // The negotiated_version is initialized to the configured maximum.
-    if (channel->negotiated_version() >= message::version::level::bip61)
+    if (channel->negotiated_version() >= message::version::level::bip61) {
         attach<protocol_version_70002>(channel, own_version, own_services,
             invalid_services, minimum_version, minimum_services, relay)
             ->start(handle_started);
-    else
+    } else {
         attach<protocol_version_31402>(channel, own_version, own_services,
             invalid_services, minimum_version, minimum_services)
             ->start(handle_started);
+    }
 }
 
-void session_outbound::handle_channel_stop(const code& ec,
-    channel::ptr channel)
-{
+void session_outbound::handle_channel_stop(const code& ec, channel::ptr channel) {
     LOG_DEBUG(LOG_NETWORK)
         << "Outbound channel stopped [" << channel->authority() << "] "
         << ec.message();
@@ -176,16 +162,12 @@ void session_outbound::handle_channel_stop(const code& ec,
 // ----------------------------------------------------------------------------
 // Pend outgoing connections so we can detect connection to self.
 
-void session_outbound::start_channel(channel::ptr channel,
-    result_handler handle_started)
-{
-    const result_handler unpend_handler =
-        BIND3(do_unpend, _1, channel, handle_started);
+void session_outbound::start_channel(channel::ptr channel, result_handler handle_started) {
+    const result_handler unpend_handler = BIND3(do_unpend, _1, channel, handle_started);
 
     auto const ec = pend(channel);
 
-    if (ec)
-    {
+    if (ec) {
         unpend_handler(ec);
         return;
     }
@@ -193,12 +175,9 @@ void session_outbound::start_channel(channel::ptr channel,
     session::start_channel(channel, unpend_handler);
 }
 
-void session_outbound::do_unpend(const code& ec, channel::ptr channel,
-    result_handler handle_started)
-{
+void session_outbound::do_unpend(const code& ec, channel::ptr channel, result_handler handle_started) {
     unpend(channel);
     handle_started(ec);
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

@@ -21,41 +21,38 @@ namespace network {
 using namespace bc::message;
 using namespace std::placeholders;
 
-static message::address configured_self(const network::settings& settings)
-{
-    if (settings.self.port() == 0)
+static 
+message::address configured_self(const network::settings& settings) {
+    if (settings.self.port() == 0) {
         return address{};
-
+    }
     return address{ { settings.self.to_network_address() } };
 }
 
-protocol_address_31402::protocol_address_31402(p2p& network,
-    channel::ptr channel)
-  : protocol_events(network, channel, NAME),
-    network_(network),
-    self_(configured_self(network_.network_settings())),
-    CONSTRUCT_TRACK(protocol_address_31402)
-{
-}
+protocol_address_31402::protocol_address_31402(p2p& network, channel::ptr channel)
+    : protocol_events(network, channel, NAME)
+    , network_(network)
+    , self_(configured_self(network_.network_settings()))
+    , CONSTRUCT_TRACK(protocol_address_31402)
+{}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
 
-void protocol_address_31402::start()
-{
+void protocol_address_31402::start() {
     auto const& settings = network_.network_settings();
 
     // Must have a handler to capture a shared self pointer in stop subscriber.
     protocol_events::start(BIND1(handle_stop, _1));
 
-    if (!self_.addresses().empty())
-    {
+    if ( ! self_.addresses().empty()) {
         SEND2(self_, handle_send, _1, self_.command);
     }
 
     // If we can't store addresses we don't ask for or handle them.
-    if (settings.host_pool_capacity == 0)
+    if (settings.host_pool_capacity == 0) {
         return;
+    }
 
     SUBSCRIBE2(address, handle_receive_address, _1, _2);
     SUBSCRIBE2(get_address, handle_receive_get_address, _1, _2);
@@ -65,11 +62,8 @@ void protocol_address_31402::start()
 // Protocol.
 // ----------------------------------------------------------------------------
 
-bool protocol_address_31402::handle_receive_address(const code& ec,
-    address_const_ptr message)
-{
-    if (stopped(ec))
-        return false;
+bool protocol_address_31402::handle_receive_address(const code& ec, address_const_ptr message) {
+    if (stopped(ec)) return false;
 
     LOG_DEBUG(LOG_NETWORK)
         << "Storing addresses from [" << authority() << "] ("
@@ -82,17 +76,13 @@ bool protocol_address_31402::handle_receive_address(const code& ec,
     return true;
 }
 
-bool protocol_address_31402::handle_receive_get_address(const code& ec,
-    get_address_const_ptr message)
-{
-    if (stopped(ec))
-        return false;
+bool protocol_address_31402::handle_receive_get_address(const code& ec, get_address_const_ptr message) {
+    if (stopped(ec)) return false;
 
     bc::message::network_address::list addresses;
     network_.fetch_addresses(addresses);
 
-    if (!addresses.empty())
-    {
+    if ( ! addresses.empty()) {
         const address address_subset(addresses);
         SEND2(address_subset, handle_send, _1, self_.command);
 
@@ -105,13 +95,10 @@ bool protocol_address_31402::handle_receive_get_address(const code& ec,
     return false;
 }
 
-void protocol_address_31402::handle_store_addresses(const code& ec)
-{
-    if (stopped(ec))
-        return;
+void protocol_address_31402::handle_store_addresses(const code& ec) {
+    if (stopped(ec)) return;
 
-    if (ec)
-    {
+    if (ec) {
         LOG_ERROR(LOG_NETWORK)
             << "Failure storing addresses from [" << authority() << "] "
             << ec.message();
@@ -119,8 +106,7 @@ void protocol_address_31402::handle_store_addresses(const code& ec)
     }
 }
 
-void protocol_address_31402::handle_stop(const code&)
-{
+void protocol_address_31402::handle_stop(const code&) {
     // None of the other bc::network protocols log their stop.
     ////LOG_DEBUG(LOG_NETWORK)
     ////    << "Stopped address protocol for [" << authority() << "].";
