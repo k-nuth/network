@@ -102,14 +102,27 @@ bool protocol_version_31402::handle_receive_version(const code& ec, version_cons
 
     auto const& settings = network_.network_settings();
 
+    auto blacklisted = std::find_if(begin(settings.user_agent_backlist), end(settings.user_agent_backlist), [&message](auto const& x){
+        if (x.size() <= message->user_agent().size()) {
+            return std::equal(begin(x), end(x), begin(message->user_agent()));
+        }
+        return std::equal(begin(message->user_agent()), end(message->user_agent()), begin(x));
+    });
 
-    // LOG_DEBUG(LOG_NETWORK)
-    //     << "Peer [" << authority() << "] protocol version ("
-    //     << message->value() << ") user agent: " << message->user_agent();
+    if (blacklisted != end(settings.user_agent_backlist)) {
+        LOG_DEBUG(LOG_NETWORK)
+            << "Invalid user agent (blacklisted) for peer [" << authority() << "] user agent: " << message->user_agent();
+        set_event(error::channel_stopped);
+        return false;
+    }
 
-    LOG_INFO(LOG_NETWORK)
+    LOG_DEBUG(LOG_NETWORK)
         << "Peer [" << authority() << "] protocol version ("
         << message->value() << ") user agent: " << message->user_agent();
+
+    // LOG_INFO(LOG_NETWORK)
+    //     << "Peer [" << authority() << "] protocol version ("
+    //     << message->value() << ") user agent: " << message->user_agent();
 
 
     // TODO: move these three checks to initialization.
