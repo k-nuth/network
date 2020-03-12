@@ -73,7 +73,6 @@ class KnuthNetworkConan(KnuthConanFile):
 
     def build(self):
         cmake = self.cmake_basis()
-        cmake.definitions["USE_DOMAIN"] = option_on_off(True)
 
         cmake.configure(source_dir=self.source_folder)
         if not self.options.cmake_export_compile_commands:

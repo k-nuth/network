@@ -46,16 +46,16 @@ public:
 protected:
     virtual void signal_activity() override;
     virtual void handle_stopping() override;
-    virtual bool stopped(const code& ec) const;
+    virtual bool stopped(code const& ec) const;
 
 private:
-    void do_start(const code& ec, result_handler handler);
+    void do_start(code const& ec, result_handler handler);
 
     void start_expiration();
-    void handle_expiration(const code& ec);
+    void handle_expiration(code const& ec);
 
     void start_inactivity();
-    void handle_inactivity(const code& ec);
+    void handle_inactivity(code const& ec);
 
     std::atomic<bool> notify_;
     std::atomic<uint64_t> nonce_;

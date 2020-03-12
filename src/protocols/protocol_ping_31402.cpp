@@ -38,7 +38,7 @@ void protocol_ping_31402::start()
 }
 
 // This is fired by the callback (i.e. base timer and stop handler).
-void protocol_ping_31402::send_ping(const code& ec)
+void protocol_ping_31402::send_ping(code const& ec)
 {
     if (stopped(ec))
         return;
@@ -55,7 +55,7 @@ void protocol_ping_31402::send_ping(const code& ec)
     SEND2(ping{}, handle_send, _1, ping::command);
 }
 
-bool protocol_ping_31402::handle_receive_ping(const code& ec,
+bool protocol_ping_31402::handle_receive_ping(code const& ec,
     ping_const_ptr message)
 {
     if (stopped(ec))

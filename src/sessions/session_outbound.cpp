@@ -43,7 +43,7 @@ void session_outbound::start(result_handler handler) {
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
 
-void session_outbound::handle_started(const code& ec, result_handler handler) {
+void session_outbound::handle_started(code const& ec, result_handler handler) {
     if (ec) {
         handler(ec);
         return;
@@ -70,7 +70,7 @@ void session_outbound::new_connection(const code&) {
     session_batch::connect(BIND2(handle_connect, _1, _2));
 }
 
-void session_outbound::handle_connect(const code& ec, channel::ptr channel) {
+void session_outbound::handle_connect(code const& ec, channel::ptr channel) {
     if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure connecting outbound: " << ec.message();
@@ -85,7 +85,7 @@ void session_outbound::handle_connect(const code& ec, channel::ptr channel) {
         BIND2(handle_channel_stop, _1, channel));
 }
 
-void session_outbound::handle_channel_start(const code& ec, channel::ptr channel) {
+void session_outbound::handle_channel_start(code const& ec, channel::ptr channel) {
     //throw 1;        //TODO(fernando): remover
     // asm("int $3");  //TODO(fernando): remover
 
@@ -150,7 +150,7 @@ void session_outbound::attach_handshake_protocols(channel::ptr channel, result_h
     }
 }
 
-void session_outbound::handle_channel_stop(const code& ec, channel::ptr channel) {
+void session_outbound::handle_channel_stop(code const& ec, channel::ptr channel) {
     LOG_DEBUG(LOG_NETWORK)
         << "Outbound channel stopped [" << channel->authority() << "] "
         << ec.message();
@@ -175,7 +175,7 @@ void session_outbound::start_channel(channel::ptr channel, result_handler handle
     session::start_channel(channel, unpend_handler);
 }
 
-void session_outbound::do_unpend(const code& ec, channel::ptr channel, result_handler handle_started) {
+void session_outbound::do_unpend(code const& ec, channel::ptr channel, result_handler handle_started) {
     unpend(channel);
     handle_started(ec);
 }

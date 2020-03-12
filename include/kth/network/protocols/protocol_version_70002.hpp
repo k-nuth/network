@@ -57,7 +57,7 @@ protected:
     message::version version_factory() const override;
     bool sufficient_peer(version_const_ptr message) override;
 
-    virtual bool handle_receive_reject(const code& ec, reject_const_ptr reject);
+    virtual bool handle_receive_reject(code const& ec, reject_const_ptr reject);
 
     const bool relay_;
 };

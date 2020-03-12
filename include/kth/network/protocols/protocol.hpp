@@ -104,10 +104,10 @@ protected:
     virtual threadpool& pool();
 
     /// Stop the channel (and the protocol).
-    virtual void stop(const code& ec);
+    virtual void stop(code const& ec);
 
 protected:
-    void handle_send(const code& ec, const std::string& command);
+    void handle_send(code const& ec, const std::string& command);
 
 private:
     threadpool& pool_;

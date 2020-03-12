@@ -33,7 +33,7 @@ bool protocol_events::stopped() const
     return !handler_.load();
 }
 
-bool protocol_events::stopped(const code& ec) const
+bool protocol_events::stopped(code const& ec) const
 {
     // The service stop code may also make its way into protocol handlers.
     return stopped() || ec == error::channel_stopped ||
@@ -58,7 +58,7 @@ void protocol_events::start(event_handler handler)
 // Stop.
 // ----------------------------------------------------------------------------
 
-void protocol_events::handle_stopped(const code& ec)
+void protocol_events::handle_stopped(code const& ec)
 {
     if (!stopped(ec))
     {
@@ -74,7 +74,7 @@ void protocol_events::handle_stopped(const code& ec)
 // Set Event.
 // ----------------------------------------------------------------------------
 
-void protocol_events::set_event(const code& ec)
+void protocol_events::set_event(code const& ec)
 {
     // If already stopped.
     auto handler = handler_.load();

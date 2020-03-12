@@ -43,7 +43,7 @@ void protocol_reject_70002::start()
 // ----------------------------------------------------------------------------
 
 // TODO: mitigate log fill DOS.
-bool protocol_reject_70002::handle_receive_reject(const code& ec,
+bool protocol_reject_70002::handle_receive_reject(code const& ec,
     reject_const_ptr reject)
 {
     if (stopped(ec))

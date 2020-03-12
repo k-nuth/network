@@ -25,7 +25,7 @@ class BCT_API connector
 {
 public:
     typedef std::shared_ptr<connector> ptr;
-    typedef std::function<void(const code& ec, channel::ptr)> connect_handler;
+    typedef std::function<void(code const& ec, channel::ptr)> connect_handler;
 
     /// Construct an instance.
     connector(threadpool& pool, const settings& settings);
@@ -46,7 +46,7 @@ public:
         connect_handler handler);
 
     /// Cancel outstanding connection attempt.
-    void stop(const code& ec);
+    void stop(code const& ec);
 
 private:
     typedef std::shared_ptr<asio::query> query_ptr;
@@ -57,7 +57,7 @@ private:
         connect_handler handler);
     void handle_connect(const boost_code& ec, asio::iterator iterator,
         socket::ptr socket, connect_handler handler);
-    void handle_timer(const code& ec, socket::ptr socket,
+    void handle_timer(code const& ec, socket::ptr socket,
         connect_handler handler);
 
     // These are thread safe

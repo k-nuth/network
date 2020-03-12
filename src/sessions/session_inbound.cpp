@@ -48,7 +48,7 @@ void session_inbound::start(result_handler handler)
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
 
-void session_inbound::handle_started(const code& ec, result_handler handler)
+void session_inbound::handle_started(code const& ec, result_handler handler)
 {
     if (ec)
     {
@@ -78,7 +78,7 @@ void session_inbound::handle_started(const code& ec, result_handler handler)
     handler(error::success);
 }
 
-void session_inbound::handle_stop(const code& ec)
+void session_inbound::handle_stop(code const& ec)
 {
     // Signal the stop of listener/accept attempt.
     acceptor_->stop(ec);
@@ -100,7 +100,7 @@ void session_inbound::start_accept(const code&)
     acceptor_->accept(BIND2(handle_accept, _1, _2));
 }
 
-void session_inbound::handle_accept(const code& ec, channel::ptr channel)
+void session_inbound::handle_accept(code const& ec, channel::ptr channel)
 {
     if (stopped(ec))
     {
@@ -142,7 +142,7 @@ void session_inbound::handle_accept(const code& ec, channel::ptr channel)
         BIND1(handle_channel_stop, _1));
 }
 
-void session_inbound::handle_channel_start(const code& ec,
+void session_inbound::handle_channel_start(code const& ec,
     channel::ptr channel)
 {
     if (ec)
@@ -176,7 +176,7 @@ void session_inbound::attach_protocols(channel::ptr channel)
     attach<protocol_address_31402>(channel)->start();
 }
 
-void session_inbound::handle_channel_stop(const code& ec)
+void session_inbound::handle_channel_stop(code const& ec)
 {
     LOG_DEBUG(LOG_NETWORK)
         << "Inbound channel stopped: " << ec.message();

@@ -48,7 +48,7 @@ void session_seed::start(result_handler handler)
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
 
-void session_seed::handle_started(const code& ec, result_handler handler)
+void session_seed::handle_started(code const& ec, result_handler handler)
 {
     if (ec)
     {
@@ -140,7 +140,7 @@ void session_seed::start_seed(const config::endpoint& seed,
         BIND5(handle_connect, _1, _2, seed, connector, handler));
 }
 
-void session_seed::handle_connect(const code& ec, channel::ptr channel,
+void session_seed::handle_connect(code const& ec, channel::ptr channel,
     const config::endpoint& seed, connector::ptr connector,
     result_handler handler)
 {
@@ -171,7 +171,7 @@ void session_seed::handle_connect(const code& ec, channel::ptr channel,
         BIND1(handle_channel_stop, _1));
 }
 
-void session_seed::handle_channel_start(const code& ec, channel::ptr channel,
+void session_seed::handle_channel_start(code const& ec, channel::ptr channel,
     result_handler handler)
 {
     if (ec)
@@ -199,7 +199,7 @@ void session_seed::attach_protocols(channel::ptr channel,
     attach<protocol_seed_31402>(channel)->start(handler);
 }
 
-void session_seed::handle_channel_stop(const code& ec)
+void session_seed::handle_channel_stop(code const& ec)
 {
     LOG_DEBUG(LOG_NETWORK)
         << "Seed channel stopped: " << ec.message();

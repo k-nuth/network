@@ -40,7 +40,7 @@ public:
     virtual void accept(accept_handler handler);
 
     /// Cancel outstanding accept attempt.
-    virtual void stop(const code& ec);
+    virtual void stop(code const& ec);
 
 private:
     virtual bool stopped() const;

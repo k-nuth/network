@@ -62,7 +62,7 @@ void protocol_address_31402::start() {
 // Protocol.
 // ----------------------------------------------------------------------------
 
-bool protocol_address_31402::handle_receive_address(const code& ec, address_const_ptr message) {
+bool protocol_address_31402::handle_receive_address(code const& ec, address_const_ptr message) {
     if (stopped(ec)) return false;
 
     LOG_DEBUG(LOG_NETWORK)
@@ -76,7 +76,7 @@ bool protocol_address_31402::handle_receive_address(const code& ec, address_cons
     return true;
 }
 
-bool protocol_address_31402::handle_receive_get_address(const code& ec, get_address_const_ptr message) {
+bool protocol_address_31402::handle_receive_get_address(code const& ec, get_address_const_ptr message) {
     if (stopped(ec)) return false;
 
     bc::message::network_address::list addresses;
@@ -95,7 +95,7 @@ bool protocol_address_31402::handle_receive_get_address(const code& ec, get_addr
     return false;
 }
 
-void protocol_address_31402::handle_store_addresses(const code& ec) {
+void protocol_address_31402::handle_store_addresses(code const& ec) {
     if (stopped(ec)) return;
 
     if (ec) {

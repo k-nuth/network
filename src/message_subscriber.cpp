@@ -68,7 +68,7 @@ message_subscriber::message_subscriber(threadpool& pool)
     INITIALIZE_SUBSCRIBER(pool, xversion)
 {}
 
-void message_subscriber::broadcast(const code& ec)
+void message_subscriber::broadcast(code const& ec)
 {
     RELAY_CODE(ec, address);
     RELAY_CODE(ec, alert);

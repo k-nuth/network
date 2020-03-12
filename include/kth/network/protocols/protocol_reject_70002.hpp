@@ -35,7 +35,7 @@ public:
     virtual void start();
 
 protected:
-    virtual bool handle_receive_reject(const code& ec,
+    virtual bool handle_receive_reject(code const& ec,
         reject_const_ptr reject);
 };
 

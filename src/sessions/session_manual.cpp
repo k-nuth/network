@@ -41,7 +41,7 @@ void session_manual::start(result_handler handler)
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
 
-void session_manual::handle_started(const code& ec, result_handler handler)
+void session_manual::handle_started(code const& ec, result_handler handler)
 {
     if (ec)
     {
@@ -92,7 +92,7 @@ void session_manual::start_connect(const code&, const std::string& hostname,
             handler));
 }
 
-void session_manual::handle_connect(const code& ec, channel::ptr channel,
+void session_manual::handle_connect(code const& ec, channel::ptr channel,
     const std::string& hostname, uint16_t port, uint32_t remaining,
     connector::ptr connector, channel_handler handler)
 {
@@ -130,7 +130,7 @@ void session_manual::handle_connect(const code& ec, channel::ptr channel,
         BIND3(handle_channel_stop, _1, hostname, port));
 }
 
-void session_manual::handle_channel_start(const code& ec,
+void session_manual::handle_channel_start(code const& ec,
     const std::string& hostname, uint16_t port, channel::ptr channel,
     channel_handler handler)
 {
@@ -169,7 +169,7 @@ void session_manual::attach_protocols(channel::ptr channel)
     attach<protocol_address_31402>(channel)->start();
 }
 
-void session_manual::handle_channel_stop(const code& ec,
+void session_manual::handle_channel_stop(code const& ec,
     const std::string& hostname, uint16_t port)
 {
     LOG_DEBUG(LOG_NETWORK)

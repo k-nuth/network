@@ -215,15 +215,15 @@ private:
     typedef bc::pending<channel> pending_channels;
     typedef bc::pending<connector> pending_connectors;
 
-    void handle_manual_started(const code& ec, result_handler handler);
-    void handle_inbound_started(const code& ec, result_handler handler);
-    void handle_hosts_loaded(const code& ec, result_handler handler);
-    void handle_hosts_saved(const code& ec, result_handler handler);
-    void handle_send(const code& ec, channel::ptr channel,
+    void handle_manual_started(code const& ec, result_handler handler);
+    void handle_inbound_started(code const& ec, result_handler handler);
+    void handle_hosts_loaded(code const& ec, result_handler handler);
+    void handle_hosts_saved(code const& ec, result_handler handler);
+    void handle_send(code const& ec, channel::ptr channel,
         channel_handler handle_channel, result_handler handle_complete);
 
-    void handle_started(const code& ec, result_handler handler);
-    void handle_running(const code& ec, result_handler handler);
+    void handle_started(code const& ec, result_handler handler);
+    void handle_running(code const& ec, result_handler handler);
 
     // These are thread safe.
     const settings& settings_;

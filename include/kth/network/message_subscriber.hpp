@@ -129,7 +129,7 @@ public:
      * Broadcast a default message instance with the specified error code.
      * @param[in]  ec  The error code to broadcast.
      */
-    virtual void broadcast(const code& ec);
+    virtual void broadcast(code const& ec);
 
     /*
      * Load a stream of the specified command type.

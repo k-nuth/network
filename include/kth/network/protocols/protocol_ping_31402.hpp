@@ -40,9 +40,9 @@ public:
     virtual void start();
 
 protected:
-    virtual void send_ping(const code& ec);
+    virtual void send_ping(code const& ec);
 
-    virtual bool handle_receive_ping(const code& ec, ping_const_ptr message);
+    virtual bool handle_receive_ping(code const& ec, ping_const_ptr message);
 
     const settings& settings_;
 };

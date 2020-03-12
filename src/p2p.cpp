@@ -99,7 +99,7 @@ void p2p::start(result_handler handler)
             this, _1, handler));
 }
 
-void p2p::handle_manual_started(const code& ec, result_handler handler)
+void p2p::handle_manual_started(code const& ec, result_handler handler)
 {
     if (stopped())
     {
@@ -118,7 +118,7 @@ void p2p::handle_manual_started(const code& ec, result_handler handler)
     handle_hosts_loaded(hosts_.start(), handler);
 }
 
-void p2p::handle_hosts_loaded(const code& ec, result_handler handler)
+void p2p::handle_hosts_loaded(code const& ec, result_handler handler)
 {
     if (stopped())
     {
@@ -143,7 +143,7 @@ void p2p::handle_hosts_loaded(const code& ec, result_handler handler)
             this, _1, handler));
 }
 
-void p2p::handle_started(const code& ec, result_handler handler)
+void p2p::handle_started(code const& ec, result_handler handler)
 {
     if (stopped())
     {
@@ -186,7 +186,7 @@ void p2p::run(result_handler handler)
             this, _1, handler));
 }
 
-void p2p::handle_inbound_started(const code& ec, result_handler handler)
+void p2p::handle_inbound_started(code const& ec, result_handler handler)
 {
     if (ec)
     {
@@ -205,7 +205,7 @@ void p2p::handle_inbound_started(const code& ec, result_handler handler)
             this, _1, handler));
 }
 
-void p2p::handle_running(const code& ec, result_handler handler)
+void p2p::handle_running(code const& ec, result_handler handler)
 {
     if (ec)
     {
@@ -327,7 +327,7 @@ threadpool& p2p::thread_pool()
 // ----------------------------------------------------------------------------
 
 // private
-void p2p::handle_send(const code& ec, channel::ptr channel,
+void p2p::handle_send(code const& ec, channel::ptr channel,
     channel_handler handle_channel, result_handler handle_complete)
 {
     handle_channel(ec, channel);
