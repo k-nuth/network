@@ -172,7 +172,7 @@ void connector::handle_connect(const boost_code& ec, asio::iterator,
 }
 
 // private:
-void connector::handle_timer(const code& ec, socket::ptr socket,
+void connector::handle_timer(code const& ec, socket::ptr socket,
     connect_handler handler)
 {
     handler(ec ? ec : error::channel_timeout, nullptr);

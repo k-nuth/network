@@ -74,7 +74,7 @@ public:
     virtual void start(result_handler handler);
 
     /// Stop reading or sending messages on this socket.
-    virtual void stop(const code& ec);
+    virtual void stop(code const& ec);
 
 protected:
     virtual bool stopped() const;

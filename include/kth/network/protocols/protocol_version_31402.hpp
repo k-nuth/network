@@ -56,9 +56,8 @@ protected:
     virtual message::version version_factory() const;
     virtual bool sufficient_peer(version_const_ptr message);
 
-    virtual bool handle_receive_version(const code& ec,
-        version_const_ptr version);
-    virtual bool handle_receive_verack(const code& ec, verack_const_ptr);
+    virtual bool handle_receive_version(code const& ec, version_const_ptr version);
+    virtual bool handle_receive_verack(code const& ec, verack_const_ptr);
 
     p2p& network_;
     const uint32_t own_version_;

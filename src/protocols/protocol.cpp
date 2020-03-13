@@ -64,13 +64,13 @@ threadpool& protocol::pool()
 }
 
 // Stop the channel.
-void protocol::stop(const code& ec)
+void protocol::stop(code const& ec)
 {
     channel_->stop(ec);
 }
 
 // protected
-void protocol::handle_send(const code& ec, const std::string& command)
+void protocol::handle_send(code const& ec, const std::string& command)
 {
     // Send and receive failures are logged by the proxy.
     // This provides a convenient location for override if desired.

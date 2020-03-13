@@ -46,14 +46,14 @@ protected:
 private:
     void new_connection(const code&);
 
-    void handle_started(const code& ec, result_handler handler);
-    void handle_connect(const code& ec, channel::ptr channel);
+    void handle_started(code const& ec, result_handler handler);
+    void handle_connect(code const& ec, channel::ptr channel);
 
-    void do_unpend(const code& ec, channel::ptr channel,
+    void do_unpend(code const& ec, channel::ptr channel,
         result_handler handle_started);
 
-    void handle_channel_stop(const code& ec, channel::ptr channel);
-    void handle_channel_start(const code& ec, channel::ptr channel);
+    void handle_channel_stop(code const& ec, channel::ptr channel);
+    void handle_channel_start(code const& ec, channel::ptr channel);
 };
 
 } // namespace network

@@ -99,7 +99,7 @@ bool protocol_version_70002::sufficient_peer(version_const_ptr message)
     return protocol_version_31402::sufficient_peer(message);
 }
 
-bool protocol_version_70002::handle_receive_reject(const code& ec,
+bool protocol_version_70002::handle_receive_reject(code const& ec,
     reject_const_ptr reject)
 {
     if (stopped(ec))

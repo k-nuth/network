@@ -38,11 +38,11 @@ public:
     protocol_ping_60001(p2p& network, channel::ptr channel);
 
 protected:
-    void send_ping(const code& ec) override;
+    void send_ping(code const& ec) override;
 
-    void handle_send_ping(const code& ec, const std::string& command);
-    bool handle_receive_ping(const code& ec, ping_const_ptr message) override;
-    virtual bool handle_receive_pong(const code& ec, pong_const_ptr message,
+    void handle_send_ping(code const& ec, const std::string& command);
+    bool handle_receive_ping(code const& ec, ping_const_ptr message) override;
+    virtual bool handle_receive_pong(code const& ec, pong_const_ptr message,
         uint64_t nonce);
 
 private:

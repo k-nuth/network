@@ -49,7 +49,7 @@ void channel::start(result_handler handler)
 }
 
 // Don't start the timers until the socket is enabled.
-void channel::do_start(const code& ec, result_handler handler)
+void channel::do_start(code const& ec, result_handler handler)
 {
     start_expiration();
     start_inactivity();
@@ -106,7 +106,7 @@ void channel::signal_activity()
     start_inactivity();
 }
 
-bool channel::stopped(const code& ec) const
+bool channel::stopped(code const& ec) const
 {
     return proxy::stopped() || ec == error::channel_stopped ||
         ec == error::service_stopped;
@@ -125,7 +125,7 @@ void channel::start_expiration()
             shared_from_base<channel>(), _1));
 }
 
-void channel::handle_expiration(const code& ec)
+void channel::handle_expiration(code const& ec)
 {
     if (stopped(ec))
         return;
@@ -146,7 +146,7 @@ void channel::start_inactivity()
             shared_from_base<channel>(), _1));
 }
 
-void channel::handle_inactivity(const code& ec)
+void channel::handle_inactivity(code const& ec)
 {
     if (stopped(ec))
         return;

@@ -100,7 +100,7 @@ protected:
     }
 
     /// Delay timing for a tight failure loop, based on configured timeout.
-    inline asio::duration cycle_delay(const code& ec)
+    inline asio::duration cycle_delay(code const& ec)
     {
         return (ec == error::channel_timeout || ec == error::service_stopped ||
             ec == error::success) ? asio::seconds(0) :
@@ -115,7 +115,7 @@ protected:
     virtual code fetch_address(address& out_address) const;
     virtual bool blacklisted(const authority& authority) const;
     virtual bool stopped() const;
-    virtual bool stopped(const code& ec) const;
+    virtual bool stopped(code const& ec) const;
 
     /// Socket creators.
     // ------------------------------------------------------------------------
@@ -170,14 +170,14 @@ protected:
 private:
     typedef bc::pending<connector> connectors;
 
-    void handle_stop(const code& ec);
-    void handle_starting(const code& ec, channel::ptr channel,
+    void handle_stop(code const& ec);
+    void handle_starting(code const& ec, channel::ptr channel,
         result_handler handle_started);
-    void handle_handshake(const code& ec, channel::ptr channel,
+    void handle_handshake(code const& ec, channel::ptr channel,
         result_handler handle_started);
-    void handle_start(const code& ec, channel::ptr channel,
+    void handle_start(code const& ec, channel::ptr channel,
         result_handler handle_started, result_handler handle_stopped);
-    void handle_remove(const code& ec, channel::ptr channel,
+    void handle_remove(code const& ec, channel::ptr channel,
         result_handler handle_stopped);
 
     // These are thread safe.

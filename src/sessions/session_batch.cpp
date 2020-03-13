@@ -54,7 +54,7 @@ void session_batch::new_connect(channel_handler handler)
     start_connect(ec, address, handler);
 }
 
-void session_batch::start_connect(const code& ec, const authority& host,
+void session_batch::start_connect(code const& ec, const authority& host,
     channel_handler handler)
 {
     if (stopped(ec))
@@ -94,7 +94,7 @@ void session_batch::start_connect(const code& ec, const authority& host,
         BIND4(handle_connect, _1, _2, connector, handler));
 }
 
-void session_batch::handle_connect(const code& ec, channel::ptr channel,
+void session_batch::handle_connect(code const& ec, channel::ptr channel,
     connector::ptr connector, channel_handler handler)
 {
     unpend(connector);

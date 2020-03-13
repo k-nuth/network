@@ -174,11 +174,9 @@ void proxy::read_payload(const heading& head) {
 
 void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const heading& head) {
     //LOG_INFO(LOG_NETWORK) << "proxy::handle_read_payload()";
-    if (stopped())
-        return;
+    if (stopped()) return;
 
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Payload read failure [" << authority() << "] "
             << code(error::boost_to_error_code(ec)).message();
@@ -284,7 +282,7 @@ void proxy::handle_send(const boost_code& ec, size_t, command_ptr command, paylo
 // completes at least once before invoking the handler. That would require a
 // lock be taken around the entire section, which poses a deadlock risk.
 // Instead this is thread safe and idempotent, allowing it to be unguarded.
-void proxy::stop(const code& ec) {
+void proxy::stop(code const& ec) {
     // LOG_INFO(LOG_NETWORK) << "proxy::stop()";
 
     KTH_ASSERT_MSG(ec, "The stop code must be an error code.");

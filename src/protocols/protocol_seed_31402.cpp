@@ -69,14 +69,14 @@ void protocol_seed_31402::send_own_address(const settings& settings)
     SEND1(self, handle_send_address, _1);
 }
 
-void protocol_seed_31402::handle_seeding_complete(const code& ec,
+void protocol_seed_31402::handle_seeding_complete(code const& ec,
     event_handler handler)
 {
     handler(ec);
     stop(ec);
 }
 
-bool protocol_seed_31402::handle_receive_address(const code& ec,
+bool protocol_seed_31402::handle_receive_address(code const& ec,
     address_const_ptr message)
 {
     if (stopped(ec))
@@ -91,7 +91,7 @@ bool protocol_seed_31402::handle_receive_address(const code& ec,
     return false;
 }
 
-void protocol_seed_31402::handle_send_address(const code& ec)
+void protocol_seed_31402::handle_send_address(code const& ec)
 {
     if (stopped(ec))
         return;
@@ -100,7 +100,7 @@ void protocol_seed_31402::handle_send_address(const code& ec)
     set_event(error::success);
 }
 
-void protocol_seed_31402::handle_send_get_address(const code& ec)
+void protocol_seed_31402::handle_send_get_address(code const& ec)
 {
     if (stopped(ec))
         return;
@@ -118,7 +118,7 @@ void protocol_seed_31402::handle_send_get_address(const code& ec)
     set_event(error::success);
 }
 
-void protocol_seed_31402::handle_store_addresses(const code& ec)
+void protocol_seed_31402::handle_store_addresses(code const& ec)
 {
     if (stopped(ec))
         return;

@@ -47,8 +47,8 @@ protected:
     void reset_timer();
 
 private:
-    void handle_timer(const code& ec);
-    void handle_notify(const code& ec, event_handler handler);
+    void handle_timer(code const& ec);
+    void handle_notify(code const& ec, event_handler handler);
 
     const bool perpetual_;
     deadline::ptr timer_;

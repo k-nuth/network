@@ -77,16 +77,15 @@ settings::settings(config::settings context)
             // identifier = 3652501241;
             inbound_port = 8333;
 
-    #ifdef KTH_CURRENCY_BCH
+#ifdef KTH_CURRENCY_BCH
             identifier = netmagic::bch_mainnet; 
-            seeds.reserve(6);
+            seeds.reserve(5);
             seeds.push_back({ "seed.bitcoinabc.org", 8333 });
             seeds.push_back({ "seed-abc.bitcoinforks.org", 8333 });
             seeds.push_back({ "btccash-seeder.bitcoinunlimited.info", 8333 });
-            seeds.push_back({ "seed.bitprim.org", 8333 });
             seeds.push_back({ "seed.deadalnix.me", 8333 });
             seeds.push_back({ "seed.bchd.cash", 8333 });
-    #else
+#else
             identifier = netmagic::btc_mainnet; 
             seeds.reserve(6);
             seeds.push_back({ "seed.bitcoin.sipa.be", 8333 });
@@ -95,7 +94,7 @@ settings::settings(config::settings context)
             seeds.push_back({ "seed.bitcoinstats.com", 8333 });
             seeds.push_back({ "seed.bitcoin.jonasschnelli.ch", 8333 });
             seeds.push_back({ "seed.voskuil.org", 8333 });
-    #endif // KTH_CURRENCY_BCH
+#endif // KTH_CURRENCY_BCH
 #endif //KTH_CURRENCY_LTC
             break;
         }
@@ -114,16 +113,15 @@ settings::settings(config::settings context)
 #else
             // identifier = 118034699;
             inbound_port = 18333;
-    #ifdef KTH_CURRENCY_BCH
+#ifdef KTH_CURRENCY_BCH
             identifier = netmagic::bch_testnet;
-            seeds.reserve(6);
+            seeds.reserve(5);
             seeds.push_back({ "testnet-seed.bitcoinabc.org", 18333 });
             seeds.push_back({ "testnet-seed-abc.bitcoinforks.org", 18333 });
             seeds.push_back({ "testnet-seed.bitcoinunlimited.info", 18333 });
-            seeds.push_back({ "testnet-seed.bitprim.org", 18333 });
             seeds.push_back({ "testnet-seed.deadalnix.me", 18333 });
             seeds.push_back({ "testnet-seed.bchd.cash", 18333 });
-    #else
+#else
             identifier = netmagic::btc_testnet;
             // Seeds based on satoshi client v0.14.0 plus voskuil.org.
             seeds.reserve(5);
@@ -132,7 +130,7 @@ settings::settings(config::settings context)
             seeds.push_back({ "testnet-seed.bluematt.me", 18333 });
             seeds.push_back({ "testnet-seed.bitcoin.schildbach.de", 18333 });
             seeds.push_back({ "testnet-seed.voskuil.org", 18333 });
-    #endif //KTH_CURRENCY_BCH
+#endif //KTH_CURRENCY_BCH
 #endif //KTH_CURRENCY_LTC
             break;
         }

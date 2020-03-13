@@ -49,7 +49,7 @@ protected:
      * Invoke the event handler.
      * @param[in]  ec  The error code of the preceding operation.
      */
-    virtual void set_event(const code& ec);
+    virtual void set_event(code const& ec);
 
     /**
      * Determine if the event handler has been cleared.
@@ -59,12 +59,12 @@ protected:
     /**
      * Determine if the code is a stop code or the handler has been cleared.
      */
-    virtual bool stopped(const code& ec) const;
+    virtual bool stopped(code const& ec) const;
 
 private:
     void handle_started(completion_handler handler);
-    void handle_stopped(const code& ec);
-    void do_set_event(const code& ec);
+    void handle_stopped(code const& ec);
+    void do_set_event(code const& ec);
 
     bc::atomic<event_handler> handler_;
 };

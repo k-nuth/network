@@ -77,7 +77,7 @@ bool session::stopped() const
     return stopped_;
 }
 
-bool session::stopped(const code& ec) const
+bool session::stopped(code const& ec) const
 {
     return stopped() || ec == error::service_stopped;
 }
@@ -145,7 +145,7 @@ void session::start(result_handler handler)
     handler(error::success);
 }
 
-void session::handle_stop(const code& ec)
+void session::handle_stop(code const& ec)
 {
     // This signals the session to stop creating connections, but does not
     // close the session. Channels stop, resulting in session loss of scope.
@@ -189,7 +189,7 @@ void session::start_channel(channel::ptr channel,
         BIND3(handle_starting, _1, channel, handle_started));
 }
 
-void session::handle_starting(const code& ec, channel::ptr channel,
+void session::handle_starting(code const& ec, channel::ptr channel,
     result_handler handle_started)
 {
     if (ec)
@@ -216,7 +216,7 @@ void session::attach_handshake_protocols(channel::ptr channel,
         attach<protocol_version_31402>(channel)->start(handle_started);
 }
 
-void session::handle_handshake(const code& ec, channel::ptr channel,
+void session::handle_handshake(code const& ec, channel::ptr channel,
     result_handler handle_started)
 {
     if (ec)
@@ -239,7 +239,7 @@ void session::handshake_complete(channel::ptr channel,
     handle_started(network_.store(channel));
 }
 
-void session::handle_start(const code& ec, channel::ptr channel,
+void session::handle_start(code const& ec, channel::ptr channel,
     result_handler handle_started, result_handler handle_stopped)
 {
     // Must either stop or subscribe the channel for stop before returning.
@@ -260,7 +260,7 @@ void session::handle_start(const code& ec, channel::ptr channel,
     handle_started(ec);
 }
 
-void session::handle_remove(const code& ec, channel::ptr channel,
+void session::handle_remove(code const& ec, channel::ptr channel,
     result_handler handle_stopped)
 {
     network_.remove(channel);

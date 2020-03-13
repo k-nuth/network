@@ -39,12 +39,12 @@ public:
     virtual void start();
 
 protected:
-    virtual void handle_stop(const code& ec);
-    virtual void handle_store_addresses(const code& ec);
+    virtual void handle_stop(code const& ec);
+    virtual void handle_store_addresses(code const& ec);
 
-    virtual bool handle_receive_address(const code& ec,
+    virtual bool handle_receive_address(code const& ec,
         address_const_ptr address);
-    virtual bool handle_receive_get_address(const code& ec,
+    virtual bool handle_receive_get_address(code const& ec,
         get_address_const_ptr message);
 
     p2p& network_;

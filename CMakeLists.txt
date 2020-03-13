@@ -46,16 +46,6 @@ option(WITH_TESTS "Compile with unit tests." ON)
 #------------------------------------------------------------------------------
 # option(WITH_LITECOIN "Compile with Litecoin support." OFF)
 
-
-# Implement --use-domain and declare USE_DOMAIN.
-#------------------------------------------------------------------------------
-option(USE_DOMAIN "Domain enabled." ON)
-if (USE_DOMAIN)
-  message(STATUS "Knuth: Using Domain enabled")
-  add_definitions(-DKTH_USE_DOMAIN)
-endif()
-
-
 set(KTH_PROJECT_VERSION "-" CACHE STRING "Specify the Knuth Project Version.")
 # message(${KTH_PROJECT_VERSION})
 message( STATUS "Knuth: Compiling version ${KTH_PROJECT_VERSION}")
@@ -259,7 +249,8 @@ target_include_directories(kth-network PUBLIC
         $<INSTALL_INTERFACE:include>)
 
 
-target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="\\"${KTH_PROJECT_VERSION}\\"") #TODO(fernando): manage with Conan????
+# target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="\\"${KTH_PROJECT_VERSION}\\"") #TODO(fernando): manage with Conan????
+target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="${KTH_PROJECT_VERSION}") #TODO(fernando): manage with Conan????
 
 if (NOT ENABLE_SHARED)
     target_compile_definitions(kth-network PUBLIC -DBCT_STATIC -DBC_STATIC)

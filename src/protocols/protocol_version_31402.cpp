@@ -14,8 +14,7 @@
 #include <kth/network/settings.hpp>
 #include <kth/network/user_agent.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define NAME "version"
 #define CLASS protocol_version_31402
@@ -28,41 +27,33 @@ using namespace std::placeholders;
 // Configured min version is our own but we may require higer for some stuff.
 // Configured services was our but we found that most incoming connections are
 // set to zero, so that is currently the default (see below).
-protocol_version_31402::protocol_version_31402(p2p& network,
-    channel::ptr channel)
-  : protocol_version_31402(network, channel,
-        network.network_settings().protocol_maximum,
-        network.network_settings().services,
-        network.network_settings().invalid_services,
-        network.network_settings().protocol_minimum,
-        version::service::none)
-{
-}
+protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channel)
+    : protocol_version_31402(network, channel
+        , network.network_settings().protocol_maximum
+        , network.network_settings().services
+        , network.network_settings().invalid_services
+        , network.network_settings().protocol_minimum
+        , version::service::none)
+{}
 
-protocol_version_31402::protocol_version_31402(p2p& network,
-    channel::ptr channel, uint32_t own_version, uint64_t own_services,
-    uint64_t invalid_services, uint32_t minimum_version,
-    uint64_t minimum_services)
-  : protocol_timer(network, channel, false, NAME),
-    network_(network),
-    own_version_(own_version),
-    own_services_(own_services),
-    invalid_services_(invalid_services),
-    minimum_version_(minimum_version),
-    minimum_services_(minimum_services),
-    CONSTRUCT_TRACK(protocol_version_31402)
-{
-}
+protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channel, uint32_t own_version, uint64_t own_services, uint64_t invalid_services, uint32_t minimum_version, uint64_t minimum_services)
+    : protocol_timer(network, channel, false, NAME)
+    , network_(network)
+    , own_version_(own_version)
+    , own_services_(own_services)
+    , invalid_services_(invalid_services)
+    , minimum_version_(minimum_version)
+    , minimum_services_(minimum_services)
+    , CONSTRUCT_TRACK(protocol_version_31402)
+{}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
 
-void protocol_version_31402::start(event_handler handler)
-{
+void protocol_version_31402::start(event_handler handler) {
     auto const period = network_.network_settings().channel_handshake();
 
-    auto const join_handler = synchronize(handler, 2, NAME,
-        synchronizer_terminate::on_error);
+    auto const join_handler = synchronize(handler, 2, NAME, synchronizer_terminate::on_error);
 
     // The handler is invoked in the context of the last message receipt.
     protocol_timer::start(period, join_handler);
@@ -72,8 +63,7 @@ void protocol_version_31402::start(event_handler handler)
     SEND2(version_factory(), handle_send, _1, version::command);
 }
 
-message::version protocol_version_31402::version_factory() const
-{
+message::version protocol_version_31402::version_factory() const {
     auto const& settings = network_.network_settings();
     auto const height = network_.top_block().height();
     KTH_ASSERT_MSG(height <= max_uint32, "Time to upgrade the protocol.");
@@ -99,14 +89,10 @@ message::version protocol_version_31402::version_factory() const
 // Protocol.
 // ----------------------------------------------------------------------------
 
-bool protocol_version_31402::handle_receive_version(const code& ec,
-    version_const_ptr message)
-{
-    if (stopped(ec))
-        return false;
+bool protocol_version_31402::handle_receive_version(code const& ec, version_const_ptr message) {
+    if (stopped(ec)) return false;
 
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure receiving version from [" << authority() << "] "
             << ec.message();
@@ -114,17 +100,36 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
         return false;
     }
 
+    auto const& settings = network_.network_settings();
+
+    auto blacklisted = std::find_if(begin(settings.user_agent_backlist), end(settings.user_agent_backlist), [&message](auto const& x){
+        if (x.size() <= message->user_agent().size()) {
+            return std::equal(begin(x), end(x), begin(message->user_agent()));
+        }
+        return std::equal(begin(message->user_agent()), end(message->user_agent()), begin(x));
+    });
+
+    if (blacklisted != end(settings.user_agent_backlist)) {
+        LOG_DEBUG(LOG_NETWORK)
+            << "Invalid user agent (blacklisted) for peer [" << authority() << "] user agent: " << message->user_agent();
+        set_event(error::channel_stopped);
+        return false;
+    }
+
     LOG_DEBUG(LOG_NETWORK)
         << "Peer [" << authority() << "] protocol version ("
         << message->value() << ") user agent: " << message->user_agent();
 
+    // LOG_INFO(LOG_NETWORK)
+    //     << "Peer [" << authority() << "] protocol version ("
+    //     << message->value() << ") user agent: " << message->user_agent();
+
+
     // TODO: move these three checks to initialization.
     //-------------------------------------------------------------------------
 
-    auto const& settings = network_.network_settings();
 
-    if (settings.protocol_minimum < version::level::minimum)
-    {
+    if (settings.protocol_minimum < version::level::minimum) {
         LOG_ERROR(LOG_NETWORK)
             << "Invalid protocol version configuration, minimum below ("
             << version::level::minimum << ").";
@@ -132,8 +137,7 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
         return false;
     }
 
-    if (settings.protocol_maximum > version::level::maximum)
-    {
+    if (settings.protocol_maximum > version::level::maximum) {
         LOG_ERROR(LOG_NETWORK)
             << "Invalid protocol version configuration, maximum above ("
             << version::level::maximum << ").";
@@ -141,8 +145,7 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
         return false;
     }
 
-    if (settings.protocol_minimum > settings.protocol_maximum)
-    {
+    if (settings.protocol_minimum > settings.protocol_maximum) {
         LOG_ERROR(LOG_NETWORK)
             << "Invalid protocol version configuration, "
             << "minimum exceeds maximum.";
@@ -152,8 +155,7 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
 
     //-------------------------------------------------------------------------
 
-    if (!sufficient_peer(message))
-    {
+    if ( ! sufficient_peer(message)) {
         set_event(error::channel_stopped);
         return false;
     }
@@ -173,26 +175,22 @@ bool protocol_version_31402::handle_receive_version(const code& ec,
     return false;
 }
 
-bool protocol_version_31402::sufficient_peer(version_const_ptr message)
-{
-    if ((message->services() & invalid_services_) != 0)
-    {
+bool protocol_version_31402::sufficient_peer(version_const_ptr message) {
+    if ((message->services() & invalid_services_) != 0) {
         LOG_DEBUG(LOG_NETWORK)
             << "Invalid peer network services (" << message->services()
             << ") for [" << authority() << "]";
         return false;
     }
 
-    if ((message->services() & minimum_services_) != minimum_services_)
-    {
+    if ((message->services() & minimum_services_) != minimum_services_) {
         LOG_DEBUG(LOG_NETWORK)
             << "Insufficient peer network services (" << message->services()
             << ") for [" << authority() << "]";
         return false;
     }
 
-    if (message->value() < minimum_version_)
-    {
+    if (message->value() < minimum_version_) {
         LOG_DEBUG(LOG_NETWORK)
             << "Insufficient peer protocol version (" << message->value()
             << ") for [" << authority() << "]";
@@ -202,14 +200,10 @@ bool protocol_version_31402::sufficient_peer(version_const_ptr message)
     return true;
 }
 
-bool protocol_version_31402::handle_receive_verack(const code& ec,
-    verack_const_ptr)
-{
-    if (stopped(ec))
-        return false;
+bool protocol_version_31402::handle_receive_verack(code const& ec, verack_const_ptr) {
+    if (stopped(ec)) return false;
 
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure receiving verack from [" << authority() << "] "
             << ec.message();
@@ -222,5 +216,4 @@ bool protocol_version_31402::handle_receive_verack(const code& ec,
     return false;
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

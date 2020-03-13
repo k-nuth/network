@@ -10,12 +10,10 @@
 #include <kth/domain.hpp>
 #include <kth/network/define.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// Common database configuration settings, properties not thread safe.
-class BCT_API settings
-{
+class BCT_API settings {
 public:
     settings();
     settings(config::settings context);
@@ -60,6 +58,12 @@ public:
     bool verbose;
     bool use_ipv6;
 
+    std::vector<std::string> user_agent_backlist
+#ifdef KTH_CURRENCY_BCH
+        {"/Bitcoin SV:"}
+#endif
+    ;
+
     /// Helpers.
     asio::duration connect_timeout() const;
     asio::duration channel_handshake() const;
@@ -69,7 +73,6 @@ public:
     asio::duration channel_germination() const;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
