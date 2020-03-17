@@ -12,36 +12,31 @@
 #include <kth/network/p2p.hpp>
 #include <kth/network/protocols/protocol_events.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define CLASS protocol_timer
 using namespace std::placeholders;
 
-protocol_timer::protocol_timer(p2p& network, channel::ptr channel,
-    bool perpetual, const std::string& name)
-  : protocol_events(network, channel, name),
-    perpetual_(perpetual)
-{
-}
+protocol_timer::protocol_timer(p2p& network, channel::ptr channel, bool perpetual, std::string const& name)
+    : protocol_events(network, channel, name)
+    , perpetual_(perpetual)
+{}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
 
 // protected:
-void protocol_timer::start(const asio::duration& timeout,
-    event_handler handle_event)
-{
+void protocol_timer::start(const asio::duration& timeout, event_handler handle_event) {
     // The deadline timer is thread safe.
     timer_ = std::make_shared<deadline>(pool(), timeout);
     protocol_events::start(BIND2(handle_notify, _1, handle_event));
     reset_timer();
 }
 
-void protocol_timer::handle_notify(code const& ec, event_handler handler)
-{
-    if (ec == error::channel_stopped)
+void protocol_timer::handle_notify(code const& ec, event_handler handler) {
+    if (ec == error::channel_stopped) {
         timer_->stop();
+    }
 
     handler(ec);
 }
@@ -50,18 +45,18 @@ void protocol_timer::handle_notify(code const& ec, event_handler handler)
 // ----------------------------------------------------------------------------
 
 // protected:
-void protocol_timer::reset_timer()
-{
-    if (stopped())
+void protocol_timer::reset_timer() {
+    if (stopped()) {
         return;
+    }
 
     timer_->start(BIND1(handle_timer, _1));
 }
 
-void protocol_timer::handle_timer(code const& ec)
-{
-    if (stopped())
+void protocol_timer::handle_timer(code const& ec) {
+    if (stopped()) {
         return;
+    }
 
     LOG_DEBUG(LOG_NETWORK)
         << "Fired protocol_" << name() << " timer on [" << authority() << "] "
@@ -71,9 +66,9 @@ void protocol_timer::handle_timer(code const& ec)
     set_event(error::channel_timeout);
 
     // A perpetual timer resets itself until the channel is stopped.
-    if (perpetual_)
+    if (perpetual_) {
         reset_timer();
+    }
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

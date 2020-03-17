@@ -42,7 +42,7 @@ protected:
     typedef std::function<void(const code&, size_t)> count_handler;
 
     /// Construct an instance.
-    protocol(p2p& network, channel::ptr channel, const std::string& name);
+    protocol(p2p& network, channel::ptr channel, std::string const& name);
 
     /// Bind a method in the derived class.
     template <class Protocol, typename Handler, typename... Args>
@@ -83,7 +83,7 @@ protected:
     virtual config::authority authority() const;
 
     /// Get the protocol name, for logging purposes.
-    virtual const std::string& name() const;
+    virtual std::string const& name() const;
 
     /// Get the channel nonce.
     virtual uint64_t nonce() const;
@@ -107,7 +107,7 @@ protected:
     virtual void stop(code const& ec);
 
 protected:
-    void handle_send(code const& ec, const std::string& command);
+    void handle_send(code const& ec, std::string const& command);
 
 private:
     threadpool& pool_;

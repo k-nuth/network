@@ -15,36 +15,30 @@
 #include <kth/network/protocols/protocol_ping_60001.hpp>
 #include <kth/network/protocols/protocol_reject_70002.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define CLASS session_manual
 
 using namespace std::placeholders;
 
 session_manual::session_manual(p2p& network, bool notify_on_connect)
-  : session(network, notify_on_connect),
-    CONSTRUCT_TRACK(session_manual)
-{
-}
+    : session(network, notify_on_connect)
+    , CONSTRUCT_TRACK(session_manual)
+{}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
 // Manual connections are always enabled.
 // Handshake pend not implemented for manual connections (connect to self ok).
 
-void session_manual::start(result_handler handler)
-{
-    LOG_INFO(LOG_NETWORK)
-        << "Starting manual session.";
+void session_manual::start(result_handler handler) {
+    LOG_INFO(LOG_NETWORK) << "Starting manual session.";
 
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
 
-void session_manual::handle_started(code const& ec, result_handler handler)
-{
-    if (ec)
-    {
+void session_manual::handle_started(code const& ec, result_handler handler) {
+    if (ec) {
         handler(ec);
         return;
     }
@@ -56,28 +50,19 @@ void session_manual::handle_started(code const& ec, result_handler handler)
 // Connect sequence/cycle.
 // ----------------------------------------------------------------------------
 
-void session_manual::connect(const std::string& hostname, uint16_t port)
-{
+void session_manual::connect(std::string const& hostname, uint16_t port) {
     auto const unhandled = [](code, channel::ptr) {};
     connect(hostname, port, unhandled);
 }
 
-void session_manual::connect(const std::string& hostname, uint16_t port,
-    channel_handler handler)
-{
-    start_connect(error::success, hostname, port,
-        settings_.manual_attempt_limit, handler);
+void session_manual::connect(std::string const& hostname, uint16_t port, channel_handler handler) {
+    start_connect(error::success, hostname, port, settings_.manual_attempt_limit, handler);
 }
 
 // The first connect is a sequence, which then spawns a cycle.
-void session_manual::start_connect(const code&, const std::string& hostname,
-    uint16_t port, uint32_t attempts, channel_handler handler)
-{
-    if (stopped())
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Suspended manual connection.";
-
+void session_manual::start_connect(const code&, std::string const& hostname, uint16_t port, uint32_t attempts, channel_handler handler) {
+    if (stopped()) {
+        LOG_DEBUG(LOG_NETWORK) << "Suspended manual connection.";
         handler(error::service_stopped, nullptr);
         return;
     }
@@ -87,19 +72,13 @@ void session_manual::start_connect(const code&, const std::string& hostname,
     pend(connector);
 
     // MANUAL CONNECT OUTBOUND
-    connector->connect(hostname, port,
-        BIND7(handle_connect, _1, _2, hostname, port, retries, connector,
-            handler));
+    connector->connect(hostname, port, BIND7(handle_connect, _1, _2, hostname, port, retries, connector, handler));
 }
 
-void session_manual::handle_connect(code const& ec, channel::ptr channel,
-    const std::string& hostname, uint16_t port, uint32_t remaining,
-    connector::ptr connector, channel_handler handler)
-{
+void session_manual::handle_connect(code const& ec, channel::ptr channel, std::string const& hostname, uint16_t port, uint32_t remaining, connector::ptr connector, channel_handler handler) {
     unpend(connector);
 
-    if (ec)
-    {
+    if (ec) {
         LOG_WARNING(LOG_NETWORK)
             << "Failure connecting [" << config::endpoint(hostname, port)
             << "] manually: " << ec.message();
@@ -107,11 +86,9 @@ void session_manual::handle_connect(code const& ec, channel::ptr channel,
         // Retry forever if limit is zero.
         remaining = settings_.manual_attempt_limit == 0 ? 1 : remaining;
 
-        if (remaining > 0)
-        {
+        if (remaining > 0) {
             // Retry with conditional delay in case of network error.
-            dispatch_delayed(cycle_delay(ec),
-                BIND5(start_connect, _1, hostname, port, remaining, handler));
+            dispatch_delayed(cycle_delay(ec), BIND5(start_connect, _1, hostname, port, remaining, handler));
             return;
         }
 
@@ -130,14 +107,10 @@ void session_manual::handle_connect(code const& ec, channel::ptr channel,
         BIND3(handle_channel_stop, _1, hostname, port));
 }
 
-void session_manual::handle_channel_start(code const& ec,
-    const std::string& hostname, uint16_t port, channel::ptr channel,
-    channel_handler handler)
-{
+void session_manual::handle_channel_start(code const& ec, std::string const& hostname, uint16_t port, channel::ptr channel, channel_handler handler) {
     // The start failure is also caught by handle_channel_stop.
     // Treat a start failure like a stop, but preserve the start handler.
-    if (ec)
-    {
+    if (ec) {
         LOG_INFO(LOG_NETWORK)
             << "Manual channel failed to start [" << channel->authority()
             << "] " << ec.message();
@@ -152,34 +125,32 @@ void session_manual::handle_channel_start(code const& ec,
     // This is the success end of the connect sequence.
     handler(error::success, channel);
     attach_protocols(channel);
-};
+}
 
-void session_manual::attach_protocols(channel::ptr channel)
-{
+void session_manual::attach_protocols(channel::ptr channel) {
     auto const version = channel->negotiated_version();
 
-    if (version >= message::version::level::bip31)
+    if (version >= message::version::level::bip31) {
         attach<protocol_ping_60001>(channel)->start();
-    else
+    } else {
         attach<protocol_ping_31402>(channel)->start();
+    }
 
-    if (version >= message::version::level::bip61)
+    if (version >= message::version::level::bip61) {
         attach<protocol_reject_70002>(channel)->start();
+    }
 
     attach<protocol_address_31402>(channel)->start();
 }
 
-void session_manual::handle_channel_stop(code const& ec,
-    const std::string& hostname, uint16_t port)
-{
-    LOG_DEBUG(LOG_NETWORK)
-        << "Manual channel stopped: " << ec.message();
+void session_manual::handle_channel_stop(code const& ec, std::string const& hostname, uint16_t port) {
+    LOG_DEBUG(LOG_NETWORK) << "Manual channel stopped: " << ec.message();
 
     // Special case for already connected, do not keep trying.
     // After a stop we don't use the caller's start handler, but keep connecting.
-    if (ec != error::address_in_use)
+    if (ec != error::address_in_use) {
         connect(hostname, port);
+    }
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

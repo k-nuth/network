@@ -90,7 +90,10 @@ message::version protocol_version_31402::version_factory() const {
 // ----------------------------------------------------------------------------
 
 bool protocol_version_31402::handle_receive_version(code const& ec, version_const_ptr message) {
-    if (stopped(ec)) return false;
+    if (stopped(ec)) {
+        return false;
+    }
+
 
     if (ec) {
         LOG_DEBUG(LOG_NETWORK)
@@ -201,7 +204,9 @@ bool protocol_version_31402::sufficient_peer(version_const_ptr message) {
 }
 
 bool protocol_version_31402::handle_receive_verack(code const& ec, verack_const_ptr) {
-    if (stopped(ec)) return false;
+    if (stopped(ec)) {
+        return false;
+    }
 
     if (ec) {
         LOG_DEBUG(LOG_NETWORK)

@@ -32,7 +32,7 @@ protected:
      * @param[in]  name       The instance name for logging purposes.
      */
     protocol_timer(p2p& network, channel::ptr channel, bool perpetual,
-        const std::string& name);
+        std::string const& name);
 
     /**
      * Define the event handler and start the protocol and timer.

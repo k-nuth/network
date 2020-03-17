@@ -42,7 +42,7 @@ public:
         connect_handler handler);
 
     /// Try to connect to host:port.
-    virtual void connect(const std::string& hostname, uint16_t port,
+    virtual void connect(std::string const& hostname, uint16_t port,
         connect_handler handler);
 
     /// Cancel outstanding connection attempt.

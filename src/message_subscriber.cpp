@@ -31,45 +31,43 @@
 #define STOP_SUBSCRIBER(value) \
     value##_subscriber_->stop()
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 using namespace message;
 
 message_subscriber::message_subscriber(threadpool& pool)
-  : INITIALIZE_SUBSCRIBER(pool, address),
-    INITIALIZE_SUBSCRIBER(pool, alert),
-    INITIALIZE_SUBSCRIBER(pool, block),
-    INITIALIZE_SUBSCRIBER(pool, block_transactions),
-    INITIALIZE_SUBSCRIBER(pool, compact_block),
-    INITIALIZE_SUBSCRIBER(pool, fee_filter),
-    INITIALIZE_SUBSCRIBER(pool, filter_add),
-    INITIALIZE_SUBSCRIBER(pool, filter_clear),
-    INITIALIZE_SUBSCRIBER(pool, filter_load),
-    INITIALIZE_SUBSCRIBER(pool, get_address),
-    INITIALIZE_SUBSCRIBER(pool, get_blocks),
-    INITIALIZE_SUBSCRIBER(pool, get_block_transactions),
-    INITIALIZE_SUBSCRIBER(pool, get_data),
-    INITIALIZE_SUBSCRIBER(pool, get_headers),
-    INITIALIZE_SUBSCRIBER(pool, headers),
-    INITIALIZE_SUBSCRIBER(pool, inventory),
-    INITIALIZE_SUBSCRIBER(pool, memory_pool),
-    INITIALIZE_SUBSCRIBER(pool, merkle_block),
-    INITIALIZE_SUBSCRIBER(pool, not_found),
-    INITIALIZE_SUBSCRIBER(pool, ping),
-    INITIALIZE_SUBSCRIBER(pool, pong),
-    INITIALIZE_SUBSCRIBER(pool, reject),
-    INITIALIZE_SUBSCRIBER(pool, send_compact),
-    INITIALIZE_SUBSCRIBER(pool, send_headers),
-    INITIALIZE_SUBSCRIBER(pool, transaction),
-    INITIALIZE_SUBSCRIBER(pool, verack),
-    INITIALIZE_SUBSCRIBER(pool, version),
-    INITIALIZE_SUBSCRIBER(pool, xverack),
-    INITIALIZE_SUBSCRIBER(pool, xversion)
+    : INITIALIZE_SUBSCRIBER(pool, address)
+    , INITIALIZE_SUBSCRIBER(pool, alert)
+    , INITIALIZE_SUBSCRIBER(pool, block)
+    , INITIALIZE_SUBSCRIBER(pool, block_transactions)
+    , INITIALIZE_SUBSCRIBER(pool, compact_block)
+    , INITIALIZE_SUBSCRIBER(pool, fee_filter)
+    , INITIALIZE_SUBSCRIBER(pool, filter_add)
+    , INITIALIZE_SUBSCRIBER(pool, filter_clear)
+    , INITIALIZE_SUBSCRIBER(pool, filter_load)
+    , INITIALIZE_SUBSCRIBER(pool, get_address)
+    , INITIALIZE_SUBSCRIBER(pool, get_blocks)
+    , INITIALIZE_SUBSCRIBER(pool, get_block_transactions)
+    , INITIALIZE_SUBSCRIBER(pool, get_data)
+    , INITIALIZE_SUBSCRIBER(pool, get_headers)
+    , INITIALIZE_SUBSCRIBER(pool, headers)
+    , INITIALIZE_SUBSCRIBER(pool, inventory)
+    , INITIALIZE_SUBSCRIBER(pool, memory_pool)
+    , INITIALIZE_SUBSCRIBER(pool, merkle_block)
+    , INITIALIZE_SUBSCRIBER(pool, not_found)
+    , INITIALIZE_SUBSCRIBER(pool, ping)
+    , INITIALIZE_SUBSCRIBER(pool, pong)
+    , INITIALIZE_SUBSCRIBER(pool, reject)
+    , INITIALIZE_SUBSCRIBER(pool, send_compact)
+    , INITIALIZE_SUBSCRIBER(pool, send_headers)
+    , INITIALIZE_SUBSCRIBER(pool, transaction)
+    , INITIALIZE_SUBSCRIBER(pool, verack)
+    , INITIALIZE_SUBSCRIBER(pool, version)
+    , INITIALIZE_SUBSCRIBER(pool, xverack)
+    , INITIALIZE_SUBSCRIBER(pool, xversion)
 {}
 
-void message_subscriber::broadcast(code const& ec)
-{
+void message_subscriber::broadcast(code const& ec) {
     RELAY_CODE(ec, address);
     RELAY_CODE(ec, alert);
     RELAY_CODE(ec, block);
@@ -101,11 +99,8 @@ void message_subscriber::broadcast(code const& ec)
     RELAY_CODE(ec, xversion);
 }
 
-code message_subscriber::load(message_type type, uint32_t version,
-    std::istream& stream) const
-{
-    switch (type)
-    {
+code message_subscriber::load(message_type type, uint32_t version, std::istream& stream) const {
+    switch (type) {
         CASE_RELAY_MESSAGE(stream, version, address);
         CASE_RELAY_MESSAGE(stream, version, alert);
         CASE_HANDLE_MESSAGE(stream, version, block);
@@ -141,8 +136,7 @@ code message_subscriber::load(message_type type, uint32_t version,
     }
 }
 
-void message_subscriber::start()
-{
+void message_subscriber::start() {
     START_SUBSCRIBER(address);
     START_SUBSCRIBER(alert);
     START_SUBSCRIBER(block);
@@ -174,8 +168,7 @@ void message_subscriber::start()
     START_SUBSCRIBER(xversion);
 }
 
-void message_subscriber::stop()
-{
+void message_subscriber::stop() {
     STOP_SUBSCRIBER(address);
     STOP_SUBSCRIBER(alert);
     STOP_SUBSCRIBER(block);
@@ -207,5 +200,4 @@ void message_subscriber::stop()
     STOP_SUBSCRIBER(xversion);
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

@@ -36,10 +36,10 @@ public:
     void start(result_handler handler) override;
 
     /// Maintain connection to a node.
-    virtual void connect(const std::string& hostname, uint16_t port);
+    virtual void connect(std::string const& hostname, uint16_t port);
 
     /// Maintain connection to a node with callback on first connect.
-    virtual void connect(const std::string& hostname, uint16_t port,
+    virtual void connect(std::string const& hostname, uint16_t port,
         channel_handler handler);
 
 protected:
@@ -47,17 +47,17 @@ protected:
     virtual void attach_protocols(channel::ptr channel);
 
 private:
-    void start_connect(code const& ec, const std::string& hostname,
+    void start_connect(code const& ec, std::string const& hostname,
         uint16_t port, uint32_t attempts, channel_handler handler);
 
     void handle_started(code const& ec, result_handler handler);
     void handle_connect(code const& ec, channel::ptr channel,
-        const std::string& hostname, uint16_t port, uint32_t remaining,
+        std::string const& hostname, uint16_t port, uint32_t remaining,
         connector::ptr connector, channel_handler handler);
 
-    void handle_channel_start(code const& ec, const std::string& hostname,
+    void handle_channel_start(code const& ec, std::string const& hostname,
         uint16_t port, channel::ptr channel, channel_handler handler);
-    void handle_channel_stop(code const& ec, const std::string& hostname,
+    void handle_channel_stop(code const& ec, std::string const& hostname,
         uint16_t port);
 };
 

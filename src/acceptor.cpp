@@ -13,8 +13,7 @@
 #include <kth/network/proxy.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define NAME "acceptor"
 
@@ -23,28 +22,24 @@ using namespace std::placeholders;
 static auto const reuse_address = asio::acceptor::reuse_address(true);
 
 acceptor::acceptor(threadpool& pool, const settings& settings)
-  : stopped_(true),
-    pool_(pool),
-    settings_(settings),
-    dispatch_(pool, NAME),
-    acceptor_(pool_.service()),
-    CONSTRUCT_TRACK(acceptor)
-{
-}
+    : stopped_(true)
+    , pool_(pool)
+    , settings_(settings)
+    , dispatch_(pool, NAME)
+    , acceptor_(pool_.service())
+    , CONSTRUCT_TRACK(acceptor)
+{}
 
-acceptor::~acceptor()
-{
+acceptor::~acceptor() {
     KTH_ASSERT_MSG(stopped(), "The acceptor was not stopped.");
 }
 
-void acceptor::stop(const code&)
-{
+void acceptor::stop(const code&) {
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
-    if (!stopped())
-    {
+    if ( ! stopped()) {
         mutex_.unlock_upgrade_and_lock();
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -62,20 +57,17 @@ void acceptor::stop(const code&)
 }
 
 // private
-bool acceptor::stopped() const
-{
+bool acceptor::stopped() const {
     return stopped_;
 }
 
 // This is hardwired to listen on IPv6.
-code acceptor::listen(uint16_t port)
-{
+code acceptor::listen(uint16_t port) {
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
-    if (!stopped())
-    {
+    if ( ! stopped()) {
         mutex_.unlock_upgrade();
         //---------------------------------------------------------------------
         return error::operation_failed;
@@ -88,14 +80,17 @@ code acceptor::listen(uint16_t port)
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     acceptor_.open(endpoint.protocol(), error);
 
-    if (!error)
+    if ( ! error) {
         acceptor_.set_option(reuse_address, error);
+    }
 
-    if (!error)
+    if ( ! error) {
         acceptor_.bind(endpoint, error);
+    }
 
-    if (!error)
+    if ( ! error) {
         acceptor_.listen(asio::max_connections, error);
+    }
 
     stopped_ = false;
 
@@ -105,14 +100,12 @@ code acceptor::listen(uint16_t port)
     return error::boost_to_error_code(error);
 }
 
-void acceptor::accept(accept_handler handler)
-{
+void acceptor::accept(accept_handler handler) {
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
-    if (stopped())
-    {
+    if (stopped()) {
         mutex_.unlock_upgrade();
         //---------------------------------------------------------------------
         dispatch_.concurrent(handler, error::service_stopped, nullptr);
@@ -129,19 +122,15 @@ void acceptor::accept(accept_handler handler)
     // TODO: if the accept is invoked on a thread of the acceptor, as opposed
     // to the thread of the socket, then this is unnecessary.
     acceptor_.async_accept(socket->get(),
-        std::bind(&acceptor::handle_accept,
-            shared_from_this(), _1, socket, handler));
+        std::bind(&acceptor::handle_accept, shared_from_this(), _1, socket, handler));
 
     mutex_.unlock();
     ///////////////////////////////////////////////////////////////////////////
 }
 
 // private:
-void acceptor::handle_accept(const boost_code& ec, socket::ptr socket,
-    accept_handler handler)
-{
-    if (ec)
-    {
+void acceptor::handle_accept(const boost_code& ec, socket::ptr socket, accept_handler handler) {
+    if (ec) {
         handler(error::boost_to_error_code(ec), nullptr);
         return;
     }
@@ -151,5 +140,4 @@ void acceptor::handle_accept(const boost_code& ec, socket::ptr socket,
     handler(error::success, created);
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

@@ -13,8 +13,7 @@
 #include <kth/network/p2p.hpp>
 #include <kth/network/protocols/protocol_events.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define NAME "reject"
 #define CLASS protocol_reject_70002
@@ -22,20 +21,16 @@ namespace network {
 using namespace bc::message;
 using namespace std::placeholders;
 
-protocol_reject_70002::protocol_reject_70002(p2p& network,
-    channel::ptr channel)
-  : protocol_events(network, channel, NAME),
-    CONSTRUCT_TRACK(protocol_reject_70002)
-{
-}
+protocol_reject_70002::protocol_reject_70002(p2p& network, channel::ptr channel)
+    : protocol_events(network, channel, NAME)
+    , CONSTRUCT_TRACK(protocol_reject_70002)
+{}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
 
-void protocol_reject_70002::start()
-{
+void protocol_reject_70002::start() {
     protocol_events::start();
-
     SUBSCRIBE2(reject, handle_receive_reject, _1, _2);
 }
 
@@ -43,14 +38,12 @@ void protocol_reject_70002::start()
 // ----------------------------------------------------------------------------
 
 // TODO: mitigate log fill DOS.
-bool protocol_reject_70002::handle_receive_reject(code const& ec,
-    reject_const_ptr reject)
-{
-    if (stopped(ec))
+bool protocol_reject_70002::handle_receive_reject(code const& ec, reject_const_ptr reject) {
+    if (stopped(ec)) {
         return false;
+    }
 
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure receiving reject from [" << authority() << "] "
             << ec.message();
@@ -61,12 +54,14 @@ bool protocol_reject_70002::handle_receive_reject(code const& ec,
     auto const& message = reject->message();
 
     // Handle these in the version protocol.
-    if (message == version::command)
+    if (message == version::command) {
         return true;
+    }
 
     std::string hash;
-    if (message == block::command || message == transaction::command)
+    if (message == block::command || message == transaction::command) {
         hash = " [" + encode_hash(reject->data()) + "].";
+    }
 
     auto const code = reject->code();
     LOG_DEBUG(LOG_NETWORK)
@@ -76,5 +71,4 @@ bool protocol_reject_70002::handle_receive_reject(code const& ec,
     return true;
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

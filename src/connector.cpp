@@ -80,7 +80,7 @@ void connector::connect(const authority& authority, connect_handler handler)
     connect(authority.to_hostname(), authority.port(), handler);
 }
 
-void connector::connect(const std::string& hostname, uint16_t port,
+void connector::connect(std::string const& hostname, uint16_t port,
     connect_handler handler)
 {
     // Critical Section

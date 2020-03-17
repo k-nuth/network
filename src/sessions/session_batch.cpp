@@ -5,13 +5,13 @@
 #include <kth/network/sessions/session_batch.hpp>
 
 #include <cstddef>
+
 #include <kth/domain.hpp>
 #include <kth/network/connector.hpp>
 #include <kth/network/p2p.hpp>
 #include <kth/network/sessions/session.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define CLASS session_batch
 #define NAME "session_batch"
@@ -21,28 +21,24 @@ using namespace bc::message;
 using namespace std::placeholders;
 
 session_batch::session_batch(p2p& network, bool notify_on_connect)
-  : session(network, notify_on_connect),
-    batch_size_(std::max(settings_.connect_batch_size, 1u))
-{
-}
+    : session(network, notify_on_connect)
+    , batch_size_(std::max(settings_.connect_batch_size, 1u))
+{}
 
 // Connect sequence.
 // ----------------------------------------------------------------------------
 
 // protected:
-void session_batch::connect(channel_handler handler)
-{
-    auto const join_handler = synchronize(handler, batch_size_, NAME "_join",
-        synchronizer_terminate::on_success);
+void session_batch::connect(channel_handler handler) {
+    auto const join_handler = synchronize(handler, batch_size_, NAME "_join", synchronizer_terminate::on_success);
 
-    for (size_t host = 0; host < batch_size_; ++host)
+    for (size_t host = 0; host < batch_size_; ++host) {
         new_connect(join_handler);
+    }
 }
 
-void session_batch::new_connect(channel_handler handler)
-{
-    if (stopped())
-    {
+void session_batch::new_connect(channel_handler handler) {
+    if (stopped()) {
         LOG_DEBUG(LOG_NETWORK)
             << "Suspended batch connection.";
         handler(error::channel_stopped, nullptr);
@@ -54,11 +50,8 @@ void session_batch::new_connect(channel_handler handler)
     start_connect(ec, address, handler);
 }
 
-void session_batch::start_connect(code const& ec, const authority& host,
-    channel_handler handler)
-{
-    if (stopped(ec))
-    {
+void session_batch::start_connect(code const& ec, const authority& host, channel_handler handler) {
+    if (stopped(ec)) {
         LOG_DEBUG(LOG_NETWORK)
             << "Batch session stopped while starting.";
         handler(error::service_stopped, nullptr);
@@ -66,51 +59,40 @@ void session_batch::start_connect(code const& ec, const authority& host,
     }
 
     // This termination prevents a tight loop in the empty address pool case.
-    if (ec)
-    {
-        LOG_WARNING(LOG_NETWORK)
-            << "Failure fetching new address: " << ec.message();
+    if (ec) {
+        LOG_WARNING(LOG_NETWORK) << "Failure fetching new address: " << ec.message();
         handler(ec, nullptr);
         return;
     }
 
     // This creates a tight loop in the case of a small address pool.
-    if (blacklisted(host))
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Fetched blacklisted address [" << host << "] ";
+    if (blacklisted(host)) {
+        LOG_DEBUG(LOG_NETWORK) << "Fetched blacklisted address [" << host << "] ";
         handler(error::address_blocked, nullptr);
         return;
     }
 
-    LOG_DEBUG(LOG_NETWORK)
-        << "Connecting to [" << host << "]";
+    LOG_DEBUG(LOG_NETWORK) << "Connecting to [" << host << "]";
 
     auto const connector = create_connector();
     pend(connector);
 
     // CONNECT
-    connector->connect(host,
-        BIND4(handle_connect, _1, _2, connector, handler));
+    connector->connect(host, BIND4(handle_connect, _1, _2, connector, handler));
 }
 
-void session_batch::handle_connect(code const& ec, channel::ptr channel,
-    connector::ptr connector, channel_handler handler)
-{
+void session_batch::handle_connect(code const& ec, channel::ptr channel, connector::ptr connector, channel_handler handler) {
     unpend(connector);
 
-    if (ec)
-    {
+    if (ec) {
         handler(ec, nullptr);
         return;
     }
 
-    LOG_DEBUG(LOG_NETWORK)
-        << "Connected to [" << channel->authority() << "]";
+    LOG_DEBUG(LOG_NETWORK) << "Connected to [" << channel->authority() << "]";
 
     // This is the end of the connect sequence.
     handler(error::success, channel);
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

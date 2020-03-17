@@ -7,39 +7,38 @@
 #include <kth/domain.hpp>
 #include <kth/domain/multi_crypto_support.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 using namespace bc::asio;
 using namespace bc::message;
 
 // Common default values (no settings context).
 settings::settings()
-  : threads(0),
-    protocol_maximum(version::level::maximum),
-    protocol_minimum(version::level::minimum),
-    services(version::service::none),
+    : threads(0)
+    , protocol_maximum(version::level::maximum)
+    , protocol_minimum(version::level::minimum)
+    , services(version::service::none)
 #ifdef KTH_CURRENCY_BCH
-    invalid_services(0),
+    , invalid_services(0)
 #else
-    invalid_services(176),
+    , invalid_services(176)
 #endif    
-    relay_transactions(true),
-    validate_checksum(false),
-    inbound_connections(0),
-    outbound_connections(8),
-    manual_attempt_limit(0),
-    connect_batch_size(5),
-    connect_timeout_seconds(5),
-    channel_handshake_seconds(30),
-    channel_heartbeat_minutes(5),
-    channel_inactivity_minutes(10),
-    channel_expiration_minutes(60),
-    channel_germination_seconds(30),
-    host_pool_capacity(0),
-    hosts_file("hosts.cache"),
-    self(unspecified_network_address),
-    // bitcoin_cash(false),
+    , relay_transactions(true)
+    , validate_checksum(false)
+    , inbound_connections(0)
+    , outbound_connections(8)
+    , manual_attempt_limit(0)
+    , connect_batch_size(5)
+    , connect_timeout_seconds(5)
+    , channel_handshake_seconds(30)
+    , channel_heartbeat_minutes(5)
+    , channel_inactivity_minutes(10)
+    , channel_expiration_minutes(60)
+    , channel_germination_seconds(30)
+    , host_pool_capacity(0)
+    , hosts_file("hosts.cache")
+    , self(unspecified_network_address)
+    // , bitcoin_cash(false)
 
     // [log]
     debug_file("debug.log"),
@@ -172,5 +171,4 @@ duration settings::channel_germination() const {
     return seconds(channel_germination_seconds);
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

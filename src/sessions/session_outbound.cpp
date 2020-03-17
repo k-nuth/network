@@ -31,14 +31,12 @@ session_outbound::session_outbound(p2p& network, bool notify_on_connect)
 
 void session_outbound::start(result_handler handler) {
     if (settings_.outbound_connections == 0) {
-        LOG_INFO(LOG_NETWORK)
-            << "Not configured for generating outbound connections.";
+        LOG_INFO(LOG_NETWORK) << "Not configured for generating outbound connections.";
         handler(error::success);
         return;
     }
 
-    LOG_INFO(LOG_NETWORK)
-        << "Starting outbound session.";
+    LOG_INFO(LOG_NETWORK) << "Starting outbound session.";
 
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
@@ -62,8 +60,7 @@ void session_outbound::handle_started(code const& ec, result_handler handler) {
 
 void session_outbound::new_connection(const code&) {
     if (stopped()) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Suspended outbound connection.";
+        LOG_DEBUG(LOG_NETWORK) << "Suspended outbound connection.";
         return;
     }
 
@@ -72,9 +69,7 @@ void session_outbound::new_connection(const code&) {
 
 void session_outbound::handle_connect(code const& ec, channel::ptr channel) {
     if (ec) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failure connecting outbound: " << ec.message();
-
+        LOG_DEBUG(LOG_NETWORK) << "Failure connecting outbound: " << ec.message();
         // Retry with conditional delay in case of network error.
         dispatch_delayed(cycle_delay(ec), BIND1(new_connection, _1));
         return;
@@ -133,8 +128,7 @@ void session_outbound::attach_handshake_protocols(channel::ptr channel, result_h
     auto const minimum_services = serve::node_network;
 #else
     // Require peer to serve network (and witness if configured on self).
-    auto const minimum_services = (own_services & serve::node_witness) |
-        serve::node_network;
+    auto const minimum_services = (own_services & serve::node_witness) | serve::node_network;
 #endif
 
     // Reject messages are not handled until bip61 (70002).

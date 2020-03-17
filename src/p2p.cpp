@@ -355,7 +355,7 @@ void p2p::connect(const config::endpoint& peer)
     connect(peer.host(), peer.port());
 }
 
-void p2p::connect(const std::string& hostname, uint16_t port)
+void p2p::connect(std::string const& hostname, uint16_t port)
 {
     if (stopped())
         return;
@@ -367,7 +367,7 @@ void p2p::connect(const std::string& hostname, uint16_t port)
         manual->connect(hostname, port);
 }
 
-void p2p::connect(const std::string& hostname, uint16_t port,
+void p2p::connect(std::string const& hostname, uint16_t port,
     channel_handler handler)
 {
     if (stopped())

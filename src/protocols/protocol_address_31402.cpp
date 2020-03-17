@@ -12,8 +12,7 @@
 #include <kth/network/protocols/protocol.hpp>
 #include <kth/network/protocols/protocol_events.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define NAME "address"
 #define CLASS protocol_address_31402
@@ -63,7 +62,9 @@ void protocol_address_31402::start() {
 // ----------------------------------------------------------------------------
 
 bool protocol_address_31402::handle_receive_address(code const& ec, address_const_ptr message) {
-    if (stopped(ec)) return false;
+    if (stopped(ec)) {
+        return false;
+    }
 
     LOG_DEBUG(LOG_NETWORK)
         << "Storing addresses from [" << authority() << "] ("
@@ -77,7 +78,9 @@ bool protocol_address_31402::handle_receive_address(code const& ec, address_cons
 }
 
 bool protocol_address_31402::handle_receive_get_address(code const& ec, get_address_const_ptr message) {
-    if (stopped(ec)) return false;
+    if (stopped(ec)) {
+        return false;
+    }
 
     bc::message::network_address::list addresses;
     network_.fetch_addresses(addresses);
@@ -96,7 +99,9 @@ bool protocol_address_31402::handle_receive_get_address(code const& ec, get_addr
 }
 
 void protocol_address_31402::handle_store_addresses(code const& ec) {
-    if (stopped(ec)) return;
+    if (stopped(ec)) {
+        return false;
+    }
 
     if (ec) {
         LOG_ERROR(LOG_NETWORK)
@@ -112,5 +117,4 @@ void protocol_address_31402::handle_stop(const code&) {
     ////    << "Stopped address protocol for [" << authority() << "].";
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

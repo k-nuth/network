@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <string>
+
 #include <kth/domain.hpp>
 #include <kth/network/channel.hpp>
 #include <kth/network/define.hpp>
@@ -14,8 +15,7 @@
 #include <kth/network/protocols/protocol_ping_31402.hpp>
 #include <kth/network/protocols/protocol_timer.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define CLASS protocol_ping_60001
 
@@ -23,20 +23,18 @@ using namespace bc::message;
 using namespace std::placeholders;
 
 protocol_ping_60001::protocol_ping_60001(p2p& network, channel::ptr channel)
-  : protocol_ping_31402(network, channel),
-    pending_(false),
-    CONSTRUCT_TRACK(protocol_ping_60001)
-{
-}
+    : protocol_ping_31402(network, channel)
+    , pending_(false)
+    , CONSTRUCT_TRACK(protocol_ping_60001)
+{}
 
 // This is fired by the callback (i.e. base timer and stop handler).
-void protocol_ping_60001::send_ping(code const& ec)
-{
-    if (stopped(ec))
+void protocol_ping_60001::send_ping(code const& ec) {
+    if (stopped(ec)) {
         return;
+    }
 
-    if (ec && ec != error::channel_timeout)
-    {
+    if (ec && ec != error::channel_timeout) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure in ping timer for [" << authority() << "] "
             << ec.message();
@@ -44,10 +42,8 @@ void protocol_ping_60001::send_ping(code const& ec)
         return;
     }
 
-    if (pending_)
-    {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Ping latency limit exceeded [" << authority() << "]";
+    if (pending_) {
+        LOG_DEBUG(LOG_NETWORK) << "Ping latency limit exceeded [" << authority() << "]";
         stop(error::channel_timeout);
         return;
     }
@@ -58,13 +54,12 @@ void protocol_ping_60001::send_ping(code const& ec)
     SEND2(ping{ nonce }, handle_send_ping, _1, ping::command);
 }
 
-void protocol_ping_60001::handle_send_ping(code const& ec, const std::string&)
-{
-    if (stopped(ec))
+void protocol_ping_60001::handle_send_ping(code const& ec, const std::string&) {
+    if (stopped(ec)) {
         return;
+    }
 
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure sending ping to [" << authority() << "] "
             << ec.message();
@@ -73,14 +68,12 @@ void protocol_ping_60001::handle_send_ping(code const& ec, const std::string&)
     }
 }
 
-bool protocol_ping_60001::handle_receive_ping(code const& ec,
-    ping_const_ptr message)
-{
-    if (stopped(ec))
+bool protocol_ping_60001::handle_receive_ping(code const& ec, ping_const_ptr message) {
+    if (stopped(ec)) {
         return false;
+    }
 
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure getting ping from [" << authority() << "] "
             << ec.message();
@@ -92,14 +85,12 @@ bool protocol_ping_60001::handle_receive_ping(code const& ec,
     return true;
 }
 
-bool protocol_ping_60001::handle_receive_pong(code const& ec,
-    pong_const_ptr message, uint64_t nonce)
-{
-    if (stopped(ec))
+bool protocol_ping_60001::handle_receive_pong(code const& ec, pong_const_ptr message, uint64_t nonce) {
+    if (stopped(ec)) {
         return false;
+    }
 
-    if (ec)
-    {
+    if (ec) {
         LOG_DEBUG(LOG_NETWORK)
             << "Failure getting pong from [" << authority() << "] "
             << ec.message();
@@ -109,10 +100,8 @@ bool protocol_ping_60001::handle_receive_pong(code const& ec,
 
     pending_ = false;
 
-    if (message->nonce() != nonce)
-    {
-        LOG_WARNING(LOG_NETWORK)
-            << "Invalid pong nonce from [" << authority() << "]";
+    if (message->nonce() != nonce) {
+        LOG_WARNING(LOG_NETWORK) << "Invalid pong nonce from [" << authority() << "]";
         stop(error::bad_stream);
         return false;
     }
@@ -120,5 +109,4 @@ bool protocol_ping_60001::handle_receive_pong(code const& ec,
     return false;
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

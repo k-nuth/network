@@ -57,14 +57,14 @@ using namespace bc::network;
     name.seeds = { { SEED1 } }; \
     name.hosts_file = get_log_path(TEST_NAME, "hosts")
 
-std::string get_log_path(const std::string& test, const std::string& file)
+std::string get_log_path(std::string const& test, std::string const& file)
 {
     auto const path = test + "." + file + ".log";
     boost::filesystem::remove_all(path);
     return path;
 }
 
-static void print_headers(const std::string& test)
+static void print_headers(std::string const& test)
 {
     auto const header = "=========== " + test + " ==========";
     LOG_INFO(TEST_SET_NAME) << header;

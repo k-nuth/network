@@ -132,11 +132,11 @@ public:
     virtual void connect(const config::endpoint& peer);
 
     /// Maintain a connection to hostname:port.
-    virtual void connect(const std::string& hostname, uint16_t port);
+    virtual void connect(std::string const& hostname, uint16_t port);
 
     /// Maintain a connection to hostname:port.
     /// The callback is invoked by the first connection creation only.
-    virtual void connect(const std::string& hostname, uint16_t port,
+    virtual void connect(std::string const& hostname, uint16_t port,
         channel_handler handler);
 
     // Hosts collection.

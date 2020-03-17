@@ -31,7 +31,7 @@ protected:
      * @param[in]  name      The instance name for logging purposes.
      */
     protocol_events(p2p& network, channel::ptr channel,
-        const std::string& name);
+        std::string const& name);
 
     /**
      * Start the protocol with no event handler.
