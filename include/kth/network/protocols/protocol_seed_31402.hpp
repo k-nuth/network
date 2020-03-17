@@ -45,8 +45,7 @@ protected:
     virtual void handle_send_address(code const& ec);
     virtual void handle_send_get_address(code const& ec);
     virtual void handle_store_addresses(code const& ec);
-    virtual void handle_seeding_complete(code const& ec,
-        event_handler handler);
+    virtual void handle_seeding_complete(code const& ec, event_handler handler);
 
     virtual bool handle_receive_address(code const& ec,
         address_const_ptr address);

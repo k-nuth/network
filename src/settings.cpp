@@ -41,16 +41,16 @@ settings::settings()
     // , bitcoin_cash(false)
 
     // [log]
-    debug_file("debug.log"),
-    error_file("error.log"),
-    archive_directory("archive"),
-    rotation_size(0),
-    minimum_free_space(0),
-    maximum_archive_size(0),
-    maximum_archive_files(0),
-    statistics_server(unspecified_network_address),
-    verbose(false),
-    use_ipv6(true)
+    , debug_file("debug.log")
+    , error_file("error.log")
+    , archive_directory("archive")
+    , rotation_size(0)
+    , minimum_free_space(0)
+    , maximum_archive_size(0)
+    , maximum_archive_files(0)
+    , statistics_server(unspecified_network_address)
+    , verbose(false)
+    , use_ipv6(true)
 {}
 
 // Use push_back due to initializer_list bug:

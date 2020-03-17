@@ -100,7 +100,7 @@ bool protocol_address_31402::handle_receive_get_address(code const& ec, get_addr
 
 void protocol_address_31402::handle_store_addresses(code const& ec) {
     if (stopped(ec)) {
-        return false;
+        return;
     }
 
     if (ec) {
