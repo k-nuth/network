@@ -39,8 +39,7 @@ void session_batch::connect(channel_handler handler) {
 
 void session_batch::new_connect(channel_handler handler) {
     if (stopped()) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Suspended batch connection.";
+        LOG_DEBUG(LOG_NETWORK, "Suspended batch connection.");
         handler(error::channel_stopped, nullptr);
         return;
     }
@@ -52,27 +51,26 @@ void session_batch::new_connect(channel_handler handler) {
 
 void session_batch::start_connect(code const& ec, const authority& host, channel_handler handler) {
     if (stopped(ec)) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Batch session stopped while starting.";
+        LOG_DEBUG(LOG_NETWORK, "Batch session stopped while starting.");
         handler(error::service_stopped, nullptr);
         return;
     }
 
     // This termination prevents a tight loop in the empty address pool case.
     if (ec) {
-        LOG_WARNING(LOG_NETWORK) << "Failure fetching new address: " << ec.message();
+        LOG_WARNING(LOG_NETWORK, "Failure fetching new address: ", ec.message());
         handler(ec, nullptr);
         return;
     }
 
     // This creates a tight loop in the case of a small address pool.
     if (blacklisted(host)) {
-        LOG_DEBUG(LOG_NETWORK) << "Fetched blacklisted address [" << host << "] ";
+        LOG_DEBUG(LOG_NETWORK, "Fetched blacklisted address [", host, "] ");
         handler(error::address_blocked, nullptr);
         return;
     }
 
-    LOG_DEBUG(LOG_NETWORK) << "Connecting to [" << host << "]";
+    LOG_DEBUG(LOG_NETWORK, "Connecting to [", host, "]");
 
     auto const connector = create_connector();
     pend(connector);
@@ -89,7 +87,7 @@ void session_batch::handle_connect(code const& ec, channel::ptr channel, connect
         return;
     }
 
-    LOG_DEBUG(LOG_NETWORK) << "Connected to [" << channel->authority() << "]";
+    LOG_DEBUG(LOG_NETWORK, "Connected to [", channel->authority(), "]");
 
     // This is the end of the connect sequence.
     handler(error::success, channel);

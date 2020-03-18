@@ -163,9 +163,9 @@ void session::start_channel(channel::ptr channel, result_handler handle_started)
 
 void session::handle_starting(code const& ec, channel::ptr channel, result_handler handle_started) {
     if (ec) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Channel failed to start [" << channel->authority() << "] "
-            << ec.message();
+        LOG_DEBUG(LOG_NETWORK
+           , "Channel failed to start [", channel->authority(), "] "
+           , ec.message());
         handle_started(ec);
         return;
     }
@@ -185,9 +185,9 @@ void session::attach_handshake_protocols(channel::ptr channel, result_handler ha
 
 void session::handle_handshake(code const& ec, channel::ptr channel, result_handler handle_started) {
     if (ec) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Failure in handshake with [" << channel->authority()
-            << "] " << ec.message();
+        LOG_DEBUG(LOG_NETWORK
+           , "Failure in handshake with [", channel->authority()
+           , "] ", ec.message());
 
         handle_started(ec);
         return;

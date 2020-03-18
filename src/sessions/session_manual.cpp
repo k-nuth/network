@@ -32,7 +32,7 @@ session_manual::session_manual(p2p& network, bool notify_on_connect)
 // Handshake pend not implemented for manual connections (connect to self ok).
 
 void session_manual::start(result_handler handler) {
-    LOG_INFO(LOG_NETWORK) << "Starting manual session.";
+    LOG_INFO(LOG_NETWORK, "Starting manual session.");
 
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));
 }
@@ -62,7 +62,7 @@ void session_manual::connect(std::string const& hostname, uint16_t port, channel
 // The first connect is a sequence, which then spawns a cycle.
 void session_manual::start_connect(const code&, std::string const& hostname, uint16_t port, uint32_t attempts, channel_handler handler) {
     if (stopped()) {
-        LOG_DEBUG(LOG_NETWORK) << "Suspended manual connection.";
+        LOG_DEBUG(LOG_NETWORK, "Suspended manual connection.");
         handler(error::service_stopped, nullptr);
         return;
     }
@@ -79,9 +79,9 @@ void session_manual::handle_connect(code const& ec, channel::ptr channel, std::s
     unpend(connector);
 
     if (ec) {
-        LOG_WARNING(LOG_NETWORK)
-            << "Failure connecting [" << config::endpoint(hostname, port)
-            << "] manually: " << ec.message();
+        LOG_WARNING(LOG_NETWORK
+           , "Failure connecting [", config::endpoint(hostname, port)
+           , "] manually: ", ec.message());
 
         // Retry forever if limit is zero.
         remaining = settings_.manual_attempt_limit == 0 ? 1 : remaining;
@@ -92,10 +92,10 @@ void session_manual::handle_connect(code const& ec, channel::ptr channel, std::s
             return;
         }
 
-        LOG_WARNING(LOG_NETWORK)
-            << "Suspending manual connection to ["
-            << config::endpoint(hostname, port) << "] after "
-            << settings_.manual_attempt_limit << " failed attempts.";
+        LOG_WARNING(LOG_NETWORK
+           , "Suspending manual connection to ["
+           , config::endpoint(hostname, port), "] after "
+           , settings_.manual_attempt_limit, " failed attempts.");
 
         // This is the failure end of the connect sequence.
         handler(ec, nullptr);
@@ -111,16 +111,16 @@ void session_manual::handle_channel_start(code const& ec, std::string const& hos
     // The start failure is also caught by handle_channel_stop.
     // Treat a start failure like a stop, but preserve the start handler.
     if (ec) {
-        LOG_INFO(LOG_NETWORK)
-            << "Manual channel failed to start [" << channel->authority()
-            << "] " << ec.message();
+        LOG_INFO(LOG_NETWORK
+           , "Manual channel failed to start [", channel->authority()
+           , "] ", ec.message());
         return;
     }
 
-    LOG_INFO(LOG_NETWORK)
-        << "Connected manual channel [" << config::endpoint(hostname, port)
-        << "] as [" << channel->authority() << "] ("
-        << connection_count() << ")";
+    LOG_INFO(LOG_NETWORK
+       , "Connected manual channel [", config::endpoint(hostname, port)
+       , "] as [", channel->authority(), "] ("
+       , connection_count(), ")");
 
     // This is the success end of the connect sequence.
     handler(error::success, channel);
@@ -144,7 +144,7 @@ void session_manual::attach_protocols(channel::ptr channel) {
 }
 
 void session_manual::handle_channel_stop(code const& ec, std::string const& hostname, uint16_t port) {
-    LOG_DEBUG(LOG_NETWORK) << "Manual channel stopped: " << ec.message();
+    LOG_DEBUG(LOG_NETWORK, "Manual channel stopped: ", ec.message());
 
     // Special case for already connected, do not keep trying.
     // After a stop we don't use the caller's start handler, but keep connecting.

@@ -53,9 +53,11 @@ void protocol_events::start(event_handler handler) {
 
 void protocol_events::handle_stopped(code const& ec) {
     if ( ! stopped(ec)) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Stop protocol_" << name() << " on [" << authority() << "] "
-            << ec.message();
+        LOG_DEBUG(LOG_NETWORK, "Stop protocol_", name(), " on [", authority(), "] ", ec.message());
+        // // BINLOG_DEBUG("Stop protocol_{} on [{}] ", name(), authority(), ec.message());
+        // BINLOG_DEBUG("Stop protocol_{}", name());
+        // BINLOG_DEBUG("Stop protocol_{}", authority());
+        // BINLOG_DEBUG("Stop protocol_{}", ec.message());
     }
 
     // Event handlers can depend on this code for channel stop.

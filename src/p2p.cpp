@@ -109,8 +109,7 @@ void p2p::handle_manual_started(code const& ec, result_handler handler)
 
     if (ec)
     {
-        LOG_ERROR(LOG_NETWORK)
-            << "Error starting manual session: " << ec.message();
+        LOG_ERROR(LOG_NETWORK, "Error starting manual session: ", ec.message());
         handler(ec);
         return;
     }
@@ -126,10 +125,8 @@ void p2p::handle_hosts_loaded(code const& ec, result_handler handler)
         return;
     }
 
-    if (ec)
-    {
-        LOG_ERROR(LOG_NETWORK)
-            << "Error loading host addresses: " << ec.message();
+    if (ec) {
+        LOG_ERROR(LOG_NETWORK, "Error loading host addresses: ", ec.message());
         handler(ec);
         return;
     }
@@ -153,8 +150,7 @@ void p2p::handle_started(code const& ec, result_handler handler)
 
     if (ec)
     {
-        LOG_ERROR(LOG_NETWORK)
-            << "Error seeding host addresses: " << ec.message();
+        LOG_ERROR(LOG_NETWORK, "Error seeding host addresses: ", ec.message());
         handler(ec);
         return;
     }
@@ -190,8 +186,7 @@ void p2p::handle_inbound_started(code const& ec, result_handler handler)
 {
     if (ec)
     {
-        LOG_ERROR(LOG_NETWORK)
-            << "Error starting inbound session: " << ec.message();
+        LOG_ERROR(LOG_NETWORK, "Error starting inbound session: ", ec.message());
         handler(ec);
         return;
     }
@@ -209,8 +204,7 @@ void p2p::handle_running(code const& ec, result_handler handler)
 {
     if (ec)
     {
-        LOG_ERROR(LOG_NETWORK)
-            << "Error starting outbound session: " << ec.message();
+        LOG_ERROR(LOG_NETWORK, "Error starting outbound session: ", ec.message());
         handler(ec);
         return;
     }

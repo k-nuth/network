@@ -35,7 +35,7 @@ session_seed::session_seed(p2p& network)
 
 void session_seed::start(result_handler handler) {
     if (settings_.host_pool_capacity == 0) {
-        LOG_INFO(LOG_NETWORK) << "Not configured to populate an address pool.";
+        LOG_INFO(LOG_NETWORK, "Not configured to populate an address pool.");
         handler(error::success);
         return;
     }
@@ -52,15 +52,15 @@ void session_seed::handle_started(code const& ec, result_handler handler) {
     auto const start_size = address_count();
 
     if (start_size != 0) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Seeding is not required because there are "
-            << start_size << " cached addresses.";
+        LOG_DEBUG(LOG_NETWORK
+           , "Seeding is not required because there are "
+           , start_size, " cached addresses.");
         handler(error::success);
         return;
     }
 
     if (settings_.seeds.empty()) {
-        LOG_ERROR(LOG_NETWORK) << "Seeding is required but no seeds are configured.";
+        LOG_ERROR(LOG_NETWORK, "Seeding is required but no seeds are configured.");
         handler(error::operation_failed);
         return;
     }
@@ -107,12 +107,12 @@ void session_seed::start_seeding(size_t start_size, result_handler handler) {
 
 void session_seed::start_seed(const config::endpoint& seed, result_handler handler) {
     if (stopped()) {
-        LOG_DEBUG(LOG_NETWORK) << "Suspended seed connection";
+        LOG_DEBUG(LOG_NETWORK, "Suspended seed connection");
         handler(error::channel_stopped);
         return;
     }
 
-    LOG_INFO(LOG_NETWORK) << "Contacting seed [" << seed << "]";
+    LOG_INFO(LOG_NETWORK, "Contacting seed [", seed, "]");
 
     auto const connector = create_connector();
     pend(connector);
@@ -125,20 +125,20 @@ void session_seed::handle_connect(code const& ec, channel::ptr channel, const co
     unpend(connector);
 
     if (ec) {
-        LOG_INFO(LOG_NETWORK) << "Failure contacting seed [" << seed << "] " << ec.message();
+        LOG_INFO(LOG_NETWORK, "Failure contacting seed [", seed, "] ", ec.message());
         handler(ec);
         return;
     }
 
     if (blacklisted(channel->authority())) {
-        LOG_DEBUG(LOG_NETWORK)
-            << "Seed [" << seed << "] on blacklisted address ["
-            << channel->authority() << "]";
+        LOG_DEBUG(LOG_NETWORK
+           , "Seed [", seed, "] on blacklisted address ["
+           , channel->authority(), "]");
         handler(error::address_blocked);
         return;
     }
 
-    LOG_INFO(LOG_NETWORK) << "Connected seed [" << seed << "] as " << channel->authority();
+    LOG_INFO(LOG_NETWORK, "Connected seed [", seed, "] as ", channel->authority());
 
     register_channel(channel,
         BIND3(handle_channel_start, _1, channel, handler),
@@ -171,7 +171,7 @@ void session_seed::attach_protocols(channel::ptr channel, result_handler handler
 }
 
 void session_seed::handle_channel_stop(code const& ec) {
-    LOG_DEBUG(LOG_NETWORK) << "Seed channel stopped: " << ec.message();
+    LOG_DEBUG(LOG_NETWORK, "Seed channel stopped: ", ec.message());
 }
 
 // This accepts no error code because individual seed errors are suppressed.
