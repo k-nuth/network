@@ -70,6 +70,10 @@ class KnuthNetworkConan(KnuthConanFile):
     def configure(self):
         KnuthConanFile.configure(self)
 
+        self.options["*"].binlog = self.options.binlog
+        self.output.info("Compiling with binlog: %s" % (self.options.binlog,))
+
+
     def package_id(self):
         KnuthConanFile.package_id(self)
 
