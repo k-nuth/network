@@ -6,8 +6,8 @@
 #include <future>
 #include <iostream>
 #include <boost/filesystem.hpp>
-#include <boost/format.hpp>
 #include <boost/test/unit_test.hpp>
+
 #include <kth/network.hpp>
 
 using namespace bc;
