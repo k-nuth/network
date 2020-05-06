@@ -61,7 +61,7 @@ private:
 
     // HACK: we use this because the buffer capacity cannot be set to zero.
     const bool disabled_;
-    const boost::filesystem::path file_path_;
+    const std::filesystem::path file_path_;
 };
 
 } // namespace network

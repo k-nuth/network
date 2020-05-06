@@ -32,7 +32,7 @@
 // Include boost only here, so placeholders exclusion works.
 #include <boost/asio.hpp>
 #include <boost/circular_buffer.hpp>
-#include <boost/filesystem.hpp>
+// #include <boost/filesystem.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/thread.hpp>
 
