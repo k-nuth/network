@@ -31,7 +31,7 @@ class KnuthNetworkConan(KnuthConanFile):
         "cflags": "ANY",
         "glibcxx_supports_cxx11_abi": "ANY",
         "cmake_export_compile_commands": [True, False],
-        "binlog": [True, False],
+        "log": ["boost", "spdlog", "binlog"]
     }
 
     default_options = {
@@ -50,7 +50,7 @@ class KnuthNetworkConan(KnuthConanFile):
         "cflags": "_DUMMY_",
         "glibcxx_supports_cxx11_abi": "_DUMMY_",
         "cmake_export_compile_commands": False,
-        "binlog": False,
+        "log": "boost",
     }
 
     generators = "cmake"
@@ -61,7 +61,6 @@ class KnuthNetworkConan(KnuthConanFile):
 
 
     def requirements(self):
-        self.requires("boost/1.72.0@kth/stable")
         self.requires("domain/0.X@%s/%s" % (self.user, self.channel))
 
     def config_options(self):
@@ -70,8 +69,9 @@ class KnuthNetworkConan(KnuthConanFile):
     def configure(self):
         KnuthConanFile.configure(self)
 
-        self.options["*"].binlog = self.options.binlog
-        self.output.info("Compiling with binlog: %s" % (self.options.binlog,))
+        #TODO(fernando): move to kthbuild
+        self.options["*"].log = self.options.log
+        self.output.info("Compiling with log: %s" % (self.options.log,))
 
 
     def package_id(self):
@@ -79,7 +79,9 @@ class KnuthNetworkConan(KnuthConanFile):
 
     def build(self):
         cmake = self.cmake_basis()
-        cmake.definitions["BINLOG"] = option_on_off(self.options.binlog)
+
+        #TODO(fernando): move to kthbuild
+        cmake.definitions["LOG_LIBRARY"] = self.options.log
 
         cmake.configure(source_dir=self.source_folder)
         if not self.options.cmake_export_compile_commands:

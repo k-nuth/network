@@ -3,9 +3,11 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <cstdio>
+#include <filesystem>
 #include <future>
 #include <iostream>
-#include <boost/filesystem.hpp>
+
+// #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <kth/network.hpp>
@@ -60,7 +62,7 @@ using namespace bc::network;
 std::string get_log_path(std::string const& test, std::string const& file)
 {
     auto const path = test + "." + file + ".log";
-    boost::filesystem::remove_all(path);
+    std::filesystem::remove_all(path);
     return path;
 }
 

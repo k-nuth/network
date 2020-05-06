@@ -39,7 +39,7 @@ public:
     uint32_t channel_expiration_minutes;
     uint32_t channel_germination_seconds;
     uint32_t host_pool_capacity;
-    boost::filesystem::path hosts_file;
+    std::filesystem::path hosts_file;
     config::authority self;
     config::authority::list blacklists;
     config::endpoint::list peers;
@@ -47,9 +47,9 @@ public:
     // bool bitcoin_cash;
 
     // [log]
-    boost::filesystem::path debug_file;
-    boost::filesystem::path error_file;
-    boost::filesystem::path archive_directory;
+    std::filesystem::path debug_file;
+    std::filesystem::path error_file;
+    std::filesystem::path archive_directory;
     size_t rotation_size;
     size_t minimum_free_space;
     size_t maximum_archive_size;
