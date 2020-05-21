@@ -80,7 +80,7 @@ settings::settings(config::settings context)
             identifier = netmagic::bch_mainnet; 
             seeds.reserve(5);
             seeds.push_back({ "seed.bitcoinabc.org", 8333 });
-            seeds.push_back({ "seed-abc.bitcoinforks.org", 8333 });
+            seeds.push_back({ "seed-bch.bitcoinforks.org", 8333 });
             seeds.push_back({ "btccash-seeder.bitcoinunlimited.info", 8333 });
             seeds.push_back({ "seed.deadalnix.me", 8333 });
             seeds.push_back({ "seed.bchd.cash", 8333 });
@@ -116,7 +116,7 @@ settings::settings(config::settings context)
             identifier = netmagic::bch_testnet;
             seeds.reserve(5);
             seeds.push_back({ "testnet-seed.bitcoinabc.org", 18333 });
-            seeds.push_back({ "testnet-seed-abc.bitcoinforks.org", 18333 });
+            seeds.push_back({ "testnet-seed-bch.bitcoinforks.org", 18333 });
             seeds.push_back({ "testnet-seed.bitcoinunlimited.info", 18333 });
             seeds.push_back({ "testnet-seed.deadalnix.me", 18333 });
             seeds.push_back({ "testnet-seed.bchd.cash", 18333 });
