@@ -314,14 +314,22 @@ if (WITH_TESTS)
           test/p2p.cpp
           test/user_agent_dummy.cpp)
 
-    target_link_libraries(kth_network_test PUBLIC kth-network)
 
+    target_include_directories(kth_network_test PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test>)
+
+    
+    target_link_libraries(kth_network_test PUBLIC kth-network)
     _group_sources(kth_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
-    _add_tests(kth_network_test 
-      empty_tests 
-      # p2p_tests
-    )
+    include(CTest)
+    include(Catch)
+    catch_discover_tests(kth_network_test)
+
+    # _add_tests(kth_network_test 
+    #   empty_tests 
+    #   # p2p_tests
+    # )
 endif()
 
 
