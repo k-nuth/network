@@ -43,10 +43,10 @@ protected:
 
 private:
     void start_seeding(size_t start_size, result_handler handler);
-    void start_seed(const infrastructure::config::endpoint& seed, result_handler handler);
+    void start_seed(infrastructure::config::endpoint const& seed, result_handler handler);
     void handle_started(code const& ec, result_handler handler);
     void handle_connect(code const& ec, channel::ptr channel,
-        const infrastructure::config::endpoint& seed, connector::ptr connector,
+        infrastructure::config::endpoint const& seed, connector::ptr connector,
         result_handler handler);
     void handle_complete(size_t start_size, result_handler handler);
 
