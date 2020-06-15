@@ -12,7 +12,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <kth/domain.hpp>
+
 #include <kth/network/channel.hpp>
 #include <kth/network/define.hpp>
 #include <kth/network/hosts.hpp>
