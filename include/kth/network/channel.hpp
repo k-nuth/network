@@ -17,8 +17,7 @@
 #include <kth/network/proxy.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// A concrete proxy with timers and state, mostly thread safe.
 class BCT_API channel
