@@ -14,8 +14,7 @@
 #include <kth/network/define.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// Create inbound socket connections.
 /// This class is thread safe against stop.
