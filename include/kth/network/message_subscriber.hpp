@@ -11,18 +11,21 @@
 #include <memory>
 #include <utility>
 #include <string>
+
 #include <kth/domain.hpp>
+#include <kth/infrastructure.hpp>
+
 #include <kth/network/define.hpp>
 
 namespace kth::network {
 
 #define DEFINE_SUBSCRIBER_TYPE(value) \
-    typedef resubscriber<code, message::value::const_ptr> \
-        value##_subscriber_type
+    using value##_subscriber_type = resubscriber<code, domain::message::value::const_ptr>
+        
 
 #define DEFINE_SUBSCRIBER_OVERLOAD(value) \
     template <typename Handler> \
-    void subscribe(message::value&&, Handler&& handler) { \
+    void subscribe(domain::message::value&&, Handler&& handler) { \
         value##_subscriber_->subscribe(std::forward<Handler>(handler), \
             error::channel_stopped, {}); \
     }
