@@ -18,8 +18,7 @@
 #include <kth/network/proxy.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define SESSION_ARGS(handler, args) \
     std::forward<Handler>(handler), \
