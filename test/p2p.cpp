@@ -240,51 +240,51 @@ TEST_CASE("p2p  start  seed session handshake timeout  start peer throttling sto
     // The (timeout) error on the individual connection is ignored.
     // The connection failure results in a failure to generate any addresses.
     // The failure to generate an increase of 100 addresses produces error::peer_throttling.
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
+    REQUIRE(start_result(network) == error::peer_throttling);
 
     // The service never started but stop will still succeed (and is optional).
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_connect_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session connect timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.connect_timeout_seconds = 0;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::peer_throttling);
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_germination_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session germination timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.channel_germination_seconds = 0;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::peer_throttling);
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_inactivity_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session inactivity timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.channel_inactivity_minutes = 0;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::peer_throttling);
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_expiration_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session expiration timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.channel_expiration_minutes = 0;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::peer_throttling);
+    REQUIRE(network.stop());
 }
 
 // Disabled for live test reliability.
 // This may fail due to missing blacklist entries for the specified host.
-////BOOST_AUTO_TEST_CASE(p2p__start__seed_session_blacklisted__start_operation_fail_stop_success)
+////TEST_CASE("p2p  start  seed session blacklisted  start operation fail stop success", "[p2p tests]")
 ////{
 ////    print_headers(TEST_NAME);
 ////    SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
