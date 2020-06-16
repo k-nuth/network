@@ -20,7 +20,7 @@ using namespace kth::network;
     "p2p_tests"
 
 #define TEST_NAME \
-    boost::unit_test::framework::current_test_case().p_name
+    Catch::getResultCapture().getCurrentTestName()
 
 // TODO: build mock and/or use dedicated test service.
 #define SEED1 "testnet-seed.bitcoin.petertodd.org:18333"
