@@ -11,8 +11,7 @@
 #include <kth/network/define.hpp>
 #include <kth/network/protocols/protocol_events.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
