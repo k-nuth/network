@@ -194,44 +194,44 @@ TEST_CASE("p2p  set top block2  values  expected", "[p2p tests]") {
     auto const hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
     infrastructure::config::checkpoint const expected{ hash, expected_height };
     network.set_top_block(expected);
-    BOOST_REQUIRE(network.top_block().hash() == expected.hash());
-    BOOST_REQUIRE_EQUAL(network.top_block().height(), expected.height());
+    REQUIRE(network.top_block().hash() == expected.hash());
+    REQUIRE(network.top_block().height() == expected.height());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success) {
+TEST_CASE("p2p  start  no sessions  start success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+    REQUIRE(start_result(network) == error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_connections__start_stop_success) {
+TEST_CASE("p2p  start  no connections  start stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success_start_operation_fail) {
+TEST_CASE("p2p  start  no sessions  start success start operation fail", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::operation_failed);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(start_result(network) == error::operation_failed);
 }
 
-////BOOST_AUTO_TEST_CASE(p2p__start__seed_session__start_stop_start_success)
+////TEST_CASE("p2p  start  seed session  start stop start success", "[p2p tests]")
 ////{
 ////    print_headers(TEST_NAME);
 ////    SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
 ////    p2p network(configuration);
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-////    BOOST_REQUIRE(network.stop());
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+////    REQUIRE(start_result(network) == error::success);
+////    REQUIRE(network.stop());
+////    REQUIRE(start_result(network) == error::success);
 ////}
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_handshake_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session handshake timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.channel_handshake_seconds = 0;
