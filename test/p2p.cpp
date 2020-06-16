@@ -140,7 +140,7 @@ template<typename Message>
 static
 int send_result(Message const& message, p2p& network, int channels) {
     auto const channel_counter = [&channels](code ec, channel::ptr channel) {
-        BOOST_REQUIRE_EQUAL(ec, error::success);
+        REQUIRE(ec == error::success);
         --channels;
     };
 
