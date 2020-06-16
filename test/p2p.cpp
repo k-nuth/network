@@ -82,7 +82,7 @@ int start_result(p2p& network) {
 }
 
 static 
-int connect_result(p2p& network, const infrastructure::config::endpoint& host) {
+int connect_result(p2p& network, infrastructure::config::endpoint const& host) {
     std::promise<code> promise;
     auto const handler = [&promise](code ec, channel::ptr) {
         promise.set_value(ec);
