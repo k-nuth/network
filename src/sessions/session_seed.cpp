@@ -120,7 +120,7 @@ void session_seed::start_seed(infrastructure::config::endpoint const& seed, resu
     connector->connect(seed, BIND5(handle_connect, _1, _2, seed, connector, handler));
 }
 
-void session_seed::handle_connect(code const& ec, channel::ptr channel, const infrastructure::config::endpoint& seed, connector::ptr connector, result_handler handler) {
+void session_seed::handle_connect(code const& ec, channel::ptr channel, infrastructure::config::endpoint const& seed, connector::ptr connector, result_handler handler) {
     unpend(connector);
 
     if (ec) {
