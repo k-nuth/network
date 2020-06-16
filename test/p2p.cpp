@@ -293,69 +293,69 @@ TEST_CASE("p2p  start  seed session expiration timeout  start peer throttling st
 ////    configuration.seeds = { { SEED1 } };
 ////    configuration.blacklists = SEED1_AUTHORITIES;
 ////    p2p network(configuration);
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::operation_failed);
-////    BOOST_REQUIRE(network.stop());
+////    REQUIRE(start_result(network) == error::operation_failed);
+////    REQUIRE(network.stop());
 ////}
 
-BOOST_AUTO_TEST_CASE(p2p__start__outbound_no_seeds__success) {
+TEST_CASE("p2p  start  outbound no seeds  success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     configuration.outbound_connections = 1;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+    REQUIRE(start_result(network) == error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__connect__not_started__service_stopped) {
+TEST_CASE("p2p  connect  not started  service stopped", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host(SEED1);
-    BOOST_REQUIRE_EQUAL(connect_result(network, host), error::service_stopped);
+    infrastructure::config::endpoint const host(SEED1);
+    REQUIRE(connect_result(network, host) == error::service_stopped);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__connect__started__success) {
+TEST_CASE("p2p  connect  started  success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host(SEED1);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(run_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(connect_result(network, host), error::success);
+    infrastructure::config::endpoint const host(SEED1);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(run_result(network) == error::success);
+    REQUIRE(connect_result(network, host) == error::success);
 }
 
 // Disabled for live test reliability.
 // This may fail due to connecting to the same host on different addresses.
-////BOOST_AUTO_TEST_CASE(p2p__connect__twice__address_in_use)
+////TEST_CASE("p2p  connect  twice  address in use", "[p2p tests]")
 ////{
 ////    print_headers(TEST_NAME);
 ////    SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
 ////    p2p network(configuration);
-////    const infrastructure::config::endpoint host(SEED1);
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-////    BOOST_REQUIRE_EQUAL(run_result(network), error::success);
-////    BOOST_REQUIRE_EQUAL(connect_result(network, host), error::success);
-////    BOOST_REQUIRE_EQUAL(connect_result(network, host), error::address_in_use);
+////    infrastructure::config::endpoint const host(SEED1);
+////    REQUIRE(start_result(network) == error::success);
+////    REQUIRE(run_result(network) == error::success);
+////    REQUIRE(connect_result(network, host) == error::success);
+////    REQUIRE(connect_result(network, host) == error::address_in_use);
 ////}
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__stopped__service_stopped) {
+TEST_CASE("p2p  subscribe  stopped  service stopped", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
 
     // Expect immediate return because service is not started.
-    BOOST_REQUIRE_EQUAL(subscribe_result(network), error::service_stopped);
+    REQUIRE(subscribe_result(network) == error::service_stopped);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__started_stop__service_stopped) {
+TEST_CASE("p2p  subscribe  started stop  service stopped", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+    REQUIRE(start_result(network) == error::success);
 
     std::promise<code> promise;
     auto const handler = [](code ec, channel::ptr channel) {
-        BOOST_REQUIRE( ! channel);
-        BOOST_REQUIRE_EQUAL(ec, error::service_stopped);
+        REQUIRE( ! channel);
+        REQUIRE(ec == error::service_stopped);
         return false;
     };
 
