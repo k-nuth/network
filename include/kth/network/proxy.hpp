@@ -17,8 +17,7 @@
 #include <kth/network/message_subscriber.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// Manages all socket communication, thread safe.
 class BCT_API proxy
