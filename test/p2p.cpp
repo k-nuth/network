@@ -363,43 +363,43 @@ TEST_CASE("p2p  subscribe  started stop  service stopped", "[p2p tests]") {
     network.subscribe_connection(handler);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__started_connect1__success) {
+TEST_CASE("p2p  subscribe  started connect1  success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host(SEED1);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(subscribe_connect1_result(network, host), error::success);
+    infrastructure::config::endpoint const host(SEED1);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(subscribe_connect1_result(network, host) == error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__started_connect2__success) {
+TEST_CASE("p2p  subscribe  started connect2  success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host(SEED1);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(subscribe_connect2_result(network, host), error::success);
+    infrastructure::config::endpoint const host(SEED1);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(subscribe_connect2_result(network, host) == error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__broadcast__ping_two_distinct_hosts__two_sends_and_successful_completion) {
+TEST_CASE("p2p  broadcast  ping two distinct hosts  two sends and successful completion", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host1(SEED1);
-    const infrastructure::config::endpoint host2(SEED2);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(run_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(connect_result(network, host1), error::success);
-    BOOST_REQUIRE_EQUAL(connect_result(network, host2), error::success);
-    BOOST_REQUIRE_EQUAL(send_result(ping(0), network, 2), error::success);
+    infrastructure::config::endpoint const host1(SEED1);
+    infrastructure::config::endpoint const host2(SEED2);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(run_result(network) == error::success);
+    REQUIRE(connect_result(network, host1) == error::success);
+    REQUIRE(connect_result(network, host2) == error::success);
+    REQUIRE(send_result(ping(0), network, 2) == error::success);
 }
 
-////BOOST_AUTO_TEST_CASE(p2p__subscribe__seed_outbound__success)
+////TEST_CASE("p2p  subscribe  seed outbound  success", "[p2p tests]")
 ////{
 ////    print_headers(TEST_NAME);
 ////    SETTINGS_TESTNET_THREE_THREADS_ONE_SEED_FIVE_OUTBOUND(configuration);
 ////    p2p network(configuration);
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+////    REQUIRE(start_result(network) == error::success);
 ////
 ////    std::promise<code> subscribe;
 ////    auto const subscribe_handler = [&subscribe, &network](code ec, channel::ptr)
