@@ -152,41 +152,41 @@ int send_result(Message const& message, p2p& network, int channels) {
     network.broadcast(message, channel_counter, completion_handler);
     auto const result = promise.get_future().get().value();
 
-    BOOST_REQUIRE_EQUAL(channels, 0);
+    REQUIRE(channels == 0);
     return result;
 }
 
 // Trivial tests just validate static inits (required because p2p tests disabled in travis).
-BOOST_AUTO_TEST_SUITE(empty_tests)
+// Start Boost Suite: empty tests
 
-BOOST_AUTO_TEST_CASE(empty_test) {
-    BOOST_REQUIRE(true);
+TEST_CASE("empty test", "[empty tests]") {
+    REQUIRE(true);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+// End Boost Suite
 
-BOOST_AUTO_TEST_SUITE(p2p_tests)
+// Start Boost Suite: p2p tests
 
-BOOST_AUTO_TEST_CASE(p2p__top_block__default__zero_null_hash) {
+TEST_CASE("p2p  top block  default  zero null hash", "[p2p tests]") {
     print_headers(TEST_NAME);
     network::settings const configuration;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(network.top_block().height(), 0);
-    BOOST_REQUIRE(network.top_block().hash() == null_hash);
+    REQUIRE(network.top_block().height() == 0);
+    REQUIRE(network.top_block().hash() == null_hash);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__set_top_block1__values__expected) {
+TEST_CASE("p2p  set top block1  values  expected", "[p2p tests]") {
     print_headers(TEST_NAME);
     network::settings const configuration;
     p2p network(configuration);
     size_t const expected_height = 42;
     auto const expected_hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
     network.set_top_block({ expected_hash, expected_height });
-    BOOST_REQUIRE(network.top_block().hash() == expected_hash);
-    BOOST_REQUIRE_EQUAL(network.top_block().height(), expected_height);
+    REQUIRE(network.top_block().hash() == expected_hash);
+    REQUIRE(network.top_block().height() == expected_height);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__set_top_block2__values__expected) {
+TEST_CASE("p2p  set top block2  values  expected", "[p2p tests]") {
     print_headers(TEST_NAME);
     network::settings const configuration;
     p2p network(configuration);
