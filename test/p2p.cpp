@@ -418,11 +418,11 @@ TEST_CASE("p2p  broadcast  ping two distinct hosts  two sends and successful com
 ////    };
 ////    network.run(run_handler);
 ////
-////    BOOST_REQUIRE_EQUAL(run.get_future().get().value(), error::success);
-////    BOOST_REQUIRE_EQUAL(subscribe.get_future().get().value(), error::success);
+////    REQUIRE(run.get_future().get().value() == error::success);
+////    REQUIRE(subscribe.get_future().get().value() == error::success);
 ////
 ////    // ~network blocks on stopping all channels.
 ////    // during channel.stop each channel removes itself from the collection.
 ////}
 
-BOOST_AUTO_TEST_SUITE_END()
+// End Boost Suite
