@@ -13,8 +13,7 @@
 #include <kth/network/channel.hpp>
 #include <kth/network/define.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define PROTOCOL_ARGS(handler, args) \
     std::forward<Handler>(handler), \
