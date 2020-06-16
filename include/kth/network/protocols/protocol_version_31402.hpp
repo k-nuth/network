@@ -14,8 +14,7 @@
 #include <kth/network/protocols/protocol_timer.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
