@@ -16,15 +16,14 @@ namespace kth::network {
 #define NAME "seed"
 #define CLASS protocol_seed_31402
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 // Require three callbacks (or any error) before calling complete.
 protocol_seed_31402::protocol_seed_31402(p2p& network, channel::ptr channel)
     : protocol_timer(network, channel, false, NAME)
     , network_(network)
-    , CONSTRUCT_TRACK(protocol_seed_31402)
-{}
+    , CONSTRUCT_TRACK(protocol_seed_31402) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
