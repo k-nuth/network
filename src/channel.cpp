@@ -16,7 +16,7 @@
 
 namespace kth::network {
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 // Factory for deadline timer pointer construction.
