@@ -11,29 +11,27 @@
 #include <kth/network/p2p.hpp>
 #include <kth/network/protocols/protocol.hpp>
 #include <kth/network/protocols/protocol_events.hpp>
-
 namespace kth::network {
 
 #define NAME "address"
 #define CLASS protocol_address_31402
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 static 
-message::address configured_self(const network::settings& settings) {
+domain::message::address configured_self(network::settings const& settings) {
     if (settings.self.port() == 0) {
-        return address{};
+        return {};
     }
-    return address{ { settings.self.to_network_address() } };
+    return address{{settings.self.to_network_address()}};
 }
 
 protocol_address_31402::protocol_address_31402(p2p& network, channel::ptr channel)
     : protocol_events(network, channel, NAME)
     , network_(network)
     , self_(configured_self(network_.network_settings()))
-    , CONSTRUCT_TRACK(protocol_address_31402)
-{}
+    , CONSTRUCT_TRACK(protocol_address_31402) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
