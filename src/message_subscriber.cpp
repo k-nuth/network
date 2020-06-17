@@ -9,31 +9,25 @@
 #include <string>
 #include <kth/domain.hpp>
 
-#define INITIALIZE_SUBSCRIBER(pool, value) \
-    value##_subscriber_(std::make_shared<value##_subscriber_type>( \
-        pool, #value "_sub"))
-
-#define RELAY_CODE(code, value) \
-    value##_subscriber_->relay(code, {})
+#define INITIALIZE_SUBSCRIBER(pool, value) value##_subscriber_(std::make_shared<value##_subscriber_type>(pool, #value "_sub"))
+#define RELAY_CODE(code, value) value##_subscriber_->relay(code, {})
 
 // This allows us to block the peer while handling the message.
 #define CASE_HANDLE_MESSAGE(stream, version, value) \
     case message_type::value: \
-        return handle<message::value>(stream, version, value##_subscriber_)
+        return handle<domain::message::value>(stream, version, value##_subscriber_)
 
 #define CASE_RELAY_MESSAGE(stream, version, value) \
     case message_type::value: \
-        return relay<message::value>(stream, version, value##_subscriber_)
+        return relay<domain::message::value>(stream, version, value##_subscriber_)
 
-#define START_SUBSCRIBER(value) \
-    value##_subscriber_->start()
+#define START_SUBSCRIBER(value) value##_subscriber_->start()
 
-#define STOP_SUBSCRIBER(value) \
-    value##_subscriber_->stop()
+#define STOP_SUBSCRIBER(value) value##_subscriber_->stop()
 
 namespace kth::network {
 
-using namespace message;
+using namespace domain::message;
 
 message_subscriber::message_subscriber(threadpool& pool)
     : INITIALIZE_SUBSCRIBER(pool, address)
