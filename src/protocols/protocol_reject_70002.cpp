@@ -18,13 +18,12 @@ namespace kth::network {
 #define NAME "reject"
 #define CLASS protocol_reject_70002
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 protocol_reject_70002::protocol_reject_70002(p2p& network, channel::ptr channel)
     : protocol_events(network, channel, NAME)
-    , CONSTRUCT_TRACK(protocol_reject_70002)
-{}
+    , CONSTRUCT_TRACK(protocol_reject_70002) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
