@@ -7,7 +7,10 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <kth/domain.hpp>
+#include <kth/infrastructure.hpp>
+
 #include <kth/network/define.hpp>
 
 namespace kth::network {
