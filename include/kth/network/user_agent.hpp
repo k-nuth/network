@@ -7,12 +7,10 @@
 
 #include <string>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 std::string get_user_agent();
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif //KTH_NETWORK_USER_AGENT_HPP_
