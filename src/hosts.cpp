@@ -13,22 +13,21 @@
 
 namespace kth::network {
 
-using namespace bc::config;
+using namespace kth::config;
 
 #define NAME "hosts"
 
 // TODO: change to network_address bimap hash table with services and age.
-hosts::hosts(const settings& settings)
+hosts::hosts(settings const& settings)
     : capacity_(std::min(max_address, static_cast<size_t>(settings.host_pool_capacity)))
     , buffer_(std::max(capacity_, static_cast<size_t>(1u)))
     , stopped_(true)
     , file_path_(settings.hosts_file)
-    , disabled_(capacity_ == 0)
-{}
+    , disabled_(capacity_ == 0) {}
 
 // private
-hosts::iterator hosts::find(const address& host) {
-    auto const found = [&host](const address& entry) {
+hosts::iterator hosts::find(address const& host) {
+    auto const found = [&host](address const& entry) {
         return entry.port() == host.port() && entry.ip() == host.ip();
     };
 
