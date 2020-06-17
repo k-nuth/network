@@ -19,8 +19,7 @@ namespace kth::network {
 using namespace std::placeholders;
 
 protocol_events::protocol_events(p2p& network, channel::ptr channel, std::string const& name)
-    : protocol(network, channel, name)
-{}
+    : protocol(network, channel, name) {}
 
 // Properties.
 // ----------------------------------------------------------------------------
