@@ -14,45 +14,41 @@
 #include <kth/network/proxy.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define NAME "connector"
 
-using namespace bc::config;
+using namespace kth::config;
 using namespace std::placeholders;
 
-connector::connector(threadpool& pool, const settings& settings)
-  : stopped_(false),
-    pool_(pool),
-    settings_(settings),
-    dispatch_(pool, NAME),
-    resolver_(pool.service()),
-    CONSTRUCT_TRACK(connector)
-{
-}
+connector::connector(threadpool& pool, settings const& settings)
+    : stopped_(false)
+    , pool_(pool)
+    , settings_(settings)
+    , dispatch_(pool, NAME)
+    , resolver_(pool.service())
+    , CONSTRUCT_TRACK(connector) 
+{}
 
-connector::~connector()
-{
+connector::~connector() {
     KTH_ASSERT_MSG(stopped(), "The connector was not stopped.");
 }
 
-void connector::stop(const code&)
-{
+void connector::stop(code const&) {
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
-    if (!stopped())
-    {
+    if ( ! stopped()) {
         mutex_.unlock_upgrade_and_lock();
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         // This will asynchronously invoke the handler of the pending resolve.
         resolver_.cancel();
 
-        if (timer_)
+        if (timer_) {
             timer_->stop();
+        }
 
         stopped_ = true;
         //---------------------------------------------------------------------
