@@ -24,10 +24,10 @@ class BCT_API acceptor
 {
 public:
     typedef std::shared_ptr<acceptor> ptr;
-    typedef std::function<void(const code&, channel::ptr)> accept_handler;
+    typedef std::function<void(code const&, channel::ptr)> accept_handler;
 
     /// Construct an instance.
-    acceptor(threadpool& pool, const settings& settings);
+    acceptor(threadpool& pool, settings const& settings);
 
     /// Validate acceptor stopped.
     ~acceptor();
