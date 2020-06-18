@@ -16,7 +16,7 @@ namespace kth::network {
 #define NAME "version"
 #define CLASS protocol_version_70002
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 static const std::string insufficient_version = "insufficient-version";
