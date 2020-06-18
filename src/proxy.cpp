@@ -17,22 +17,21 @@
 #include <kth/network/define.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define NAME "proxy"
 
 using namespace std::placeholders;
 using namespace boost::asio;
-using namespace bc::message;
+using namespace kd::message;
 
 // Dump up to 1k of payload as hex in order to diagnose failure.
-static const size_t invalid_payload_dump_size = 1024;
+static size_t const invalid_payload_dump_size = 1024;
 
 // payload_buffer_ sizing assumes monotonically increasing size by version.
 // Initialize to pre-witness max payload and let grow to witness as required.
 // The socket owns the single thread on which this channel reads and writes.
-proxy::proxy(threadpool& pool, socket::ptr socket, const settings& settings)
+proxy::proxy(threadpool& pool, socket::ptr socket, settings const& settings)
   : authority_(socket->authority()),
     heading_buffer_(heading::maximum_size()),
     payload_buffer_(heading::maximum_payload_size(settings.protocol_maximum, false)),
