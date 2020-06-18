@@ -19,7 +19,7 @@ namespace kth::network {
 #define NAME "version"
 #define CLASS protocol_version_31402
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 // TODO: set explicitly on inbound (none or new config) and self on outbound.
