@@ -32,8 +32,7 @@ session::session(p2p& network, bool notify_on_connect)
     , stopped_(true)
     , notify_on_connect_(notify_on_connect)
     , network_(network)
-    , dispatch_(pool_, NAME)
-{}
+    , dispatch_(pool_, NAME) {}
 
 session::~session() {
     KTH_ASSERT_MSG(stopped(), "The session was not stopped.");
