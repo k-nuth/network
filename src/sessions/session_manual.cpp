@@ -23,8 +23,7 @@ using namespace std::placeholders;
 
 session_manual::session_manual(p2p& network, bool notify_on_connect)
     : session(network, notify_on_connect)
-    , CONSTRUCT_TRACK(session_manual)
-{}
+    , CONSTRUCT_TRACK(session_manual) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
