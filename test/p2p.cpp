@@ -12,9 +12,9 @@
 
 #include <kth/network.hpp>
 
-using namespace bc;
-using namespace bc::message;
-using namespace bc::network;
+using namespace kth;
+using namespace kd::message;
+using namespace kth::network;
 
 #define TEST_SET_NAME \
     "p2p_tests"
