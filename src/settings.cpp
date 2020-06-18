@@ -9,8 +9,8 @@
 
 namespace kth::network {
 
-using namespace bc::asio;
-using namespace bc::message;
+using namespace kth::asio;
+using namespace kd::message;
 
 // Common default values (no settings context).
 settings::settings()
