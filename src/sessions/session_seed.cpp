@@ -22,13 +22,12 @@ namespace kth::network {
 #define NAME "session_seed"
 
 /// If seeding occurs it must generate an increase hosts or will fail.
-static const size_t minimum_host_increase = 1;
+static size_t const minimum_host_increase = 1;
 
 using namespace std::placeholders;
 session_seed::session_seed(p2p& network)
     : session(network, false)
-    , CONSTRUCT_TRACK(session_seed)
-{}
+    , CONSTRUCT_TRACK(session_seed) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
