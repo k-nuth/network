@@ -19,11 +19,9 @@ class p2p;
  * Address protocol.
  * Attach this to a channel immediately following handshake completion.
  */
-class BCT_API protocol_address_31402
-  : public protocol_events, track<protocol_address_31402>
-{
+class BCT_API protocol_address_31402 : public protocol_events, track<protocol_address_31402> {
 public:
-    typedef std::shared_ptr<protocol_address_31402> ptr;
+    using ptr = std::shared_ptr<protocol_address_31402>;
 
     /**
      * Construct an address protocol instance.
