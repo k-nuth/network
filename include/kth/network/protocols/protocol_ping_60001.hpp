@@ -48,7 +48,6 @@ private:
     std::atomic<bool> pending_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
