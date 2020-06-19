@@ -25,34 +25,29 @@
 #include <kth/network/sessions/session_seed.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// Top level public networking interface, partly thread safe.
-class BCT_API p2p
-  : public enable_shared_from_base<p2p>, noncopyable
-{
+class BCT_API p2p : public enable_shared_from_base<p2p>, noncopyable {
 public:
-    typedef std::shared_ptr<p2p> ptr;
-    typedef message::network_address address;
-    typedef std::function<void()> stop_handler;
-    typedef std::function<void(bool)> truth_handler;
-    typedef std::function<void(size_t)> count_handler;
-    typedef std::function<void(const code&)> result_handler;
-    typedef std::function<void(const code&, const address&)> address_handler;
-    typedef std::function<void(const code&, channel::ptr)> channel_handler;
-    typedef std::function<bool(const code&, channel::ptr)> connect_handler;
-    typedef subscriber<code> stop_subscriber;
-    typedef resubscriber<code, channel::ptr> channel_subscriber;
+    using ptr = std::shared_ptr<p2p>;
+    using address = domain::message::network_address;
+    using stop_handler = std::function<void()>;
+    using truth_handler = std::function<void(bool)>;
+    using count_handler = std::function<void(size_t)>;
+    using result_handler = std::function<void(code const&)>;
+    using address_handler = std::function<void(code const&, address const&)>;
+    using channel_handler = std::function<void(code const&, channel::ptr)>;
+    using connect_handler = std::function<bool(code const&, channel::ptr)>;
+    using stop_subscriber = subscriber<code>;
+    using channel_subscriber = resubscriber<code, channel::ptr>;
 
     // Templates (send/receive).
     // ------------------------------------------------------------------------
 
     /// Send message to all connections.
     template <typename Message>
-    void broadcast(const Message& message, channel_handler handle_channel,
-        result_handler handle_complete)
-    {
+    void broadcast(Message const& message, channel_handler handle_channel, result_handler handle_complete) {
         // Safely copy the channel collection.
         auto const channels = pending_close_.collection();
 
