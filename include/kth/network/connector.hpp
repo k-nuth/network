@@ -27,17 +27,17 @@ public:
     typedef std::function<void(code const& ec, channel::ptr)> connect_handler;
 
     /// Construct an instance.
-    connector(threadpool& pool, const settings& settings);
+    connector(threadpool& pool, settings const& settings);
 
     /// Validate connector stopped.
     ~connector();
 
     /// Try to connect to the endpoint.
-    virtual void connect(const config::endpoint& endpoint,
+    virtual void connect(const infrastructure::config::endpoint& endpoint,
         connect_handler handler);
 
     /// Try to connect to the authority.
-    virtual void connect(const config::authority& authority,
+    virtual void connect(const infrastructure::config::authority& authority,
         connect_handler handler);
 
     /// Try to connect to host:port.
