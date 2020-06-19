@@ -49,11 +49,10 @@ private:
     void handle_timer(code const& ec);
     void handle_notify(code const& ec, event_handler handler);
 
-    const bool perpetual_;
+    bool const perpetual_;
     deadline::ptr timer_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
