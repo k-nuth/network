@@ -38,8 +38,7 @@ protected:
         reject_const_ptr reject);
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 
