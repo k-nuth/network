@@ -39,17 +39,17 @@ public:
     virtual size_t count() const;
     virtual code fetch(address& out) const;
     virtual code fetch(address::list& out) const;
-    virtual code remove(const address& host);
-    virtual code store(const address& host);
-    virtual void store(const address::list& hosts, result_handler handler);
+    virtual code remove(address const& host);
+    virtual code store(address const& host);
+    virtual void store(address::list const& hosts, result_handler handler);
 
 private:
-    typedef boost::circular_buffer<address> list;
-    typedef list::iterator iterator;
+    using list = boost::circular_buffer<address>;
+    using iterator = list::iterator;
 
-    iterator find(const address& host);
+    iterator find(address const& host);
 
-    const size_t capacity_;
+    size_t const capacity_;
 
     // These are protected by a mutex.
     list buffer_;
