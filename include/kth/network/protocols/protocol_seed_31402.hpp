@@ -39,7 +39,7 @@ public:
     virtual void start(event_handler handler);
 
 protected:
-    virtual void send_own_address(const settings& settings);
+    virtual void send_own_address(settings const& settings);
 
     virtual void handle_send_address(code const& ec);
     virtual void handle_send_get_address(code const& ec);
