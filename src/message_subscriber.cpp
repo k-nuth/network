@@ -58,7 +58,7 @@ message_subscriber::message_subscriber(threadpool& pool)
     , INITIALIZE_SUBSCRIBER(pool, verack)
     , INITIALIZE_SUBSCRIBER(pool, version)
     // , INITIALIZE_SUBSCRIBER(pool, xverack)
-    // , INITIALIZE_SUBSCRIBER(pool, xversion)
+    // , INITIALIZE_SUBSCRIBER(pool, xversion) 
 {}
 
 void message_subscriber::broadcast(code const& ec) {
