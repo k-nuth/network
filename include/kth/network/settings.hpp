@@ -19,7 +19,7 @@ namespace kth::network {
 class BCT_API settings {
 public:
     settings();
-    settings(config::settings context);
+    settings(infrastructure::config::settings context);
 
     /// Properties.
     uint32_t threads;
