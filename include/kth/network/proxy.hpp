@@ -25,20 +25,19 @@ class BCT_API proxy
 {
 public:
     typedef std::shared_ptr<proxy> ptr;
-    typedef std::function<void(const code&)> result_handler;
+    typedef std::function<void(code const&)> result_handler;
     typedef subscriber<code> stop_subscriber;
 
     /// Construct an instance.
-    proxy(threadpool& pool, socket::ptr socket, const settings& settings);
+    proxy(threadpool& pool, socket::ptr socket, settings const& settings);
 
     /// Validate proxy stopped.
     ~proxy();
 
     /// Send a message on the socket.
-    template <class Message>
-    void send(const Message& message, result_handler handler)
-    {
-        auto data = message::serialize(version_, message, protocol_magic_);
+    template <typename Message>
+    void send(Message const& message, result_handler handler) {
+        auto data = domain::message::serialize(version_, message, protocol_magic_);
         auto const payload = std::make_shared<data_chunk>(std::move(data));
         auto const command = std::make_shared<std::string>(message.command);
 
