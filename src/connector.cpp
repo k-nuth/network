@@ -61,30 +61,24 @@ void connector::stop(code const&) {
 }
 
 // private
-bool connector::stopped() const
-{
+bool connector::stopped() const {
     return stopped_;
 }
 
-void connector::connect(const endpoint& endpoint, connect_handler handler)
-{
+void connector::connect(infrastructure::config::endpoint const& endpoint, connect_handler handler) {
     connect(endpoint.host(), endpoint.port(), handler);
 }
 
-void connector::connect(const authority& authority, connect_handler handler)
-{
+void connector::connect(infrastructure::config::authority const& authority, connect_handler handler) {
     connect(authority.to_hostname(), authority.port(), handler);
 }
 
-void connector::connect(std::string const& hostname, uint16_t port,
-    connect_handler handler)
-{
+void connector::connect(std::string const& hostname, uint16_t port, connect_handler handler) {
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
 
-    if (stopped())
-    {
+    if (stopped()) {
         mutex_.unlock_upgrade();
         //---------------------------------------------------------------------
         dispatch_.concurrent(handler, error::service_stopped, nullptr);
