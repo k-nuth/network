@@ -37,18 +37,16 @@ namespace kth::network {
 class p2p;
 
 /// Base class for maintaining the lifetime of a channel set, thread safe.
-class BCT_API session
-  : public enable_shared_from_base<session>, noncopyable
-{
+class BCT_API session : public enable_shared_from_base<session>, noncopyable {
 public:
-    typedef config::authority authority;
-    typedef message::network_address address;
-    typedef std::function<void(bool)> truth_handler;
-    typedef std::function<void(size_t)> count_handler;
-    typedef std::function<void(const code&)> result_handler;
-    typedef std::function<void(const code&, channel::ptr)> channel_handler;
-    typedef std::function<void(const code&, acceptor::ptr)> accept_handler;
-    typedef std::function<void(const code&, const authority&)> host_handler;
+    using authority = infrastructure::config::authority;
+    using address = domain::message::network_address;
+    using truth_handler = std::function<void(bool)>;
+    using count_handler = std::function<void(size_t)>;
+    using result_handler = std::function<void(code const&)>;
+    using channel_handler = std::function<void(code const&, channel::ptr)>;
+    using accept_handler = std::function<void(code const&, acceptor::ptr)>;
+    using host_handler = std::function<void(code const&, authority const&)>;
 
     /// Start the session, invokes handler once stop is registered.
     virtual void start(result_handler handler);
