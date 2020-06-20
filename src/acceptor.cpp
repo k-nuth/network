@@ -111,7 +111,7 @@ void acceptor::accept(accept_handler handler) {
         return;
     }
 
-    auto const socket = std::make_shared<bc::socket>(pool_);
+    auto const socket = std::make_shared<kth::socket>(pool_);
 
     mutex_.unlock_upgrade_and_lock();
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
