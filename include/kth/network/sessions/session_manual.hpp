@@ -26,7 +26,7 @@ class BCT_API session_manual
 {
 public:
     typedef std::shared_ptr<session_manual> ptr;
-    typedef std::function<void(const code&, channel::ptr)> channel_handler;
+    typedef std::function<void(code const&, channel::ptr)> channel_handler;
 
     /// Construct an instance.
     session_manual(p2p& network, bool notify_on_connect);
