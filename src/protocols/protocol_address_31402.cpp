@@ -80,7 +80,7 @@ bool protocol_address_31402::handle_receive_get_address(code const& ec, get_addr
         return false;
     }
 
-    bc::message::network_address::list addresses;
+    kd::message::network_address::list addresses;
     network_.fetch_addresses(addresses);
 
     if ( ! addresses.empty()) {
