@@ -38,7 +38,7 @@ bool protocol_events::stopped(code const& ec) const {
 // ----------------------------------------------------------------------------
 
 void protocol_events::start() {
-    auto const nop = [](const code&){};
+    auto const nop = [](code const&){};
     start(nop);
 }
 
