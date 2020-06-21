@@ -75,7 +75,7 @@ void session_inbound::handle_stop(code const& ec) {
 // Accept sequence.
 // ----------------------------------------------------------------------------
 
-void session_inbound::start_accept(const code&) {
+void session_inbound::start_accept(code const&) {
     if (stopped()) {
         LOG_DEBUG(LOG_NETWORK, "Suspended inbound connection.");
         return;
