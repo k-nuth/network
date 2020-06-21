@@ -48,7 +48,7 @@ void session_batch::new_connect(channel_handler handler) {
     start_connect(ec, address, handler);
 }
 
-void session_batch::start_connect(code const& ec, const authority& host, channel_handler handler) {
+void session_batch::start_connect(code const& ec, authority const& host, channel_handler handler) {
     if (stopped(ec)) {
         LOG_DEBUG(LOG_NETWORK, "Batch session stopped while starting.");
         handler(error::service_stopped, nullptr);
