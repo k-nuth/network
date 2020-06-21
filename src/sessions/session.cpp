@@ -54,8 +54,8 @@ code session::fetch_address(address& out_address) const {
     return network_.fetch_address(out_address);
 }
 
-bool session::blacklisted(const authority& authority) const {
-    auto const ip_compare = [&](const config::authority& blocked) {
+bool session::blacklisted(authority const& authority) const {
+    auto const ip_compare = [&](const infrastructure::config::authority& blocked) {
         return authority.ip() == blocked.ip();
     };
 
