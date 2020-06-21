@@ -45,8 +45,7 @@ proxy::proxy(threadpool& pool, socket::ptr socket, settings const& settings)
     version_(settings.protocol_maximum),
     message_subscriber_(pool),
     stop_subscriber_(std::make_shared<stop_subscriber>(pool, NAME "_sub")),
-    dispatch_(pool, NAME "_dispatch")
-{
+    dispatch_(pool, NAME "_dispatch") {
     //LOG_INFO(LOG_NETWORK, "proxy::proxy");
 }
 
