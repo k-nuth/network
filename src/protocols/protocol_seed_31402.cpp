@@ -49,7 +49,7 @@ void protocol_seed_31402::start(event_handler handler) {
 // Protocol.
 // ----------------------------------------------------------------------------
 
-void protocol_seed_31402::send_own_address(const settings& settings) {
+void protocol_seed_31402::send_own_address(settings const& settings) {
     if (settings.self.port() == 0) {
         set_event(error::success);
         return;
