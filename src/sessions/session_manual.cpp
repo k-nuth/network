@@ -59,7 +59,7 @@ void session_manual::connect(std::string const& hostname, uint16_t port, channel
 }
 
 // The first connect is a sequence, which then spawns a cycle.
-void session_manual::start_connect(const code&, std::string const& hostname, uint16_t port, uint32_t attempts, channel_handler handler) {
+void session_manual::start_connect(code const&, std::string const& hostname, uint16_t port, uint32_t attempts, channel_handler handler) {
     if (stopped()) {
         LOG_DEBUG(LOG_NETWORK, "Suspended manual connection.");
         handler(error::service_stopped, nullptr);
