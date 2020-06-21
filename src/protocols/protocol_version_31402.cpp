@@ -33,8 +33,7 @@ protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channe
         , network.network_settings().services
         , network.network_settings().invalid_services
         , network.network_settings().protocol_minimum
-        , version::service::none)
-{}
+        , version::service::none) {}
 
 protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channel, uint32_t own_version, uint64_t own_services, uint64_t invalid_services, uint32_t minimum_version, uint64_t minimum_services)
     : protocol_timer(network, channel, false, NAME)
