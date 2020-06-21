@@ -30,63 +30,52 @@
 #include <kth/network/sessions/session_seed.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define NAME "p2p"
 
-using namespace bc::config;
+using namespace kth::config;
 using namespace std::placeholders;
 
 // This can be exceeded due to manual connection calls and race conditions.
-inline size_t nominal_connecting(const settings& settings)
-{
-    return settings.peers.size() + settings.connect_batch_size *
-        settings.outbound_connections;
+inline 
+size_t nominal_connecting(settings const& settings) {
+    return settings.peers.size() + settings.connect_batch_size * settings.outbound_connections;
 }
 
 // This can be exceeded due to manual connection calls and race conditions.
-inline size_t nominal_connected(const settings& settings)
-{
-    return settings.peers.size() + settings.outbound_connections +
-        settings.inbound_connections;
+inline 
+size_t nominal_connected(settings const& settings) {
+    return settings.peers.size() + settings.outbound_connections + settings.inbound_connections;
 }
 
-p2p::p2p(const settings& settings)
-  : settings_(settings),
-    stopped_(true),
-    top_block_({ null_hash, 0 }),
-    hosts_(settings_),
-    pending_connect_(nominal_connecting(settings_)),
-    pending_handshake_(nominal_connected(settings_)),
-    pending_close_(nominal_connected(settings_)),
-    stop_subscriber_(std::make_shared<stop_subscriber>(threadpool_,
-        NAME "_stop_sub")),
-    channel_subscriber_(std::make_shared<channel_subscriber>(threadpool_,
-        NAME "_sub"))
-{
-}
+p2p::p2p(settings const& settings)
+    : settings_(settings)
+    , stopped_(true)
+    , top_block_({ null_hash, 0 })
+    , hosts_(settings_)
+    , pending_connect_(nominal_connecting(settings_))
+    , pending_handshake_(nominal_connected(settings_))
+    , pending_close_(nominal_connected(settings_))
+    , stop_subscriber_(std::make_shared<stop_subscriber>(threadpool_, NAME "_stop_sub"))
+    , channel_subscriber_(std::make_shared<channel_subscriber>(threadpool_, NAME "_sub")) {}
 
 // This allows for shutdown based on destruct without need to call stop.
-p2p::~p2p()
-{
+p2p::~p2p() {
     p2p::close();
 }
 
 // Start sequence.
 // ----------------------------------------------------------------------------
 
-void p2p::start(result_handler handler)
-{
-    if (!stopped())
-    {
+void p2p::start(result_handler handler) {
+    if ( ! stopped()) {
         handler(error::operation_failed);
         return;
     }
 
     threadpool_.join();
-    threadpool_.spawn(thread_default(settings_.threads),
-        thread_priority::normal);
+    threadpool_.spawn(thread_default(settings_.threads), thread_priority::normal);
 
     stopped_ = false;
     stop_subscriber_->start();
