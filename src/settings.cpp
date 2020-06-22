@@ -50,17 +50,15 @@ settings::settings()
     , maximum_archive_files(0)
     , statistics_server(unspecified_network_address)
     , verbose(false)
-    , use_ipv6(true)
-{}
+    , use_ipv6(true) {}
 
 // Use push_back due to initializer_list bug:
 // stackoverflow.com/a/20168627/1172329
-settings::settings(config::settings context)
-    : settings()
-{
+settings::settings(infrastructure::config::settings context)
+    : settings() {
     // Handle deviations from common defaults.
     switch (context) {
-        case config::settings::mainnet: {
+        case infrastructure::config::settings::mainnet: {
 // #ifdef LITECOIN
 #ifdef KTH_CURRENCY_LTC
             inbound_port = 9333;
