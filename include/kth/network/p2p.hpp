@@ -56,16 +56,16 @@ public:
             "p2p_join", synchronizer_terminate::on_count);
 
         // No pre-serialize, channels may have different protocol versions.
-        for (auto const channel: channels)
-            channel->send(message, std::bind(&p2p::handle_send, this,
-                std::placeholders::_1, channel, handle_channel, join_handler));
+        for (auto const channel: channels) {
+            channel->send(message, std::bind(&p2p::handle_send, this, std::placeholders::_1, channel, handle_channel, join_handler));
+        }
     }
 
     // Constructors.
     // ------------------------------------------------------------------------
 
     /// Construct an instance.
-    p2p(const settings& settings);
+    p2p(settings const& settings);
 
     /// Ensure all threads are coalesced.
     virtual ~p2p();
