@@ -73,14 +73,14 @@ void session_seed::attach_handshake_protocols(channel::ptr channel, result_handl
     // Don't use configured services or relay for seeding.
     auto const relay = false;
     auto const own_version = settings_.protocol_maximum;
-    auto const own_services = message::version::service::none;
+    auto const own_services = domain::message::version::service::none;
     auto const invalid_services = settings_.invalid_services;
     auto const minimum_version = settings_.protocol_minimum;
-    auto const minimum_services = message::version::service::none;
+    auto const minimum_services = domain::message::version::service::none;
 
     // Reject messages are not handled until bip61 (70002).
     // The negotiated_version is initialized to the configured maximum.
-    if (channel->negotiated_version() >= message::version::level::bip61) {
+    if (channel->negotiated_version() >= domain::message::version::level::bip61) {
         attach<protocol_version_70002>(channel, own_version, own_services,
             invalid_services, minimum_version, minimum_services, relay)
             ->start(handle_started);
