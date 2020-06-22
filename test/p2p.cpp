@@ -40,7 +40,7 @@ using namespace kth::network;
     }
 
 #define SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(name) \
-    auto name = network::settings(bc::config::settings::testnet); \
+    auto name = network::settings(infrastructure::config::settings::testnet); \
     name.threads = 1; \
     name.outbound_connections = 0; \
     name.manual_attempt_limit = 2
