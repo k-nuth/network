@@ -81,7 +81,7 @@ public:
      * Subscribing must be immediate, we cannot switch thread contexts.
      * @param[in]  handler  The handler to register.
      */
-    template <class Message, typename Handler>
+    template <typename Message, typename Handler>
     void subscribe(Handler&& handler) {
         subscribe(Message(), std::forward<Handler>(handler));
     }
