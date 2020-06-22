@@ -134,7 +134,6 @@ private:
 #define DISPATCH_CONCURRENT1(method, p1) \
     dispatch_concurrent<CLASS>(&CLASS::method, p1)
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
