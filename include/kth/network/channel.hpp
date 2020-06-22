@@ -58,12 +58,11 @@ private:
 
     std::atomic<bool> notify_;
     std::atomic<uint64_t> nonce_;
-    bc::atomic<version_const_ptr> peer_version_;
+    kth::atomic<version_const_ptr> peer_version_;
     deadline::ptr expiration_;
     deadline::ptr inactivity_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
