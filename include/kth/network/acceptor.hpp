@@ -50,7 +50,7 @@ private:
     // These are thread safe.
     std::atomic<bool> stopped_;
     threadpool& pool_;
-    const settings& settings_;
+    settings const& settings_;
     mutable dispatcher dispatch_;
 
     // These are protected by mutex.
