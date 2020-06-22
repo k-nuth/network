@@ -57,12 +57,11 @@ private:
     mutable upgrade_mutex mutex_;
 
     // HACK: we use this because the buffer capacity cannot be set to zero.
-    const bool disabled_;
-    const std::filesystem::path file_path_;
+    bool const disabled_;
+    std::filesystem::path const file_path_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 
