@@ -57,7 +57,7 @@ void session_outbound::handle_started(code const& ec, result_handler handler) {
 // Connnect cycle.
 // ----------------------------------------------------------------------------
 
-void session_outbound::new_connection(const code&) {
+void session_outbound::new_connection(code const&) {
     if (stopped()) {
         LOG_DEBUG(LOG_NETWORK, "Suspended outbound connection.");
         return;
