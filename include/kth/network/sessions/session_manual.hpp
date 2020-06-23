@@ -60,7 +60,6 @@ private:
         uint16_t port);
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
