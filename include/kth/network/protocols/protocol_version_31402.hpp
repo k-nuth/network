@@ -66,8 +66,7 @@ protected:
     const uint64_t minimum_services_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 
