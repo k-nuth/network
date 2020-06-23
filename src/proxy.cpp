@@ -57,7 +57,7 @@ proxy::~proxy() {
 // Properties.
 // ----------------------------------------------------------------------------
 
-const config::authority& proxy::authority() const {
+const infrastructure::config::authority& proxy::authority() const {
     return authority_;
 }
 
