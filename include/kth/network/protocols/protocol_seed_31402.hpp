@@ -52,10 +52,9 @@ protected:
     ////    get_address_const_ptr message);
 
     p2p& network_;
-    const config::authority self_;
+    const infrastructure::config::authority self_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
