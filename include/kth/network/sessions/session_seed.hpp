@@ -55,8 +55,7 @@ private:
     void handle_channel_stop(code const& ec);
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 
