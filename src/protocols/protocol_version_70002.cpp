@@ -47,7 +47,7 @@ void protocol_version_70002::start(event_handler handler) {
     SUBSCRIBE2(reject, handle_receive_reject, _1, _2);
 }
 
-message::version protocol_version_70002::version_factory() const {
+domain::message::version protocol_version_70002::version_factory() const {
     auto version = protocol_version_31402::version_factory();
 
     // This is the only difference at protocol level 70001.
