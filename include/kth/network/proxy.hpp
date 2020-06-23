@@ -48,9 +48,8 @@ public:
     }
 
     /// Subscribe to messages of the specified type on the socket.
-    template <class Message>
-    void subscribe(message_handler<Message>&& handler)
-    {
+    template <typename Message>
+    void subscribe(message_handler<Message>&& handler) {
         message_subscriber_.subscribe<Message>(
             std::forward<message_handler<Message>>(handler));
     }
