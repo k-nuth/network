@@ -43,8 +43,7 @@ protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channe
     , invalid_services_(invalid_services)
     , minimum_version_(minimum_version)
     , minimum_services_(minimum_services)
-    , CONSTRUCT_TRACK(protocol_version_31402)
-{}
+    , CONSTRUCT_TRACK(protocol_version_31402) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
