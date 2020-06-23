@@ -55,7 +55,6 @@ private:
     void handle_channel_start(code const& ec, channel::ptr channel);
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
