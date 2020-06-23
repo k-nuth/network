@@ -43,10 +43,10 @@ public:
     uint32_t channel_germination_seconds;
     uint32_t host_pool_capacity;
     std::filesystem::path hosts_file;
-    config::authority self;
-    config::authority::list blacklists;
-    config::endpoint::list peers;
-    config::endpoint::list seeds;
+    infrastructure::config::authority self;
+    infrastructure::config::authority::list blacklists;
+    infrastructure::config::endpoint::list peers;
+    infrastructure::config::endpoint::list seeds;
     // bool bitcoin_cash;
 
     // [log]
