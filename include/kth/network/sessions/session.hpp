@@ -66,15 +66,13 @@ protected:
     // ------------------------------------------------------------------------
 
     /// Attach a protocol to a channel, caller must start the channel.
-    template <class Protocol, typename... Args>
-    typename Protocol::ptr attach(channel::ptr channel, Args&&... args)
-    {
-        return std::make_shared<Protocol>(network_, channel,
-            std::forward<Args>(args)...);
+    template <typename Protocol, typename... Args>
+    typename Protocol::ptr attach(channel::ptr channel, Args&&... args) {
+        return std::make_shared<Protocol>(network_, channel, std::forward<Args>(args)...);
     }
 
     /// Bind a method in the derived class.
-    template <class Session, typename Handler, typename... Args>
+    template <typename Session, typename Handler, typename... Args>
     auto bind(Handler&& handler, Args&&... args) ->
         decltype(BOUND_SESSION_TYPE(handler, args)) const
     {
