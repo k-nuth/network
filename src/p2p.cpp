@@ -85,21 +85,16 @@ void p2p::start(result_handler handler) {
     manual_.store(attach_manual_session());
 
     // This is invoked on a new thread.
-    manual_.load()->start(
-        std::bind(&p2p::handle_manual_started,
-            this, _1, handler));
+    manual_.load()->start(std::bind(&p2p::handle_manual_started, this, _1, handler));
 }
 
-void p2p::handle_manual_started(code const& ec, result_handler handler)
-{
-    if (stopped())
-    {
+void p2p::handle_manual_started(code const& ec, result_handler handler) {
+    if (stopped()) {
         handler(error::service_stopped);
         return;
     }
 
-    if (ec)
-    {
+    if (ec) {
         LOG_ERROR(LOG_NETWORK, "Error starting manual session: ", ec.message());
         handler(ec);
         return;
