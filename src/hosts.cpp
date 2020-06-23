@@ -131,7 +131,7 @@ code hosts::start() {
         while (std::getline(file, line)) {
             // TODO: create full space-delimited network_address serialization.
             // Use to/from string format as opposed to wire serialization.
-            config::authority host(line);
+            infrastructure::config::authority host(line);
 
             if (host.port() != 0) {
                 buffer_.push_back(host.to_network_address());
