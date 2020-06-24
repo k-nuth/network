@@ -58,7 +58,7 @@ public:
     virtual void subscribe_stop(result_handler handler);
 
     /// Get the authority of the far end of this socket.
-    virtual const config::authority& authority() const;
+    virtual const infrastructure::config::authority& authority() const;
 
     /// Get the negotiated protocol version of this socket.
     /// The value should be the lesser of own max and peer min.
