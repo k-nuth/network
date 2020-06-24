@@ -72,7 +72,6 @@ private:
     mutable upgrade_mutex mutex_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
