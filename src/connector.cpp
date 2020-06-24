@@ -137,10 +137,8 @@ void connector::handle_resolve(const boost_code& ec, asio::iterator iterator, co
 
 // private:
 void connector::handle_connect(const boost_code& ec, asio::iterator,
-    socket::ptr socket, connect_handler handler)
-{
-    if (ec)
-    {
+    socket::ptr socket, connect_handler handler) {
+    if (ec) {
         handler(error::boost_to_error_code(ec), nullptr);
         return;
     }
