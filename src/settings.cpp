@@ -97,7 +97,7 @@ settings::settings(infrastructure::config::settings context)
         }
 
         // Seeds based on satoshi client v0.14.0 plus voskuil.org.
-        case config::settings::testnet: {
+        case infrastructure::config::settings::testnet: {
 
 // #ifdef LITECOIN
 #ifdef KTH_CURRENCY_LTC
