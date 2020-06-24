@@ -93,12 +93,12 @@ public:
      * @param[in]  subscriber  The subscriber for the message type.
      * @return                 Returns error::bad_stream if failed.
      */
-    template <class Message, class Subscriber>
+    template <typename Message, typename Subscriber>
     code relay(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
         auto const message = std::make_shared<Message>();
 
         // Subscribers are invoked only with stop and success codes.
-        if ( ! message->from_data(version, stream)) {
+        if ( ! domain::entity_from_data(*message, stream, version)) {
             return error::bad_stream;
         }
 
