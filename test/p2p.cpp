@@ -52,64 +52,59 @@ using namespace kth::network;
     name.hosts_file = get_log_path(TEST_NAME, "hosts")
 
 #define SETTINGS_TESTNET_THREE_THREADS_ONE_SEED_FIVE_OUTBOUND(name) \
-    auto name = network::settings(bc::config::settings::testnet); \
+    auto name = network::settings(infrastructure::config::settings::testnet); \
     name.threads = 3; \
     name.host_pool_capacity = 42; \
     name.outbound_connections = 5; \
     name.seeds = { { SEED1 } }; \
     name.hosts_file = get_log_path(TEST_NAME, "hosts")
 
-std::string get_log_path(std::string const& test, std::string const& file)
-{
+std::string get_log_path(std::string const& test, std::string const& file) {
     auto const path = test + "." + file + ".log";
     std::filesystem::remove_all(path);
     return path;
 }
 
-static void print_headers(std::string const& test)
-{
+static 
+void print_headers(std::string const& test) {
     auto const header = "=========== " + test + " ==========";
-    LOG_INFO(TEST_SET_NAME) << header;
+    LOG_INFO(TEST_SET_NAME, header);
 }
 
-static int start_result(p2p& network)
-{
+static 
+int start_result(p2p& network) {
     std::promise<code> promise;
-    auto const handler = [&promise](code ec)
-    {
+    auto const handler = [&promise](code ec) {
         promise.set_value(ec);
     };
     network.start(handler);
     return promise.get_future().get().value();
 }
 
-static int connect_result(p2p& network, const config::endpoint& host)
-{
+static 
+int connect_result(p2p& network, const infrastructure::config::endpoint& host) {
     std::promise<code> promise;
-    auto const handler = [&promise](code ec, channel::ptr)
-    {
+    auto const handler = [&promise](code ec, channel::ptr) {
         promise.set_value(ec);
     };
     network.connect(host.host(), host.port(), handler);
     return promise.get_future().get().value();
 }
 
-static int run_result(p2p& network)
-{
+static
+int run_result(p2p& network) {
     std::promise<code> promise;
-    auto const handler = [&promise](code ec)
-    {
+    auto const handler = [&promise](code ec) {
         promise.set_value(ec);
     };
     network.run(handler);
     return promise.get_future().get().value();
 }
 
-static int subscribe_result(p2p& network)
-{
+static
+int subscribe_result(p2p& network) {
     std::promise<code> promise;
-    auto const handler = [&promise](code ec, channel::ptr)
-    {
+    auto const handler = [&promise](code ec, channel::ptr) {
         promise.set_value(ec);
         return false;
     };
