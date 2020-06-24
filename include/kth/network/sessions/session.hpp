@@ -80,7 +80,7 @@ protected:
     }
 
     /// Bind a concurrent delegate to a method in the derived class.
-    template <class Session, typename Handler, typename... Args>
+    template <typename Session, typename Handler, typename... Args>
     auto concurrent_delegate(Handler&& handler, Args&&... args) ->
         delegates::concurrent<decltype(BOUND_SESSION_TYPE(handler, args))> const
     {
