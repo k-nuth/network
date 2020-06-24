@@ -79,7 +79,7 @@ void session_manual::handle_connect(code const& ec, channel::ptr channel, std::s
 
     if (ec) {
         LOG_WARNING(LOG_NETWORK
-           , "Failure connecting [", config::endpoint(hostname, port)
+           , "Failure connecting [", infrastructure::config::endpoint(hostname, port)
            , "] manually: ", ec.message());
 
         // Retry forever if limit is zero.
