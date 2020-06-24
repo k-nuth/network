@@ -169,14 +169,14 @@ code hosts::stop() {
     mutex_.unlock_upgrade_and_lock();
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     stopped_ = true;
-    bc::ofstream file(file_path_.string());
+    kth::ofstream file(file_path_.string());
     auto const file_error = file.bad();
 
     if ( ! file_error) {
         for (auto const& entry: buffer_) {
             // TODO: create full space-delimited network_address serialization.
             // Use to/from string format as opposed to wire serialization.
-            file << config::authority(entry) << std::endl;
+            file << infrastructure::config::authority(entry) << std::endl;
         }
 
         buffer_.clear();
