@@ -104,7 +104,7 @@ void session_seed::start_seeding(size_t start_size, result_handler handler) {
     }
 }
 
-void session_seed::start_seed(const config::endpoint& seed, result_handler handler) {
+void session_seed::start_seed(const infrastructure::config::endpoint& seed, result_handler handler) {
     if (stopped()) {
         LOG_DEBUG(LOG_NETWORK, "Suspended seed connection");
         handler(error::channel_stopped);
