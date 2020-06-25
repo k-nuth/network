@@ -84,7 +84,7 @@ private:
     typedef std::shared_ptr<std::string> command_ptr;
     typedef std::shared_ptr<data_chunk> payload_ptr;
 
-    static config::authority authority_factory(socket::ptr socket);
+    static infrastructure::config::authority authority_factory(socket::ptr socket);
 
     void do_close();
     void stop(const boost_code& ec);
