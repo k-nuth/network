@@ -123,5 +123,4 @@ bool protocol_version_70002::handle_receive_reject(code const& ec, reject_const_
     return true;
 }
 
-
 } // namespace kth::network
