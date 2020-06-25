@@ -112,11 +112,10 @@ int subscribe_result(p2p& network) {
     return promise.get_future().get().value();
 }
 
-static int subscribe_connect1_result(p2p& network, const config::endpoint& host)
-{
+static
+int subscribe_connect1_result(p2p& network, const infrastructure::config::endpoint& host) {
     std::promise<code> promise;
-    auto const handler = [&promise](code ec, channel::ptr)
-    {
+    auto const handler = [&promise](code ec, channel::ptr) {
         promise.set_value(ec);
         return false;
     };
