@@ -132,7 +132,7 @@ settings::settings(infrastructure::config::settings context)
             break;
         }
 
-        case config::settings::regtest: {
+        case infrastructure::config::settings::regtest: {
             identifier = 3669344250;
             inbound_port = 18444;
 
