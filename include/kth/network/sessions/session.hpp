@@ -88,15 +88,14 @@ protected:
     }
 
     /// Invoke a method in the derived class after the specified delay.
-    inline void dispatch_delayed(const asio::duration& delay,
-        dispatcher::delay_handler handler) const
-    {
+    inline 
+    void dispatch_delayed(const asio::duration& delay, dispatcher::delay_handler handler) const {
         dispatch_.delayed(delay, handler);
     }
 
     /// Delay timing for a tight failure loop, based on configured timeout.
-    inline asio::duration cycle_delay(code const& ec)
-    {
+    inline 
+    asio::duration cycle_delay(code const& ec) {
         return (ec == error::channel_timeout || ec == error::service_stopped ||
             ec == error::success) ? asio::seconds(0) :
             settings_.connect_timeout();
