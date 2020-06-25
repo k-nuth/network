@@ -56,17 +56,17 @@ void protocol_version_31402::start(event_handler handler) {
     // The handler is invoked in the context of the last message receipt.
     protocol_timer::start(period, join_handler);
 
-    SUBSCRIBE2(message::version, handle_receive_version, _1, _2);
+    SUBSCRIBE2(domain::message::version, handle_receive_version, _1, _2);
     SUBSCRIBE2(verack, handle_receive_verack, _1, _2);
     SEND2(version_factory(), handle_send, _1, version::command);
 }
 
-message::version protocol_version_31402::version_factory() const {
+domain::message::version protocol_version_31402::version_factory() const {
     auto const& settings = network_.network_settings();
     auto const height = network_.top_block().height();
     KTH_ASSERT_MSG(height <= max_uint32, "Time to upgrade the protocol.");
 
-    message::version version;
+    domain::message::version version;
     version.set_value(own_version_);
     version.set_services(own_services_);
     version.set_timestamp(static_cast<uint64_t>(zulu_time()));
