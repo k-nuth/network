@@ -78,4 +78,4 @@ public:
 
 } // namespace kth::network
 
-#endif
+#endif // KTH_NETWORK_SETTINGS_HPP
