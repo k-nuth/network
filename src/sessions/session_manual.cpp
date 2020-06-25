@@ -93,7 +93,7 @@ void session_manual::handle_connect(code const& ec, channel::ptr channel, std::s
 
         LOG_WARNING(LOG_NETWORK
            , "Suspending manual connection to ["
-           , config::endpoint(hostname, port), "] after "
+           , infrastructure::config::endpoint(hostname, port), "] after "
            , settings_.manual_attempt_limit, " failed attempts.");
 
         // This is the failure end of the connect sequence.
