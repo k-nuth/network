@@ -150,10 +150,8 @@ void connector::handle_connect(const boost_code& ec, asio::iterator,
 
 // private:
 void connector::handle_timer(code const& ec, socket::ptr socket,
-    connect_handler handler)
-{
+    connect_handler handler) {
     handler(ec ? ec : error::channel_timeout, nullptr);
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
