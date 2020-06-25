@@ -103,10 +103,8 @@ void p2p::handle_manual_started(code const& ec, result_handler handler) {
     handle_hosts_loaded(hosts_.start(), handler);
 }
 
-void p2p::handle_hosts_loaded(code const& ec, result_handler handler)
-{
-    if (stopped())
-    {
+void p2p::handle_hosts_loaded(code const& ec, result_handler handler) {
+    if (stopped()) {
         handler(error::service_stopped);
         return;
     }
