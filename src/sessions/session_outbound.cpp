@@ -116,7 +116,7 @@ void session_outbound::attach_protocols(channel::ptr channel) {
 }
 
 void session_outbound::attach_handshake_protocols(channel::ptr channel, result_handler handle_started) {
-    using serve = message::version::service;
+    using serve = domain::message::version::service;
     auto const relay = settings_.relay_transactions;
     auto const own_version = settings_.protocol_maximum;
     auto const own_services = settings_.services;
