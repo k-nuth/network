@@ -113,8 +113,9 @@ void proxy::read_heading() {
 
 void proxy::handle_read_heading(const boost_code& ec, size_t) {
     // LOG_INFO(LOG_NETWORK, "proxy::handle_read_heading()");
-    if (stopped())
+    if (stopped()) {
         return;
+    }
 
     if (ec) {
         LOG_DEBUG(LOG_NETWORK
