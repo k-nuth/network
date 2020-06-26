@@ -226,7 +226,7 @@ code hosts::remove(address const& host) {
     return error::not_found;
 }
 
-code hosts::store(const address& host) {
+code hosts::store(address const& host) {
     if (disabled_) {
         return error::success;
     }
