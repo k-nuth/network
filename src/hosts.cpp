@@ -193,7 +193,7 @@ code hosts::stop() {
     return error::success;
 }
 
-code hosts::remove(const address& host) {
+code hosts::remove(address const& host) {
     if (disabled_) {
         return error::not_found;
     }
