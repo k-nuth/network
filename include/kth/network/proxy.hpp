@@ -92,16 +92,16 @@ private:
     void read_heading();
     void handle_read_heading(const boost_code& ec, size_t payload_size);
 
-    void read_payload(const message::heading& head);
+    void read_payload(const domain::message::heading& head);
     void handle_read_payload(const boost_code& ec, size_t,
-        const message::heading& head);
+        const domain::message::heading& head);
 
     void do_send(command_ptr command, payload_ptr payload,
         result_handler handler);
     void handle_send(const boost_code& ec, size_t bytes, command_ptr command,
         payload_ptr payload, result_handler handler);
 
-    const config::authority authority_;
+    const infrastructure::config::authority authority_;
 
     // These are protected by read header/payload ordering.
     data_chunk heading_buffer_;
