@@ -107,7 +107,7 @@ protected:
     virtual size_t address_count() const;
     virtual size_t connection_count() const;
     virtual code fetch_address(address& out_address) const;
-    virtual bool blacklisted(const authority& authority) const;
+    virtual bool blacklisted(authority const& authority) const;
     virtual bool stopped() const;
     virtual bool stopped(code const& ec) const;
 
