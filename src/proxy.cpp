@@ -125,18 +125,15 @@ void proxy::handle_read_heading(const boost_code& ec, size_t) {
         return;
     }
 
-    auto const head = heading::factory_from_data(heading_buffer_);
+    auto const head = domain::create<heading>(heading_buffer_);
 
-    if (!head.is_valid())
-    {
-        LOG_WARNING(LOG_NETWORK
-           , "Invalid heading from [", authority(), "]");
+    if ( ! head.is_valid()) {
+        LOG_WARNING(LOG_NETWORK, "Invalid heading from [", authority(), "]");
         stop(error::bad_stream);
         return;
     }
 
-    if (head.magic() != protocol_magic_)
-    {
+    if (head.magic() != protocol_magic_) {
         // These are common, with magic 542393671 coming from http requests.
         LOG_DEBUG(LOG_NETWORK
            , "Invalid heading magic (", head.magic(), ") from ["
