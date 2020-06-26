@@ -132,7 +132,7 @@ void session_outbound::attach_handshake_protocols(channel::ptr channel, result_h
 
     // Reject messages are not handled until bip61 (70002).
     // The negotiated_version is initialized to the configured maximum.
-    if (channel->negotiated_version() >= message::version::level::bip61) {
+    if (channel->negotiated_version() >= domain::message::version::level::bip61) {
         attach<protocol_version_70002>(channel, own_version, own_services,
             invalid_services, minimum_version, minimum_services, relay)
             ->start(handle_started);
