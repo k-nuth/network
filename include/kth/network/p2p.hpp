@@ -142,10 +142,10 @@ public:
     virtual size_t address_count() const;
 
     /// Store an address.
-    virtual code store(const address& address);
+    virtual code store(address const& address);
 
     /// Store a collection of addresses (asynchronous).
-    virtual void store(const address::list& addresses, result_handler handler);
+    virtual void store(address::list const& addresses, result_handler handler);
 
     /// Get a randomly-selected address.
     virtual code fetch_address(address& out_address) const;
