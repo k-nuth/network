@@ -119,21 +119,16 @@ void p2p::handle_hosts_loaded(code const& ec, result_handler handler) {
     auto const seed = attach_seed_session();
 
     // This is invoked on a new thread.
-    seed->start(
-        std::bind(&p2p::handle_started,
-            this, _1, handler));
+    seed->start(std::bind(&p2p::handle_started, this, _1, handler));
 }
 
-void p2p::handle_started(code const& ec, result_handler handler)
-{
-    if (stopped())
-    {
+void p2p::handle_started(code const& ec, result_handler handler) {
+    if (stopped()) {
         handler(error::service_stopped);
         return;
     }
 
-    if (ec)
-    {
+    if (ec) {
         LOG_ERROR(LOG_NETWORK, "Error seeding host addresses: ", ec.message());
         handler(ec);
         return;
