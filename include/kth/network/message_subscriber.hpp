@@ -143,7 +143,7 @@ public:
      * @param[in]  stream   The stream from which to load the message.
      * @return              Returns error::bad_stream if failed.
      */
-    virtual code load(message::message_type type, uint32_t version, std::istream& stream) const;
+    virtual code load(domain::message::message_type type, uint32_t version, std::istream& stream) const;
 
     /**
      * Start all subscribers so that they accept subscription.
