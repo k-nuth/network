@@ -117,7 +117,7 @@ void session_manual::handle_channel_start(code const& ec, std::string const& hos
     }
 
     LOG_INFO(LOG_NETWORK
-       , "Connected manual channel [", config::endpoint(hostname, port)
+       , "Connected manual channel [", infrastructure::config::endpoint(hostname, port)
        , "] as [", channel->authority(), "] ("
        , connection_count(), ")");
 
