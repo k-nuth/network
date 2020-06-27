@@ -178,26 +178,16 @@ private:
 #undef SESSION_ARGS_TYPE
 #undef BOUND_SESSION_TYPE
 
-#define BIND1(method, p1) \
-    bind<CLASS>(&CLASS::method, p1)
-#define BIND2(method, p1, p2) \
-    bind<CLASS>(&CLASS::method, p1, p2)
-#define BIND3(method, p1, p2, p3) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3)
-#define BIND4(method, p1, p2, p3, p4) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3, p4)
-#define BIND5(method, p1, p2, p3, p4, p5) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5)
-#define BIND6(method, p1, p2, p3, p4, p5, p6) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6)
-#define BIND7(method, p1, p2, p3, p4, p5, p6, p7) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6, p7)
+#define BIND1(method, p1) bind<CLASS>(&CLASS::method, p1)
+#define BIND2(method, p1, p2) bind<CLASS>(&CLASS::method, p1, p2)
+#define BIND3(method, p1, p2, p3) bind<CLASS>(&CLASS::method, p1, p2, p3)
+#define BIND4(method, p1, p2, p3, p4) bind<CLASS>(&CLASS::method, p1, p2, p3, p4)
+#define BIND5(method, p1, p2, p3, p4, p5) bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5)
+#define BIND6(method, p1, p2, p3, p4, p5, p6) bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6)
+#define BIND7(method, p1, p2, p3, p4, p5, p6, p7) bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6, p7)
 
-#define CONCURRENT_DELEGATE2(method, p1, p2) \
-    concurrent_delegate<CLASS>(&CLASS::method, p1, p2)
+#define CONCURRENT_DELEGATE2(method, p1, p2) concurrent_delegate<CLASS>(&CLASS::method, p1, p2)
 
+} // namespace kth::network
 
-} // namespace network
-} // namespace kth
-
-#endif
+#endif //KTH_NETWORK_SESSION_HPP
