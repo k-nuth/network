@@ -146,8 +146,7 @@ void p2p::handle_started(code const& ec, result_handler handler) {
 // Run sequence.
 // ----------------------------------------------------------------------------
 
-void p2p::run(result_handler handler)
-{
+void p2p::run(result_handler handler) {
     // Start node.peer persistent connections.
     for (auto const& peer: settings_.peers)
         connect(peer);
