@@ -187,7 +187,7 @@ public:
     virtual code store(channel::ptr channel);
 
     /// Determine if there exists a connection to the address.
-    virtual bool connected(const address& address) const;
+    virtual bool connected(address const& address) const;
 
     /// Remove a connection.
     virtual void remove(channel::ptr channel);
