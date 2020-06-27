@@ -156,15 +156,14 @@ void proxy::handle_read_heading(const boost_code& ec, size_t) {
 
 void proxy::read_payload(const heading& head) {
     //LOG_INFO(LOG_NETWORK, "proxy::read_payload()");
-    if (stopped())
+    if (stopped()) {
         return;
+    }
 
     // This does not cause a reallocation.
     payload_buffer_.resize(head.payload_size());
 
-    async_read(socket_->get(), buffer(payload_buffer_),
-        std::bind(&proxy::handle_read_payload,
-            shared_from_this(), _1, _2, head));
+    async_read(socket_->get(), buffer(payload_buffer_), std::bind(&proxy::handle_read_payload, shared_from_this(), _1, _2, head));
 }
 
 void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const heading& head) {
