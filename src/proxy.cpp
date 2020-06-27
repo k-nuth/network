@@ -142,8 +142,7 @@ void proxy::handle_read_heading(const boost_code& ec, size_t) {
         return;
     }
 
-    if (head.payload_size() > maximum_payload_)
-    {
+    if (head.payload_size() > maximum_payload_) {
         LOG_DEBUG(LOG_NETWORK
            , "Oversized payload indicated by ", head.command()
            , " heading from [", authority(), "] ("
