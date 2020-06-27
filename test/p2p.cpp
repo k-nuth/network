@@ -136,18 +136,16 @@ int subscribe_connect2_result(p2p& network, const infrastructure::config::endpoi
     return promise.get_future().get().value();
 }
 
-template<class Message>
-static int send_result(const Message& message, p2p& network, int channels)
-{
-    auto const channel_counter = [&channels](code ec, channel::ptr channel)
-    {
+template<typename Message>
+static
+int send_result(Message const& message, p2p& network, int channels) {
+    auto const channel_counter = [&channels](code ec, channel::ptr channel) {
         BOOST_REQUIRE_EQUAL(ec, error::success);
         --channels;
     };
 
     std::promise<code> promise;
-    auto const completion_handler = [&promise](code ec)
-    {
+    auto const completion_handler = [&promise](code ec) {
         promise.set_value(ec);
     };
 
