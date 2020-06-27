@@ -159,8 +159,7 @@ int send_result(Message const& message, p2p& network, int channels) {
 // Trivial tests just validate static inits (required because p2p tests disabled in travis).
 BOOST_AUTO_TEST_SUITE(empty_tests)
 
-BOOST_AUTO_TEST_CASE(empty_test)
-{
+BOOST_AUTO_TEST_CASE(empty_test) {
     BOOST_REQUIRE(true);
 }
 
