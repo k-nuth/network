@@ -111,17 +111,16 @@ private:
     // These are thread safe.
     std::atomic<bool> stopped_;
     const uint32_t protocol_magic_;
-    const size_t maximum_payload_;
-    const bool validate_checksum_;
-    const bool verbose_;
+    size_t const maximum_payload_;
+    bool const validate_checksum_;
+    bool const verbose_;
     std::atomic<uint32_t> version_;
     message_subscriber message_subscriber_;
     stop_subscriber::ptr stop_subscriber_;
     dispatcher dispatch_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 
