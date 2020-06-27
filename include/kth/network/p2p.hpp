@@ -154,7 +154,7 @@ public:
     virtual code fetch_addresses(address::list& out_addresses) const;
 
     /// Remove an address.
-    virtual code remove(const address& address);
+    virtual code remove(address const& address);
 
     // Pending connect collection.
     // ------------------------------------------------------------------------
