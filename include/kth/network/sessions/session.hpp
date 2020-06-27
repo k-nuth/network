@@ -142,41 +142,33 @@ protected:
     //-------------------------------------------------------------------------
 
     /// Register a new channel with the session and bind its handlers.
-    virtual void register_channel(channel::ptr channel,
-        result_handler handle_started, result_handler handle_stopped);
+    virtual void register_channel(channel::ptr channel, result_handler handle_started, result_handler handle_stopped);
 
     /// Start the channel, override to perform pending registration.
-    virtual void start_channel(channel::ptr channel,
-        result_handler handle_started);
+    virtual void start_channel(channel::ptr channel, result_handler handle_started);
 
     /// Override to attach specialized handshake protocols upon session start.
-    virtual void attach_handshake_protocols(channel::ptr channel,
-        result_handler handle_started);
+    virtual void attach_handshake_protocols(channel::ptr channel, result_handler handle_started);
 
     /// The handshake is complete, override to perform loopback check.
-    virtual void handshake_complete(channel::ptr channel,
-        result_handler handle_started);
+    virtual void handshake_complete(channel::ptr channel, result_handler handle_started);
 
     // TODO: create session_timer base class.
     threadpool& pool_;
-    const settings& settings_;
+    settings const& settings_;
 
 private:
-    typedef bc::pending<connector> connectors;
+    using connectors = kth::pending<connector>;
 
     void handle_stop(code const& ec);
-    void handle_starting(code const& ec, channel::ptr channel,
-        result_handler handle_started);
-    void handle_handshake(code const& ec, channel::ptr channel,
-        result_handler handle_started);
-    void handle_start(code const& ec, channel::ptr channel,
-        result_handler handle_started, result_handler handle_stopped);
-    void handle_remove(code const& ec, channel::ptr channel,
-        result_handler handle_stopped);
+    void handle_starting(code const& ec, channel::ptr channel, result_handler handle_started);
+    void handle_handshake(code const& ec, channel::ptr channel, result_handler handle_started);
+    void handle_start(code const& ec, channel::ptr channel, result_handler handle_started, result_handler handle_stopped);
+    void handle_remove(code const& ec, channel::ptr channel, result_handler handle_stopped);
 
     // These are thread safe.
     std::atomic<bool> stopped_;
-    const bool notify_on_connect_;
+    bool const notify_on_connect_;
     p2p& network_;
     mutable dispatcher dispatch_;
 };
