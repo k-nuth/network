@@ -267,7 +267,7 @@ code hosts::store(address const& host) {
     return error::success;
 }
 
-void hosts::store(const address::list& hosts, result_handler handler) {
+void hosts::store(address::list const& hosts, result_handler handler) {
     if (disabled_ || hosts.empty()) {
         handler(error::success);
         return;
