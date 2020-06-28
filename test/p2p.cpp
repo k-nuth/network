@@ -213,8 +213,7 @@ BOOST_AUTO_TEST_CASE(p2p__start__no_connections__start_stop_success) {
     BOOST_REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success_start_operation_fail)
-{
+BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success_start_operation_fail) {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
