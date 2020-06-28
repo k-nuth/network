@@ -195,9 +195,8 @@ public:
 protected:
 
     /// Attach a session to the network, caller must start the session.
-    template <class Session, typename... Args>
-    typename Session::ptr attach(Args&&... args)
-    {
+    template <typename Session, typename... Args>
+    typename Session::ptr attach(Args&&... args) {
         return std::make_shared<Session>(*this, std::forward<Args>(args)...);
     }
 
