@@ -308,5 +308,4 @@ bool proxy::stopped() const {
     return stopped_;
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
