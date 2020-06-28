@@ -167,50 +167,45 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(p2p_tests)
 
-BOOST_AUTO_TEST_CASE(p2p__top_block__default__zero_null_hash)
-{
+BOOST_AUTO_TEST_CASE(p2p__top_block__default__zero_null_hash) {
     print_headers(TEST_NAME);
-    const network::settings configuration;
+    network::settings const configuration;
     p2p network(configuration);
     BOOST_REQUIRE_EQUAL(network.top_block().height(), 0);
     BOOST_REQUIRE(network.top_block().hash() == null_hash);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__set_top_block1__values__expected)
-{
+BOOST_AUTO_TEST_CASE(p2p__set_top_block1__values__expected) {
     print_headers(TEST_NAME);
-    const network::settings configuration;
+    network::settings const configuration;
     p2p network(configuration);
-    const size_t expected_height = 42;
+    size_t const expected_height = 42;
     auto const expected_hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
     network.set_top_block({ expected_hash, expected_height });
     BOOST_REQUIRE(network.top_block().hash() == expected_hash);
     BOOST_REQUIRE_EQUAL(network.top_block().height(), expected_height);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__set_top_block2__values__expected)
-{
+BOOST_AUTO_TEST_CASE(p2p__set_top_block2__values__expected) {
     print_headers(TEST_NAME);
-    const network::settings configuration;
+    network::settings const configuration;
     p2p network(configuration);
-    const size_t expected_height = 42;
+    size_t const expected_height = 42;
     auto const hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
-    const config::checkpoint expected{ hash, expected_height };
+    infrastructure::config::checkpoint const expected{ hash, expected_height };
     network.set_top_block(expected);
     BOOST_REQUIRE(network.top_block().hash() == expected.hash());
     BOOST_REQUIRE_EQUAL(network.top_block().height(), expected.height());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success)
-{
+BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success) {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
     BOOST_REQUIRE_EQUAL(start_result(network), error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_connections__start_stop_success)
-{
+BOOST_AUTO_TEST_CASE(p2p__start__no_connections__start_stop_success) {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
