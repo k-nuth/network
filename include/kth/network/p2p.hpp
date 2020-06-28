@@ -207,24 +207,23 @@ protected:
     virtual session_outbound::ptr attach_outbound_session();
 
 private:
-    typedef bc::pending<channel> pending_channels;
-    typedef bc::pending<connector> pending_connectors;
+    using pending_channels = kth::pending<channel>;
+    using pending_connectors = kth::pending<connector>;
 
     void handle_manual_started(code const& ec, result_handler handler);
     void handle_inbound_started(code const& ec, result_handler handler);
     void handle_hosts_loaded(code const& ec, result_handler handler);
     void handle_hosts_saved(code const& ec, result_handler handler);
-    void handle_send(code const& ec, channel::ptr channel,
-        channel_handler handle_channel, result_handler handle_complete);
+    void handle_send(code const& ec, channel::ptr channel, channel_handler handle_channel, result_handler handle_complete);
 
     void handle_started(code const& ec, result_handler handler);
     void handle_running(code const& ec, result_handler handler);
 
     // These are thread safe.
-    const settings& settings_;
+    settings const& settings_;
     std::atomic<bool> stopped_;
-    bc::atomic<config::checkpoint> top_block_;
-    bc::atomic<session_manual::ptr> manual_;
+    kth::atomic<infrastructure::config::checkpoint> top_block_;
+    kth::atomic<session_manual::ptr> manual_;
     threadpool threadpool_;
     hosts hosts_;
     pending_connectors pending_connect_;
