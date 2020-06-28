@@ -214,7 +214,7 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
         return;
     }
 
-    if (!consumed) {
+    if ( ! consumed) {
         LOG_WARNING(LOG_NETWORK
            , "Invalid ", head.command(), " payload from [", authority()
            , "] trailing bytes.");
