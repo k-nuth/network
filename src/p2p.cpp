@@ -176,10 +176,8 @@ void p2p::handle_inbound_started(code const& ec, result_handler handler) {
             this, _1, handler));
 }
 
-void p2p::handle_running(code const& ec, result_handler handler)
-{
-    if (ec)
-    {
+void p2p::handle_running(code const& ec, result_handler handler) {
+    if (ec) {
         LOG_ERROR(LOG_NETWORK, "Error starting outbound session: ", ec.message());
         handler(ec);
         return;
