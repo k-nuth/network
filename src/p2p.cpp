@@ -216,8 +216,7 @@ session_outbound::ptr p2p::attach_outbound_session() {
 // completes at least once before returning. This requires a unique lock be
 // taken around the entire section, which poses a deadlock risk. Instead this
 // is thread safe and idempotent, allowing it to be unguarded.
-bool p2p::stop()
-{
+bool p2p::stop() {
     // This is the only stop operation that can fail.
     auto const result = (hosts_.stop() == error::success);
 
