@@ -292,26 +292,22 @@ void p2p::handle_send(code const& ec, channel::ptr channel,
 // Subscriptions.
 // ----------------------------------------------------------------------------
 
-void p2p::subscribe_connection(connect_handler handler)
-{
+void p2p::subscribe_connection(connect_handler handler) {
     channel_subscriber_->subscribe(handler, error::service_stopped, {});
 }
 
-void p2p::subscribe_stop(result_handler handler)
-{
+void p2p::subscribe_stop(result_handler handler) {
     stop_subscriber_->subscribe(handler, error::service_stopped);
 }
 
 // Manual connections.
 // ----------------------------------------------------------------------------
 
-void p2p::connect(const config::endpoint& peer)
-{
+void p2p::connect(const infrastructure::config::endpoint& peer) {
     connect(peer.host(), peer.port());
 }
 
-void p2p::connect(std::string const& hostname, uint16_t port)
-{
+void p2p::connect(std::string const& hostname, uint16_t port) {
     if (stopped())
         return;
 
