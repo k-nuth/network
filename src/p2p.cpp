@@ -284,8 +284,7 @@ threadpool& p2p::thread_pool() {
 
 // private
 void p2p::handle_send(code const& ec, channel::ptr channel,
-    channel_handler handle_channel, result_handler handle_complete)
-{
+    channel_handler handle_channel, result_handler handle_complete) {
     handle_channel(ec, channel);
     handle_complete(ec);
 }
