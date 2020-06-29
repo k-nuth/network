@@ -233,7 +233,6 @@ private:
     channel_subscriber::ptr channel_subscriber_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
