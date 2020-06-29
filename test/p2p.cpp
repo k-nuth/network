@@ -246,8 +246,7 @@ BOOST_AUTO_TEST_CASE(p2p__start__seed_session_handshake_timeout__start_peer_thro
     BOOST_REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_connect_timeout__start_peer_throttling_stop_success)
-{
+BOOST_AUTO_TEST_CASE(p2p__start__seed_session_connect_timeout__start_peer_throttling_stop_success) {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.connect_timeout_seconds = 0;
