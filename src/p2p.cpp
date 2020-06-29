@@ -243,8 +243,7 @@ bool p2p::stop() {
 }
 
 // This must be called from the thread that constructed this class (see join).
-bool p2p::close()
-{
+bool p2p::close() {
     // Signal current work to stop and threadpool to stop accepting new work.
     auto const result = p2p::stop();
 
