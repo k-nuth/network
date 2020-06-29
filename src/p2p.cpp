@@ -255,33 +255,27 @@ bool p2p::close() {
 // Properties.
 // ----------------------------------------------------------------------------
 
-const settings& p2p::network_settings() const
-{
+settings const& p2p::network_settings() const {
     return settings_;
 }
 
-checkpoint p2p::top_block() const
-{
+infrastructure::config::checkpoint p2p::top_block() const {
     return top_block_.load();
 }
 
-void p2p::set_top_block(checkpoint&& top)
-{
+void p2p::set_top_block(infrastructure::config::checkpoint&& top) {
     top_block_.store(std::move(top));
 }
 
-void p2p::set_top_block(const checkpoint& top)
-{
+void p2p::set_top_block(infrastructure::config::checkpoint const& top) {
     top_block_.store(top);
 }
 
-bool p2p::stopped() const
-{
+bool p2p::stopped() const {
     return stopped_;
 }
 
-threadpool& p2p::thread_pool()
-{
+threadpool& p2p::thread_pool() {
     return threadpool_;
 }
 
