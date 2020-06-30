@@ -346,17 +346,15 @@ BOOST_AUTO_TEST_CASE(p2p__subscribe__stopped__service_stopped) {
     BOOST_REQUIRE_EQUAL(subscribe_result(network), error::service_stopped);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__started_stop__service_stopped)
-{
+BOOST_AUTO_TEST_CASE(p2p__subscribe__started_stop__service_stopped) {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
     BOOST_REQUIRE_EQUAL(start_result(network), error::success);
 
     std::promise<code> promise;
-    auto const handler = [](code ec, channel::ptr channel)
-    {
-        BOOST_REQUIRE(!channel);
+    auto const handler = [](code ec, channel::ptr channel) {
+        BOOST_REQUIRE( ! channel);
         BOOST_REQUIRE_EQUAL(ec, error::service_stopped);
         return false;
     };
