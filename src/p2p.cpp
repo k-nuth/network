@@ -393,42 +393,35 @@ bool p2p::pending(uint64_t version_nonce) const {
 // Pending close collection (open connections).
 // ----------------------------------------------------------------------------
 
-size_t p2p::connection_count() const
-{
+size_t p2p::connection_count() const {
     return pending_close_.size();
 }
 
-bool p2p::connected(const address& address) const
-{
-    auto const match = [&address](const channel::ptr& element)
-    {
+bool p2p::connected(address const& address) const {
+    auto const match = [&address](const channel::ptr& element) {
         return element->authority() == address;
     };
 
     return pending_close_.exists(match);
 }
 
-code p2p::store(channel::ptr channel)
-{
+code p2p::store(channel::ptr channel) {
     auto const address = channel->authority();
-    auto const match = [&address](const channel::ptr& element)
-    {
+    auto const match = [&address](const channel::ptr& element) {
         return element->authority() == address;
     };
 
     // May return error::address_in_use.
     auto const ec = pending_close_.store(channel, match);
 
-    if (!ec && channel->notify())
+    if ( ! ec && channel->notify())
         channel_subscriber_->relay(error::success, channel);
 
     return ec;
 }
 
-void p2p::remove(channel::ptr channel)
-{
+void p2p::remove(channel::ptr channel) {
     pending_close_.remove(channel);
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
