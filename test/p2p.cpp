@@ -305,21 +305,19 @@ BOOST_AUTO_TEST_CASE(p2p__start__outbound_no_seeds__success) {
     BOOST_REQUIRE_EQUAL(start_result(network), error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__connect__not_started__service_stopped)
-{
+BOOST_AUTO_TEST_CASE(p2p__connect__not_started__service_stopped) {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const config::endpoint host(SEED1);
+    const infrastructure::config::endpoint host(SEED1);
     BOOST_REQUIRE_EQUAL(connect_result(network, host), error::service_stopped);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__connect__started__success)
-{
+BOOST_AUTO_TEST_CASE(p2p__connect__started__success) {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const config::endpoint host(SEED1);
+    const infrastructure::config::endpoint host(SEED1);
     BOOST_REQUIRE_EQUAL(start_result(network), error::success);
     BOOST_REQUIRE_EQUAL(run_result(network), error::success);
     BOOST_REQUIRE_EQUAL(connect_result(network, host), error::success);
