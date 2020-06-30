@@ -374,20 +374,16 @@ void p2p::unpend(connector::ptr connector) {
 // Pending handshake collection.
 // ----------------------------------------------------------------------------
 
-code p2p::pend(channel::ptr channel)
-{
+code p2p::pend(channel::ptr channel) {
     return pending_handshake_.store(channel);
 }
 
-void p2p::unpend(channel::ptr channel)
-{
+void p2p::unpend(channel::ptr channel) {
     pending_handshake_.remove(channel);
 }
 
-bool p2p::pending(uint64_t version_nonce) const
-{
-    auto const match = [version_nonce](const channel::ptr& element)
-    {
+bool p2p::pending(uint64_t version_nonce) const {
+    auto const match = [version_nonce](const channel::ptr& element) {
         return element->nonce() == version_nonce;
     };
 
