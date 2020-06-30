@@ -334,47 +334,39 @@ void p2p::connect(std::string const& hostname, uint16_t port,
 // Hosts collection.
 // ----------------------------------------------------------------------------
 
-size_t p2p::address_count() const
-{
+size_t p2p::address_count() const {
     return hosts_.count();
 }
 
-code p2p::store(const address& address)
-{
+code p2p::store(address const& address) {
     return hosts_.store(address);
 }
 
-void p2p::store(const address::list& addresses, result_handler handler)
-{
+void p2p::store(address::list const& addresses, result_handler handler) {
     // Store is invoked on a new thread.
     hosts_.store(addresses, handler);
 }
 
-code p2p::fetch_address(address& out_address) const
-{
+code p2p::fetch_address(address& out_address) const {
     return hosts_.fetch(out_address);
 }
 
-code p2p::fetch_addresses(address::list& out_addresses) const
-{
+code p2p::fetch_addresses(address::list& out_addresses) const {
     return hosts_.fetch(out_addresses);
 }
 
-code p2p::remove(const address& address)
-{
+code p2p::remove(address const& address) {
     return hosts_.remove(address);
 }
 
 // Pending connect collection.
 // ----------------------------------------------------------------------------
 
-code p2p::pend(connector::ptr connector)
-{
+code p2p::pend(connector::ptr connector) {
     return pending_connect_.store(connector);
 }
 
-void p2p::unpend(connector::ptr connector)
-{
+void p2p::unpend(connector::ptr connector) {
     connector->stop(error::success);
     pending_connect_.remove(connector);
 }
