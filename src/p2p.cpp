@@ -319,10 +319,8 @@ void p2p::connect(std::string const& hostname, uint16_t port) {
 }
 
 void p2p::connect(std::string const& hostname, uint16_t port,
-    channel_handler handler)
-{
-    if (stopped())
-    {
+    channel_handler handler) {
+    if (stopped()) {
         handler(error::service_stopped, {});
         return;
     }
