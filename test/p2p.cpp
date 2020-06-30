@@ -297,8 +297,7 @@ BOOST_AUTO_TEST_CASE(p2p__start__seed_session_expiration_timeout__start_peer_thr
 ////    BOOST_REQUIRE(network.stop());
 ////}
 
-BOOST_AUTO_TEST_CASE(p2p__start__outbound_no_seeds__success)
-{
+BOOST_AUTO_TEST_CASE(p2p__start__outbound_no_seeds__success) {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     configuration.outbound_connections = 1;
