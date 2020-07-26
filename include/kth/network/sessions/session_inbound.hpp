@@ -15,8 +15,7 @@
 #include <kth/network/sessions/session.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -53,10 +52,9 @@ private:
 
     // These are thread safe.
     acceptor::ptr acceptor_;
-    const size_t connection_limit_;
+    size_t const connection_limit_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

@@ -19,8 +19,7 @@ using namespace std::placeholders;
 
 protocol_timer::protocol_timer(p2p& network, channel::ptr channel, bool perpetual, std::string const& name)
     : protocol_events(network, channel, name)
-    , perpetual_(perpetual)
-{}
+    , perpetual_(perpetual) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------

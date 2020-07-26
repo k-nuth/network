@@ -11,18 +11,21 @@
 #include <memory>
 #include <utility>
 #include <string>
+
 #include <kth/domain.hpp>
+#include <kth/infrastructure.hpp>
+
 #include <kth/network/define.hpp>
 
 namespace kth::network {
 
 #define DEFINE_SUBSCRIBER_TYPE(value) \
-    typedef resubscriber<code, message::value::const_ptr> \
-        value##_subscriber_type
+    using value##_subscriber_type = resubscriber<code, domain::message::value::const_ptr>
+        
 
 #define DEFINE_SUBSCRIBER_OVERLOAD(value) \
     template <typename Handler> \
-    void subscribe(message::value&&, Handler&& handler) { \
+    void subscribe(domain::message::value&&, Handler&& handler) { \
         value##_subscriber_->subscribe(std::forward<Handler>(handler), \
             error::channel_stopped, {}); \
     }
@@ -30,8 +33,8 @@ namespace kth::network {
 #define DECLARE_SUBSCRIBER(value) \
     value##_subscriber_type::ptr value##_subscriber_
 
-template <class Message>
-using message_handler = std::function<bool(const code&, std::shared_ptr<const Message>)>;
+template <typename Message>
+using message_handler = std::function<bool(code const&, std::shared_ptr<const Message>)>;
 
 /// Aggregation of subscribers by messasge type, thread safe.
 class BCT_API message_subscriber : noncopyable {
@@ -78,7 +81,7 @@ public:
      * Subscribing must be immediate, we cannot switch thread contexts.
      * @param[in]  handler  The handler to register.
      */
-    template <class Message, typename Handler>
+    template <typename Message, typename Handler>
     void subscribe(Handler&& handler) {
         subscribe(Message(), std::forward<Handler>(handler));
     }
@@ -90,12 +93,12 @@ public:
      * @param[in]  subscriber  The subscriber for the message type.
      * @return                 Returns error::bad_stream if failed.
      */
-    template <class Message, class Subscriber>
+    template <typename Message, typename Subscriber>
     code relay(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
         auto const message = std::make_shared<Message>();
 
         // Subscribers are invoked only with stop and success codes.
-        if ( ! message->from_data(version, stream)) {
+        if ( ! domain::entity_from_data(*message, stream, version)) {
             return error::bad_stream;
         }
 
@@ -111,12 +114,12 @@ public:
      * @param[in]  subscriber  The subscriber for the message type.
      * @return                 Returns error::bad_stream if failed.
      */
-    template <class Message, class Subscriber>
+    template <typename Message, typename Subscriber>
     code handle(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
         auto const message = std::make_shared<Message>();
 
         // Subscribers are invoked only with stop and success codes.
-        if ( ! message->from_data(version, stream)) {
+        if ( ! domain::entity_from_data(*message, stream, version)) {
             return error::bad_stream;
         }
 
@@ -140,7 +143,7 @@ public:
      * @param[in]  stream   The stream from which to load the message.
      * @return              Returns error::bad_stream if failed.
      */
-    virtual code load(message::message_type type, uint32_t version, std::istream& stream) const;
+    virtual code load(domain::message::message_type type, uint32_t version, std::istream& stream) const;
 
     /**
      * Start all subscribers so that they accept subscription.

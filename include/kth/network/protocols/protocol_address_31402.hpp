@@ -11,8 +11,7 @@
 #include <kth/network/define.hpp>
 #include <kth/network/protocols/protocol_events.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -20,11 +19,9 @@ class p2p;
  * Address protocol.
  * Attach this to a channel immediately following handshake completion.
  */
-class BCT_API protocol_address_31402
-  : public protocol_events, track<protocol_address_31402>
-{
+class BCT_API protocol_address_31402 : public protocol_events, track<protocol_address_31402> {
 public:
-    typedef std::shared_ptr<protocol_address_31402> ptr;
+    using ptr = std::shared_ptr<protocol_address_31402>;
 
     /**
      * Construct an address protocol instance.
@@ -41,17 +38,13 @@ public:
 protected:
     virtual void handle_stop(code const& ec);
     virtual void handle_store_addresses(code const& ec);
-
-    virtual bool handle_receive_address(code const& ec,
-        address_const_ptr address);
-    virtual bool handle_receive_get_address(code const& ec,
-        get_address_const_ptr message);
+    virtual bool handle_receive_address(code const& ec, address_const_ptr address);
+    virtual bool handle_receive_get_address(code const& ec, get_address_const_ptr message);
 
     p2p& network_;
-    const message::address self_;
+    domain::message::address const self_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

@@ -16,7 +16,7 @@ namespace kth::network {
 #define NAME "version"
 #define CLASS protocol_version_70002
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 static const std::string insufficient_version = "insufficient-version";
@@ -32,14 +32,12 @@ protocol_version_70002::protocol_version_70002(p2p& network, channel::ptr channe
         network.network_settings().invalid_services,
         network.network_settings().protocol_minimum,
         version::service::none,
-        network.network_settings().relay_transactions)
-{}
+        network.network_settings().relay_transactions) {}
 
 protocol_version_70002::protocol_version_70002(p2p& network, channel::ptr channel, uint32_t own_version, uint64_t own_services, uint64_t invalid_services, uint32_t minimum_version, uint64_t minimum_services, bool relay)
     : protocol_version_31402(network, channel, own_version, own_services, invalid_services, minimum_version, minimum_services)
     , relay_(relay)
-    , CONSTRUCT_TRACK(protocol_version_70002)
-{}
+    , CONSTRUCT_TRACK(protocol_version_70002) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
@@ -49,7 +47,7 @@ void protocol_version_70002::start(event_handler handler) {
     SUBSCRIBE2(reject, handle_receive_reject, _1, _2);
 }
 
-message::version protocol_version_70002::version_factory() const {
+domain::message::version protocol_version_70002::version_factory() const {
     auto version = protocol_version_31402::version_factory();
 
     // This is the only difference at protocol level 70001.
@@ -124,6 +122,5 @@ bool protocol_version_70002::handle_receive_reject(code const& ec, reject_const_
 
     return true;
 }
-
 
 } // namespace kth::network

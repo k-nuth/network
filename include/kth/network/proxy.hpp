@@ -17,8 +17,7 @@
 #include <kth/network/message_subscriber.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// Manages all socket communication, thread safe.
 class BCT_API proxy
@@ -26,20 +25,19 @@ class BCT_API proxy
 {
 public:
     typedef std::shared_ptr<proxy> ptr;
-    typedef std::function<void(const code&)> result_handler;
+    typedef std::function<void(code const&)> result_handler;
     typedef subscriber<code> stop_subscriber;
 
     /// Construct an instance.
-    proxy(threadpool& pool, socket::ptr socket, const settings& settings);
+    proxy(threadpool& pool, socket::ptr socket, settings const& settings);
 
     /// Validate proxy stopped.
     ~proxy();
 
     /// Send a message on the socket.
-    template <class Message>
-    void send(const Message& message, result_handler handler)
-    {
-        auto data = message::serialize(version_, message, protocol_magic_);
+    template <typename Message>
+    void send(Message const& message, result_handler handler) {
+        auto data = domain::message::serialize(version_, message, protocol_magic_);
         auto const payload = std::make_shared<data_chunk>(std::move(data));
         auto const command = std::make_shared<std::string>(message.command);
 
@@ -50,9 +48,8 @@ public:
     }
 
     /// Subscribe to messages of the specified type on the socket.
-    template <class Message>
-    void subscribe(message_handler<Message>&& handler)
-    {
+    template <typename Message>
+    void subscribe(message_handler<Message>&& handler) {
         message_subscriber_.subscribe<Message>(
             std::forward<message_handler<Message>>(handler));
     }
@@ -61,7 +58,7 @@ public:
     virtual void subscribe_stop(result_handler handler);
 
     /// Get the authority of the far end of this socket.
-    virtual const config::authority& authority() const;
+    virtual const infrastructure::config::authority& authority() const;
 
     /// Get the negotiated protocol version of this socket.
     /// The value should be the lesser of own max and peer min.
@@ -87,7 +84,7 @@ private:
     typedef std::shared_ptr<std::string> command_ptr;
     typedef std::shared_ptr<data_chunk> payload_ptr;
 
-    static config::authority authority_factory(socket::ptr socket);
+    static infrastructure::config::authority authority_factory(socket::ptr socket);
 
     void do_close();
     void stop(const boost_code& ec);
@@ -95,16 +92,16 @@ private:
     void read_heading();
     void handle_read_heading(const boost_code& ec, size_t payload_size);
 
-    void read_payload(const message::heading& head);
+    void read_payload(const domain::message::heading& head);
     void handle_read_payload(const boost_code& ec, size_t,
-        const message::heading& head);
+        const domain::message::heading& head);
 
     void do_send(command_ptr command, payload_ptr payload,
         result_handler handler);
     void handle_send(const boost_code& ec, size_t bytes, command_ptr command,
         payload_ptr payload, result_handler handler);
 
-    const config::authority authority_;
+    const infrastructure::config::authority authority_;
 
     // These are protected by read header/payload ordering.
     data_chunk heading_buffer_;
@@ -114,17 +111,16 @@ private:
     // These are thread safe.
     std::atomic<bool> stopped_;
     const uint32_t protocol_magic_;
-    const size_t maximum_payload_;
-    const bool validate_checksum_;
-    const bool verbose_;
+    size_t const maximum_payload_;
+    bool const validate_checksum_;
+    bool const verbose_;
     std::atomic<uint32_t> version_;
     message_subscriber message_subscriber_;
     stop_subscriber::ptr stop_subscriber_;
     dispatcher dispatch_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 

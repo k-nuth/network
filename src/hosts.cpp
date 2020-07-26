@@ -13,22 +13,21 @@
 
 namespace kth::network {
 
-using namespace bc::config;
+using namespace kth::config;
 
 #define NAME "hosts"
 
 // TODO: change to network_address bimap hash table with services and age.
-hosts::hosts(const settings& settings)
+hosts::hosts(settings const& settings)
     : capacity_(std::min(max_address, static_cast<size_t>(settings.host_pool_capacity)))
     , buffer_(std::max(capacity_, static_cast<size_t>(1u)))
     , stopped_(true)
     , file_path_(settings.hosts_file)
-    , disabled_(capacity_ == 0)
-{}
+    , disabled_(capacity_ == 0) {}
 
 // private
-hosts::iterator hosts::find(const address& host) {
-    auto const found = [&host](const address& entry) {
+hosts::iterator hosts::find(address const& host) {
+    auto const found = [&host](address const& entry) {
         return entry.port() == host.port() && entry.ip() == host.ip();
     };
 
@@ -123,7 +122,7 @@ code hosts::start() {
     mutex_.unlock_upgrade_and_lock();
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     stopped_ = false;
-    bc::ifstream file(file_path_.string());
+    kth::ifstream file(file_path_.string());
     auto const file_error = file.bad();
 
     if ( ! file_error) {
@@ -132,7 +131,7 @@ code hosts::start() {
         while (std::getline(file, line)) {
             // TODO: create full space-delimited network_address serialization.
             // Use to/from string format as opposed to wire serialization.
-            config::authority host(line);
+            infrastructure::config::authority host(line);
 
             if (host.port() != 0) {
                 buffer_.push_back(host.to_network_address());
@@ -170,14 +169,14 @@ code hosts::stop() {
     mutex_.unlock_upgrade_and_lock();
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     stopped_ = true;
-    bc::ofstream file(file_path_.string());
+    kth::ofstream file(file_path_.string());
     auto const file_error = file.bad();
 
     if ( ! file_error) {
         for (auto const& entry: buffer_) {
             // TODO: create full space-delimited network_address serialization.
             // Use to/from string format as opposed to wire serialization.
-            file << config::authority(entry) << std::endl;
+            file << infrastructure::config::authority(entry) << std::endl;
         }
 
         buffer_.clear();
@@ -194,7 +193,7 @@ code hosts::stop() {
     return error::success;
 }
 
-code hosts::remove(const address& host) {
+code hosts::remove(address const& host) {
     if (disabled_) {
         return error::not_found;
     }
@@ -227,7 +226,7 @@ code hosts::remove(const address& host) {
     return error::not_found;
 }
 
-code hosts::store(const address& host) {
+code hosts::store(address const& host) {
     if (disabled_) {
         return error::success;
     }
@@ -268,7 +267,7 @@ code hosts::store(const address& host) {
     return error::success;
 }
 
-void hosts::store(const address::list& hosts, result_handler handler) {
+void hosts::store(address::list const& hosts, result_handler handler) {
     if (disabled_ || hosts.empty()) {
         handler(error::success);
         return;

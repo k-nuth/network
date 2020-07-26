@@ -18,8 +18,7 @@
 #include <kth/network/proxy.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define SESSION_ARGS(handler, args) \
     std::forward<Handler>(handler), \
@@ -38,18 +37,16 @@ namespace network {
 class p2p;
 
 /// Base class for maintaining the lifetime of a channel set, thread safe.
-class BCT_API session
-  : public enable_shared_from_base<session>, noncopyable
-{
+class BCT_API session : public enable_shared_from_base<session>, noncopyable {
 public:
-    typedef config::authority authority;
-    typedef message::network_address address;
-    typedef std::function<void(bool)> truth_handler;
-    typedef std::function<void(size_t)> count_handler;
-    typedef std::function<void(const code&)> result_handler;
-    typedef std::function<void(const code&, channel::ptr)> channel_handler;
-    typedef std::function<void(const code&, acceptor::ptr)> accept_handler;
-    typedef std::function<void(const code&, const authority&)> host_handler;
+    using authority = infrastructure::config::authority;
+    using address = domain::message::network_address;
+    using truth_handler = std::function<void(bool)>;
+    using count_handler = std::function<void(size_t)>;
+    using result_handler = std::function<void(code const&)>;
+    using channel_handler = std::function<void(code const&, channel::ptr)>;
+    using accept_handler = std::function<void(code const&, acceptor::ptr)>;
+    using host_handler = std::function<void(code const&, authority const&)>;
 
     /// Start the session, invokes handler once stop is registered.
     virtual void start(result_handler handler);
@@ -69,15 +66,13 @@ protected:
     // ------------------------------------------------------------------------
 
     /// Attach a protocol to a channel, caller must start the channel.
-    template <class Protocol, typename... Args>
-    typename Protocol::ptr attach(channel::ptr channel, Args&&... args)
-    {
-        return std::make_shared<Protocol>(network_, channel,
-            std::forward<Args>(args)...);
+    template <typename Protocol, typename... Args>
+    typename Protocol::ptr attach(channel::ptr channel, Args&&... args) {
+        return std::make_shared<Protocol>(network_, channel, std::forward<Args>(args)...);
     }
 
     /// Bind a method in the derived class.
-    template <class Session, typename Handler, typename... Args>
+    template <typename Session, typename Handler, typename... Args>
     auto bind(Handler&& handler, Args&&... args) ->
         decltype(BOUND_SESSION_TYPE(handler, args)) const
     {
@@ -85,7 +80,7 @@ protected:
     }
 
     /// Bind a concurrent delegate to a method in the derived class.
-    template <class Session, typename Handler, typename... Args>
+    template <typename Session, typename Handler, typename... Args>
     auto concurrent_delegate(Handler&& handler, Args&&... args) ->
         delegates::concurrent<decltype(BOUND_SESSION_TYPE(handler, args))> const
     {
@@ -93,15 +88,14 @@ protected:
     }
 
     /// Invoke a method in the derived class after the specified delay.
-    inline void dispatch_delayed(const asio::duration& delay,
-        dispatcher::delay_handler handler) const
-    {
+    inline 
+    void dispatch_delayed(const asio::duration& delay, dispatcher::delay_handler handler) const {
         dispatch_.delayed(delay, handler);
     }
 
     /// Delay timing for a tight failure loop, based on configured timeout.
-    inline asio::duration cycle_delay(code const& ec)
-    {
+    inline 
+    asio::duration cycle_delay(code const& ec) {
         return (ec == error::channel_timeout || ec == error::service_stopped ||
             ec == error::success) ? asio::seconds(0) :
             settings_.connect_timeout();
@@ -113,7 +107,7 @@ protected:
     virtual size_t address_count() const;
     virtual size_t connection_count() const;
     virtual code fetch_address(address& out_address) const;
-    virtual bool blacklisted(const authority& authority) const;
+    virtual bool blacklisted(authority const& authority) const;
     virtual bool stopped() const;
     virtual bool stopped(code const& ec) const;
 
@@ -148,41 +142,33 @@ protected:
     //-------------------------------------------------------------------------
 
     /// Register a new channel with the session and bind its handlers.
-    virtual void register_channel(channel::ptr channel,
-        result_handler handle_started, result_handler handle_stopped);
+    virtual void register_channel(channel::ptr channel, result_handler handle_started, result_handler handle_stopped);
 
     /// Start the channel, override to perform pending registration.
-    virtual void start_channel(channel::ptr channel,
-        result_handler handle_started);
+    virtual void start_channel(channel::ptr channel, result_handler handle_started);
 
     /// Override to attach specialized handshake protocols upon session start.
-    virtual void attach_handshake_protocols(channel::ptr channel,
-        result_handler handle_started);
+    virtual void attach_handshake_protocols(channel::ptr channel, result_handler handle_started);
 
     /// The handshake is complete, override to perform loopback check.
-    virtual void handshake_complete(channel::ptr channel,
-        result_handler handle_started);
+    virtual void handshake_complete(channel::ptr channel, result_handler handle_started);
 
     // TODO: create session_timer base class.
     threadpool& pool_;
-    const settings& settings_;
+    settings const& settings_;
 
 private:
-    typedef bc::pending<connector> connectors;
+    using connectors = kth::pending<connector>;
 
     void handle_stop(code const& ec);
-    void handle_starting(code const& ec, channel::ptr channel,
-        result_handler handle_started);
-    void handle_handshake(code const& ec, channel::ptr channel,
-        result_handler handle_started);
-    void handle_start(code const& ec, channel::ptr channel,
-        result_handler handle_started, result_handler handle_stopped);
-    void handle_remove(code const& ec, channel::ptr channel,
-        result_handler handle_stopped);
+    void handle_starting(code const& ec, channel::ptr channel, result_handler handle_started);
+    void handle_handshake(code const& ec, channel::ptr channel, result_handler handle_started);
+    void handle_start(code const& ec, channel::ptr channel, result_handler handle_started, result_handler handle_stopped);
+    void handle_remove(code const& ec, channel::ptr channel, result_handler handle_stopped);
 
     // These are thread safe.
     std::atomic<bool> stopped_;
-    const bool notify_on_connect_;
+    bool const notify_on_connect_;
     p2p& network_;
     mutable dispatcher dispatch_;
 };
@@ -192,26 +178,16 @@ private:
 #undef SESSION_ARGS_TYPE
 #undef BOUND_SESSION_TYPE
 
-#define BIND1(method, p1) \
-    bind<CLASS>(&CLASS::method, p1)
-#define BIND2(method, p1, p2) \
-    bind<CLASS>(&CLASS::method, p1, p2)
-#define BIND3(method, p1, p2, p3) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3)
-#define BIND4(method, p1, p2, p3, p4) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3, p4)
-#define BIND5(method, p1, p2, p3, p4, p5) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5)
-#define BIND6(method, p1, p2, p3, p4, p5, p6) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6)
-#define BIND7(method, p1, p2, p3, p4, p5, p6, p7) \
-    bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6, p7)
+#define BIND1(method, p1) bind<CLASS>(&CLASS::method, p1)
+#define BIND2(method, p1, p2) bind<CLASS>(&CLASS::method, p1, p2)
+#define BIND3(method, p1, p2, p3) bind<CLASS>(&CLASS::method, p1, p2, p3)
+#define BIND4(method, p1, p2, p3, p4) bind<CLASS>(&CLASS::method, p1, p2, p3, p4)
+#define BIND5(method, p1, p2, p3, p4, p5) bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5)
+#define BIND6(method, p1, p2, p3, p4, p5, p6) bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6)
+#define BIND7(method, p1, p2, p3, p4, p5, p6, p7) bind<CLASS>(&CLASS::method, p1, p2, p3, p4, p5, p6, p7)
 
-#define CONCURRENT_DELEGATE2(method, p1, p2) \
-    concurrent_delegate<CLASS>(&CLASS::method, p1, p2)
+#define CONCURRENT_DELEGATE2(method, p1, p2) concurrent_delegate<CLASS>(&CLASS::method, p1, p2)
 
+} // namespace kth::network
 
-} // namespace network
-} // namespace kth
-
-#endif
+#endif //KTH_NETWORK_SESSION_HPP

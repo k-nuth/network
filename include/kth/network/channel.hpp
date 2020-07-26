@@ -17,8 +17,7 @@
 #include <kth/network/proxy.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// A concrete proxy with timers and state, mostly thread safe.
 class BCT_API channel
@@ -28,7 +27,7 @@ public:
     typedef std::shared_ptr<channel> ptr;
 
     /// Construct an instance.
-    channel(threadpool& pool, socket::ptr socket, const settings& settings);
+    channel(threadpool& pool, socket::ptr socket, settings const& settings);
 
     void start(result_handler handler) override;
 
@@ -59,12 +58,11 @@ private:
 
     std::atomic<bool> notify_;
     std::atomic<uint64_t> nonce_;
-    bc::atomic<version_const_ptr> peer_version_;
+    kth::atomic<version_const_ptr> peer_version_;
     deadline::ptr expiration_;
     deadline::ptr inactivity_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

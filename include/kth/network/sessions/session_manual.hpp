@@ -16,8 +16,7 @@
 #include <kth/network/sessions/session.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -27,7 +26,7 @@ class BCT_API session_manual
 {
 public:
     typedef std::shared_ptr<session_manual> ptr;
-    typedef std::function<void(const code&, channel::ptr)> channel_handler;
+    typedef std::function<void(code const&, channel::ptr)> channel_handler;
 
     /// Construct an instance.
     session_manual(p2p& network, bool notify_on_connect);
@@ -61,7 +60,6 @@ private:
         uint16_t port);
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

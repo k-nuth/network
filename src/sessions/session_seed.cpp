@@ -22,13 +22,12 @@ namespace kth::network {
 #define NAME "session_seed"
 
 /// If seeding occurs it must generate an increase hosts or will fail.
-static const size_t minimum_host_increase = 1;
+static size_t const minimum_host_increase = 1;
 
 using namespace std::placeholders;
 session_seed::session_seed(p2p& network)
     : session(network, false)
-    , CONSTRUCT_TRACK(session_seed)
-{}
+    , CONSTRUCT_TRACK(session_seed) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
@@ -74,14 +73,14 @@ void session_seed::attach_handshake_protocols(channel::ptr channel, result_handl
     // Don't use configured services or relay for seeding.
     auto const relay = false;
     auto const own_version = settings_.protocol_maximum;
-    auto const own_services = message::version::service::none;
+    auto const own_services = domain::message::version::service::none;
     auto const invalid_services = settings_.invalid_services;
     auto const minimum_version = settings_.protocol_minimum;
-    auto const minimum_services = message::version::service::none;
+    auto const minimum_services = domain::message::version::service::none;
 
     // Reject messages are not handled until bip61 (70002).
     // The negotiated_version is initialized to the configured maximum.
-    if (channel->negotiated_version() >= message::version::level::bip61) {
+    if (channel->negotiated_version() >= domain::message::version::level::bip61) {
         attach<protocol_version_70002>(channel, own_version, own_services,
             invalid_services, minimum_version, minimum_services, relay)
             ->start(handle_started);
@@ -105,7 +104,7 @@ void session_seed::start_seeding(size_t start_size, result_handler handler) {
     }
 }
 
-void session_seed::start_seed(const config::endpoint& seed, result_handler handler) {
+void session_seed::start_seed(const infrastructure::config::endpoint& seed, result_handler handler) {
     if (stopped()) {
         LOG_DEBUG(LOG_NETWORK, "Suspended seed connection");
         handler(error::channel_stopped);
@@ -121,7 +120,7 @@ void session_seed::start_seed(const config::endpoint& seed, result_handler handl
     connector->connect(seed, BIND5(handle_connect, _1, _2, seed, connector, handler));
 }
 
-void session_seed::handle_connect(code const& ec, channel::ptr channel, const config::endpoint& seed, connector::ptr connector, result_handler handler) {
+void session_seed::handle_connect(code const& ec, channel::ptr channel, const infrastructure::config::endpoint& seed, connector::ptr connector, result_handler handler) {
     unpend(connector);
 
     if (ec) {
@@ -157,13 +156,13 @@ void session_seed::handle_channel_start(code const& ec, channel::ptr channel, re
 void session_seed::attach_protocols(channel::ptr channel, result_handler handler) {
     auto const version = channel->negotiated_version();
 
-    if (version >= message::version::level::bip31) {
+    if (version >= domain::message::version::level::bip31) {
         attach<protocol_ping_60001>(channel)->start();
     } else {
         attach<protocol_ping_31402>(channel)->start();
     }
 
-    if (version >= message::version::level::bip61) {
+    if (version >= domain::message::version::level::bip61) {
         attach<protocol_reject_70002>(channel)->start();
     }
 

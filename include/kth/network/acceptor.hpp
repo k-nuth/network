@@ -14,8 +14,7 @@
 #include <kth/network/define.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// Create inbound socket connections.
 /// This class is thread safe against stop.
@@ -25,10 +24,10 @@ class BCT_API acceptor
 {
 public:
     typedef std::shared_ptr<acceptor> ptr;
-    typedef std::function<void(const code&, channel::ptr)> accept_handler;
+    typedef std::function<void(code const&, channel::ptr)> accept_handler;
 
     /// Construct an instance.
-    acceptor(threadpool& pool, const settings& settings);
+    acceptor(threadpool& pool, settings const& settings);
 
     /// Validate acceptor stopped.
     ~acceptor();
@@ -51,7 +50,7 @@ private:
     // These are thread safe.
     std::atomic<bool> stopped_;
     threadpool& pool_;
-    const settings& settings_;
+    settings const& settings_;
     mutable dispatcher dispatch_;
 
     // These are protected by mutex.
@@ -59,7 +58,6 @@ private:
     mutable shared_mutex mutex_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

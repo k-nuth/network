@@ -32,8 +32,7 @@ session::session(p2p& network, bool notify_on_connect)
     , stopped_(true)
     , notify_on_connect_(notify_on_connect)
     , network_(network)
-    , dispatch_(pool_, NAME)
-{}
+    , dispatch_(pool_, NAME) {}
 
 session::~session() {
     KTH_ASSERT_MSG(stopped(), "The session was not stopped.");
@@ -55,8 +54,8 @@ code session::fetch_address(address& out_address) const {
     return network_.fetch_address(out_address);
 }
 
-bool session::blacklisted(const authority& authority) const {
-    auto const ip_compare = [&](const config::authority& blocked) {
+bool session::blacklisted(authority const& authority) const {
+    auto const ip_compare = [&](const infrastructure::config::authority& blocked) {
         return authority.ip() == blocked.ip();
     };
 
@@ -176,7 +175,7 @@ void session::handle_starting(code const& ec, channel::ptr channel, result_handl
 void session::attach_handshake_protocols(channel::ptr channel, result_handler handle_started) {
     // Reject messages are not handled until bip61 (70002).
     // The negotiated_version is initialized to the configured maximum.
-    if (channel->negotiated_version() >= message::version::level::bip61) {
+    if (channel->negotiated_version() >= domain::message::version::level::bip61) {
         attach<protocol_version_70002>(channel)->start(handle_started);
     } else {
         attach<protocol_version_31402>(channel)->start(handle_started);

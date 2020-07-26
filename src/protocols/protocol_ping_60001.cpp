@@ -19,14 +19,13 @@ namespace kth::network {
 
 #define CLASS protocol_ping_60001
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 protocol_ping_60001::protocol_ping_60001(p2p& network, channel::ptr channel)
     : protocol_ping_31402(network, channel)
     , pending_(false)
-    , CONSTRUCT_TRACK(protocol_ping_60001)
-{}
+    , CONSTRUCT_TRACK(protocol_ping_60001) {}
 
 // This is fired by the callback (i.e. base timer and stop handler).
 void protocol_ping_60001::send_ping(code const& ec) {

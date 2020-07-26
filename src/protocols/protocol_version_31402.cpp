@@ -19,7 +19,7 @@ namespace kth::network {
 #define NAME "version"
 #define CLASS protocol_version_31402
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 // TODO: set explicitly on inbound (none or new config) and self on outbound.
@@ -33,8 +33,7 @@ protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channe
         , network.network_settings().services
         , network.network_settings().invalid_services
         , network.network_settings().protocol_minimum
-        , version::service::none)
-{}
+        , version::service::none) {}
 
 protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channel, uint32_t own_version, uint64_t own_services, uint64_t invalid_services, uint32_t minimum_version, uint64_t minimum_services)
     : protocol_timer(network, channel, false, NAME)
@@ -44,8 +43,7 @@ protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channe
     , invalid_services_(invalid_services)
     , minimum_version_(minimum_version)
     , minimum_services_(minimum_services)
-    , CONSTRUCT_TRACK(protocol_version_31402)
-{}
+    , CONSTRUCT_TRACK(protocol_version_31402) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
@@ -58,17 +56,17 @@ void protocol_version_31402::start(event_handler handler) {
     // The handler is invoked in the context of the last message receipt.
     protocol_timer::start(period, join_handler);
 
-    SUBSCRIBE2(message::version, handle_receive_version, _1, _2);
+    SUBSCRIBE2(domain::message::version, handle_receive_version, _1, _2);
     SUBSCRIBE2(verack, handle_receive_verack, _1, _2);
     SEND2(version_factory(), handle_send, _1, version::command);
 }
 
-message::version protocol_version_31402::version_factory() const {
+domain::message::version protocol_version_31402::version_factory() const {
     auto const& settings = network_.network_settings();
     auto const height = network_.top_block().height();
     KTH_ASSERT_MSG(height <= max_uint32, "Time to upgrade the protocol.");
 
-    message::version version;
+    domain::message::version version;
     version.set_value(own_version_);
     version.set_services(own_services_);
     version.set_timestamp(static_cast<uint64_t>(zulu_time()));

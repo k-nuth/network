@@ -4,13 +4,11 @@
 
 #include <kth/network/user_agent.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 std::string get_user_agent() {
     //return "/kth:" KTH_VERSION "/";
     return "/kth-dummy:0.0.0/";
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

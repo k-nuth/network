@@ -22,8 +22,7 @@ using namespace std::placeholders;
 session_inbound::session_inbound(p2p& network, bool notify_on_connect)
     : session(network, notify_on_connect)
     , connection_limit_(settings_.inbound_connections + settings_.outbound_connections + settings_.peers.size())
-    , CONSTRUCT_TRACK(session_inbound)
-{}
+    , CONSTRUCT_TRACK(session_inbound) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
@@ -76,7 +75,7 @@ void session_inbound::handle_stop(code const& ec) {
 // Accept sequence.
 // ----------------------------------------------------------------------------
 
-void session_inbound::start_accept(const code&) {
+void session_inbound::start_accept(code const&) {
     if (stopped()) {
         LOG_DEBUG(LOG_NETWORK, "Suspended inbound connection.");
         return;
@@ -140,13 +139,13 @@ void session_inbound::handle_channel_start(code const& ec, channel::ptr channel)
 void session_inbound::attach_protocols(channel::ptr channel) {
     auto const version = channel->negotiated_version();
 
-    if (version >= message::version::level::bip31) {
+    if (version >= domain::message::version::level::bip31) {
         attach<protocol_ping_60001>(channel)->start();
     } else {
         attach<protocol_ping_31402>(channel)->start();
     }
 
-    if (version >= message::version::level::bip61) {
+    if (version >= domain::message::version::level::bip61) {
         attach<protocol_reject_70002>(channel)->start();
     }
 

@@ -14,24 +14,21 @@
 #include <kth/network/define.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// This class is thread safe.
 /// The hosts class manages a thread-safe dynamic store of network addresses.
 /// The store can be loaded and saved from/to the specified file path.
-/// The file is a line-oriented set of config::authority serializations.
+/// The file is a line-oriented set of infrastructure::config::authority serializations.
 /// Duplicate addresses and those with zero-valued ports are disacarded.
-class BCT_API hosts
-  : noncopyable
-{
+class BCT_API hosts : noncopyable {
 public:
-    typedef std::shared_ptr<hosts> ptr;
-    typedef message::network_address address;
-    typedef handle0 result_handler;
+    using ptr = std::shared_ptr<hosts>;
+    using address = domain::message::network_address;
+    using result_handler = handle0;
 
     /// Construct an instance.
-    hosts(const settings& settings);
+    hosts(settings const& settings);
 
     /// Load hosts file if found.
     virtual code start();
@@ -42,17 +39,17 @@ public:
     virtual size_t count() const;
     virtual code fetch(address& out) const;
     virtual code fetch(address::list& out) const;
-    virtual code remove(const address& host);
-    virtual code store(const address& host);
-    virtual void store(const address::list& hosts, result_handler handler);
+    virtual code remove(address const& host);
+    virtual code store(address const& host);
+    virtual void store(address::list const& hosts, result_handler handler);
 
 private:
-    typedef boost::circular_buffer<address> list;
-    typedef list::iterator iterator;
+    using list = boost::circular_buffer<address>;
+    using iterator = list::iterator;
 
-    iterator find(const address& host);
+    iterator find(address const& host);
 
-    const size_t capacity_;
+    size_t const capacity_;
 
     // These are protected by a mutex.
     list buffer_;
@@ -60,12 +57,11 @@ private:
     mutable upgrade_mutex mutex_;
 
     // HACK: we use this because the buffer capacity cannot be set to zero.
-    const bool disabled_;
-    const std::filesystem::path file_path_;
+    bool const disabled_;
+    std::filesystem::path const file_path_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 

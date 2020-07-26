@@ -11,8 +11,7 @@
 #include <kth/network/define.hpp>
 #include <kth/network/protocols/protocol.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -66,10 +65,9 @@ private:
     void handle_stopped(code const& ec);
     void do_set_event(code const& ec);
 
-    bc::atomic<event_handler> handler_;
+    kth::atomic<event_handler> handler_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

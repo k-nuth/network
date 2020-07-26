@@ -12,8 +12,7 @@
 #include <kth/network/protocols/protocol_timer.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -44,10 +43,9 @@ protected:
 
     virtual bool handle_receive_ping(code const& ec, ping_const_ptr message);
 
-    const settings& settings_;
+    settings const& settings_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

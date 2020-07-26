@@ -16,7 +16,7 @@
 
 namespace kth::network {
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 // Factory for deadline timer pointer construction.
@@ -25,14 +25,13 @@ deadline::ptr alarm(threadpool& pool, const asio::duration& duration) {
     return std::make_shared<deadline>(pool, pseudo_random::duration(duration));
 }
 
-channel::channel(threadpool& pool, socket::ptr socket, const settings& settings)
+channel::channel(threadpool& pool, socket::ptr socket, settings const& settings)
     : proxy(pool, socket, settings)
     , notify_(false)
     , nonce_(0)
     , expiration_(alarm(pool, settings.channel_expiration()))
     , inactivity_(alarm(pool, settings.channel_inactivity()))
-    , CONSTRUCT_TRACK(channel)
-{}
+    , CONSTRUCT_TRACK(channel) {}
 
 // Talk sequence.
 // ----------------------------------------------------------------------------

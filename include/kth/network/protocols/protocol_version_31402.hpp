@@ -14,8 +14,7 @@
 #include <kth/network/protocols/protocol_timer.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -53,7 +52,7 @@ public:
     virtual void start(event_handler handler);
 
 protected:
-    virtual message::version version_factory() const;
+    virtual domain::message::version version_factory() const;
     virtual bool sufficient_peer(version_const_ptr message);
 
     virtual bool handle_receive_version(code const& ec, version_const_ptr version);
@@ -67,8 +66,7 @@ protected:
     const uint64_t minimum_services_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 

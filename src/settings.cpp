@@ -9,8 +9,8 @@
 
 namespace kth::network {
 
-using namespace bc::asio;
-using namespace bc::message;
+using namespace kth::asio;
+using namespace kd::message;
 
 // Common default values (no settings context).
 settings::settings()
@@ -50,17 +50,15 @@ settings::settings()
     , maximum_archive_files(0)
     , statistics_server(unspecified_network_address)
     , verbose(false)
-    , use_ipv6(true)
-{}
+    , use_ipv6(true) {}
 
 // Use push_back due to initializer_list bug:
 // stackoverflow.com/a/20168627/1172329
-settings::settings(config::settings context)
-    : settings()
-{
+settings::settings(infrastructure::config::settings context)
+    : settings() {
     // Handle deviations from common defaults.
     switch (context) {
-        case config::settings::mainnet: {
+        case infrastructure::config::settings::mainnet: {
 // #ifdef LITECOIN
 #ifdef KTH_CURRENCY_LTC
             inbound_port = 9333;
@@ -99,7 +97,7 @@ settings::settings(config::settings context)
         }
 
         // Seeds based on satoshi client v0.14.0 plus voskuil.org.
-        case config::settings::testnet: {
+        case infrastructure::config::settings::testnet: {
 
 // #ifdef LITECOIN
 #ifdef KTH_CURRENCY_LTC
@@ -134,7 +132,7 @@ settings::settings(config::settings context)
             break;
         }
 
-        case config::settings::regtest: {
+        case infrastructure::config::settings::regtest: {
             identifier = 3669344250;
             inbound_port = 18444;
 
@@ -143,7 +141,7 @@ settings::settings(config::settings context)
         }
 
         default:
-        case config::settings::none: {}
+        case infrastructure::config::settings::none: {}
     }
 }
 

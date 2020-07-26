@@ -11,8 +11,7 @@
 #include <kth/network/define.hpp>
 #include <kth/network/protocols/protocol_timer.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -40,7 +39,7 @@ public:
     virtual void start(event_handler handler);
 
 protected:
-    virtual void send_own_address(const settings& settings);
+    virtual void send_own_address(settings const& settings);
 
     virtual void handle_send_address(code const& ec);
     virtual void handle_send_get_address(code const& ec);
@@ -53,10 +52,9 @@ protected:
     ////    get_address_const_ptr message);
 
     p2p& network_;
-    const config::authority self_;
+    const infrastructure::config::authority self_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

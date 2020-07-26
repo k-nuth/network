@@ -13,8 +13,7 @@
 #include <kth/network/sessions/session_batch.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -44,7 +43,7 @@ protected:
     virtual void attach_protocols(channel::ptr channel);
 
 private:
-    void new_connection(const code&);
+    void new_connection(code const&);
 
     void handle_started(code const& ec, result_handler handler);
     void handle_connect(code const& ec, channel::ptr channel);
@@ -56,7 +55,6 @@ private:
     void handle_channel_start(code const& ec, channel::ptr channel);
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

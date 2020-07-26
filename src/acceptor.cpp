@@ -21,20 +21,19 @@ using namespace std::placeholders;
 
 static auto const reuse_address = asio::acceptor::reuse_address(true);
 
-acceptor::acceptor(threadpool& pool, const settings& settings)
+acceptor::acceptor(threadpool& pool, settings const& settings)
     : stopped_(true)
     , pool_(pool)
     , settings_(settings)
     , dispatch_(pool, NAME)
     , acceptor_(pool_.service())
-    , CONSTRUCT_TRACK(acceptor)
-{}
+    , CONSTRUCT_TRACK(acceptor) {}
 
 acceptor::~acceptor() {
     KTH_ASSERT_MSG(stopped(), "The acceptor was not stopped.");
 }
 
-void acceptor::stop(const code&) {
+void acceptor::stop(code const&) {
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
     mutex_.lock_upgrade();
@@ -112,7 +111,7 @@ void acceptor::accept(accept_handler handler) {
         return;
     }
 
-    auto const socket = std::make_shared<bc::socket>(pool_);
+    auto const socket = std::make_shared<kth::socket>(pool_);
 
     mutex_.unlock_upgrade_and_lock();
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

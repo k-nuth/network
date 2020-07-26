@@ -18,10 +18,9 @@ protocol::protocol(p2p& network, channel::ptr channel, std::string const& name)
     : pool_(network.thread_pool())
     , dispatch_(network.thread_pool(), NAME)
     , channel_(channel)
-    , name_(name)
-{}
+    , name_(name) {}
 
-config::authority protocol::authority() const {
+infrastructure::config::authority protocol::authority() const {
     return channel_->authority();
 }
 

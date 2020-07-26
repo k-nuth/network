@@ -12,7 +12,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <kth/domain.hpp>
+
 #include <kth/network/channel.hpp>
 #include <kth/network/define.hpp>
 #include <kth/network/hosts.hpp>
@@ -23,34 +25,29 @@
 #include <kth/network/sessions/session_seed.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 /// Top level public networking interface, partly thread safe.
-class BCT_API p2p
-  : public enable_shared_from_base<p2p>, noncopyable
-{
+class BCT_API p2p : public enable_shared_from_base<p2p>, noncopyable {
 public:
-    typedef std::shared_ptr<p2p> ptr;
-    typedef message::network_address address;
-    typedef std::function<void()> stop_handler;
-    typedef std::function<void(bool)> truth_handler;
-    typedef std::function<void(size_t)> count_handler;
-    typedef std::function<void(const code&)> result_handler;
-    typedef std::function<void(const code&, const address&)> address_handler;
-    typedef std::function<void(const code&, channel::ptr)> channel_handler;
-    typedef std::function<bool(const code&, channel::ptr)> connect_handler;
-    typedef subscriber<code> stop_subscriber;
-    typedef resubscriber<code, channel::ptr> channel_subscriber;
+    using ptr = std::shared_ptr<p2p>;
+    using address = domain::message::network_address;
+    using stop_handler = std::function<void()>;
+    using truth_handler = std::function<void(bool)>;
+    using count_handler = std::function<void(size_t)>;
+    using result_handler = std::function<void(code const&)>;
+    using address_handler = std::function<void(code const&, address const&)>;
+    using channel_handler = std::function<void(code const&, channel::ptr)>;
+    using connect_handler = std::function<bool(code const&, channel::ptr)>;
+    using stop_subscriber = subscriber<code>;
+    using channel_subscriber = resubscriber<code, channel::ptr>;
 
     // Templates (send/receive).
     // ------------------------------------------------------------------------
 
     /// Send message to all connections.
     template <typename Message>
-    void broadcast(const Message& message, channel_handler handle_channel,
-        result_handler handle_complete)
-    {
+    void broadcast(Message const& message, channel_handler handle_channel, result_handler handle_complete) {
         // Safely copy the channel collection.
         auto const channels = pending_close_.collection();
 
@@ -59,16 +56,16 @@ public:
             "p2p_join", synchronizer_terminate::on_count);
 
         // No pre-serialize, channels may have different protocol versions.
-        for (auto const channel: channels)
-            channel->send(message, std::bind(&p2p::handle_send, this,
-                std::placeholders::_1, channel, handle_channel, join_handler));
+        for (auto const channel: channels) {
+            channel->send(message, std::bind(&p2p::handle_send, this, std::placeholders::_1, channel, handle_channel, join_handler));
+        }
     }
 
     // Constructors.
     // ------------------------------------------------------------------------
 
     /// Construct an instance.
-    p2p(const settings& settings);
+    p2p(settings const& settings);
 
     /// Ensure all threads are coalesced.
     virtual ~p2p();
@@ -99,16 +96,16 @@ public:
     // ------------------------------------------------------------------------
 
     /// Network configuration settings.
-    virtual const settings& network_settings() const;
+    virtual settings const& network_settings() const;
 
     /// Return the current top block identity.
-    config::checkpoint top_block() const;
+    infrastructure::config::checkpoint top_block() const;
 
     /// Set the current top block identity.
-    void set_top_block(config::checkpoint&& top);
+    void set_top_block(infrastructure::config::checkpoint&& top);
 
     /// Set the current top block identity.
-    void set_top_block(const config::checkpoint& top);
+    void set_top_block(infrastructure::config::checkpoint const& top);
 
     /// Determine if the network is stopped.
     virtual bool stopped() const;
@@ -129,15 +126,14 @@ public:
     // ----------------------------------------------------------------------------
 
     /// Maintain a connection to hostname:port.
-    virtual void connect(const config::endpoint& peer);
+    virtual void connect(infrastructure::config::endpoint const& peer);
 
     /// Maintain a connection to hostname:port.
     virtual void connect(std::string const& hostname, uint16_t port);
 
     /// Maintain a connection to hostname:port.
     /// The callback is invoked by the first connection creation only.
-    virtual void connect(std::string const& hostname, uint16_t port,
-        channel_handler handler);
+    virtual void connect(std::string const& hostname, uint16_t port, channel_handler handler);
 
     // Hosts collection.
     // ------------------------------------------------------------------------
@@ -146,10 +142,10 @@ public:
     virtual size_t address_count() const;
 
     /// Store an address.
-    virtual code store(const address& address);
+    virtual code store(address const& address);
 
     /// Store a collection of addresses (asynchronous).
-    virtual void store(const address::list& addresses, result_handler handler);
+    virtual void store(address::list const& addresses, result_handler handler);
 
     /// Get a randomly-selected address.
     virtual code fetch_address(address& out_address) const;
@@ -158,7 +154,7 @@ public:
     virtual code fetch_addresses(address::list& out_addresses) const;
 
     /// Remove an address.
-    virtual code remove(const address& address);
+    virtual code remove(address const& address);
 
     // Pending connect collection.
     // ------------------------------------------------------------------------
@@ -191,7 +187,7 @@ public:
     virtual code store(channel::ptr channel);
 
     /// Determine if there exists a connection to the address.
-    virtual bool connected(const address& address) const;
+    virtual bool connected(address const& address) const;
 
     /// Remove a connection.
     virtual void remove(channel::ptr channel);
@@ -199,9 +195,8 @@ public:
 protected:
 
     /// Attach a session to the network, caller must start the session.
-    template <class Session, typename... Args>
-    typename Session::ptr attach(Args&&... args)
-    {
+    template <typename Session, typename... Args>
+    typename Session::ptr attach(Args&&... args) {
         return std::make_shared<Session>(*this, std::forward<Args>(args)...);
     }
 
@@ -212,24 +207,23 @@ protected:
     virtual session_outbound::ptr attach_outbound_session();
 
 private:
-    typedef bc::pending<channel> pending_channels;
-    typedef bc::pending<connector> pending_connectors;
+    using pending_channels = kth::pending<channel>;
+    using pending_connectors = kth::pending<connector>;
 
     void handle_manual_started(code const& ec, result_handler handler);
     void handle_inbound_started(code const& ec, result_handler handler);
     void handle_hosts_loaded(code const& ec, result_handler handler);
     void handle_hosts_saved(code const& ec, result_handler handler);
-    void handle_send(code const& ec, channel::ptr channel,
-        channel_handler handle_channel, result_handler handle_complete);
+    void handle_send(code const& ec, channel::ptr channel, channel_handler handle_channel, result_handler handle_complete);
 
     void handle_started(code const& ec, result_handler handler);
     void handle_running(code const& ec, result_handler handler);
 
     // These are thread safe.
-    const settings& settings_;
+    settings const& settings_;
     std::atomic<bool> stopped_;
-    bc::atomic<config::checkpoint> top_block_;
-    bc::atomic<session_manual::ptr> manual_;
+    kth::atomic<infrastructure::config::checkpoint> top_block_;
+    kth::atomic<session_manual::ptr> manual_;
     threadpool threadpool_;
     hosts hosts_;
     pending_connectors pending_connect_;
@@ -239,7 +233,6 @@ private:
     channel_subscriber::ptr channel_subscriber_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

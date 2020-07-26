@@ -15,8 +15,7 @@
 #include <kth/network/sessions/session.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -44,10 +43,10 @@ protected:
 
 private:
     void start_seeding(size_t start_size, result_handler handler);
-    void start_seed(const config::endpoint& seed, result_handler handler);
+    void start_seed(const infrastructure::config::endpoint& seed, result_handler handler);
     void handle_started(code const& ec, result_handler handler);
     void handle_connect(code const& ec, channel::ptr channel,
-        const config::endpoint& seed, connector::ptr connector,
+        const infrastructure::config::endpoint& seed, connector::ptr connector,
         result_handler handler);
     void handle_complete(size_t start_size, result_handler handler);
 
@@ -56,8 +55,7 @@ private:
     void handle_channel_stop(code const& ec);
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif
 

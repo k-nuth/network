@@ -16,14 +16,13 @@ namespace kth::network {
 #define CLASS session_batch
 #define NAME "session_batch"
 
-using namespace bc::config;
-using namespace bc::message;
+using namespace kth::config;
+using namespace kd::message;
 using namespace std::placeholders;
 
 session_batch::session_batch(p2p& network, bool notify_on_connect)
     : session(network, notify_on_connect)
-    , batch_size_(std::max(settings_.connect_batch_size, 1u))
-{}
+    , batch_size_(std::max(settings_.connect_batch_size, 1u)) {}
 
 // Connect sequence.
 // ----------------------------------------------------------------------------
@@ -49,7 +48,7 @@ void session_batch::new_connect(channel_handler handler) {
     start_connect(ec, address, handler);
 }
 
-void session_batch::start_connect(code const& ec, const authority& host, channel_handler handler) {
+void session_batch::start_connect(code const& ec, authority const& host, channel_handler handler) {
     if (stopped(ec)) {
         LOG_DEBUG(LOG_NETWORK, "Batch session stopped while starting.");
         handler(error::service_stopped, nullptr);

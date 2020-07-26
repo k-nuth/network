@@ -13,8 +13,7 @@
 #include <kth/network/channel.hpp>
 #include <kth/network/define.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define PROTOCOL_ARGS(handler, args) \
     std::forward<Handler>(handler), \
@@ -38,49 +37,45 @@ class BCT_API protocol
 {
 protected:
     typedef std::function<void()> completion_handler;
-    typedef std::function<void(const code&)> event_handler;
-    typedef std::function<void(const code&, size_t)> count_handler;
+    typedef std::function<void(code const&)> event_handler;
+    typedef std::function<void(code const&, size_t)> count_handler;
 
     /// Construct an instance.
     protocol(p2p& network, channel::ptr channel, std::string const& name);
 
     /// Bind a method in the derived class.
-    template <class Protocol, typename Handler, typename... Args>
+    template <typename Protocol, typename Handler, typename... Args>
     auto bind(Handler&& handler, Args&&... args) ->
         decltype(BOUND_PROTOCOL_TYPE(handler, args)) const
     {
         return BOUND_PROTOCOL(handler, args);
     }
 
-    template <class Protocol, typename Handler, typename... Args>
-    void dispatch_concurrent(Handler&& handler, Args&&... args)
-    {
+    template <typename Protocol, typename Handler, typename... Args>
+    void dispatch_concurrent(Handler&& handler, Args&&... args) {
         dispatch_.concurrent(BOUND_PROTOCOL(handler, args));
     }
 
     /// Send a message on the channel and handle the result.
-    template <class Protocol, class Message, typename Handler, typename... Args>
-    void send(const Message& packet, Handler&& handler, Args&&... args)
-    {
+    template <typename Protocol, typename Message, typename Handler, typename... Args>
+    void send(Message const& packet, Handler&& handler, Args&&... args) {
         channel_->send(packet, BOUND_PROTOCOL(handler, args));
     }
 
     /// Subscribe to all channel messages, blocking until subscribed.
-    template <class Protocol, class Message, typename Handler, typename... Args>
-    void subscribe(Handler&& handler, Args&&... args)
-    {
+    template <typename Protocol, typename Message, typename Handler, typename... Args>
+    void subscribe(Handler&& handler, Args&&... args) {
         channel_->template subscribe<Message>(BOUND_PROTOCOL(handler, args));
     }
 
     /// Subscribe to the channel stop, blocking until subscribed.
-    template <class Protocol, typename Handler, typename... Args>
-    void subscribe_stop(Handler&& handler, Args&&... args)
-    {
+    template <typename Protocol, typename Handler, typename... Args>
+    void subscribe_stop(Handler&& handler, Args&&... args) {
         channel_->subscribe_stop(BOUND_PROTOCOL(handler, args));
     }
 
     /// Get the address of the channel.
-    virtual config::authority authority() const;
+    virtual infrastructure::config::authority authority() const;
 
     /// Get the protocol name, for logging purposes.
     virtual std::string const& name() const;
@@ -139,7 +134,6 @@ private:
 #define DISPATCH_CONCURRENT1(method, p1) \
     dispatch_concurrent<CLASS>(&CLASS::method, p1)
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

@@ -15,8 +15,7 @@
 #include <kth/network/protocols/protocol_timer.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 class p2p;
 
@@ -49,7 +48,6 @@ private:
     std::atomic<bool> pending_;
 };
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network
 
 #endif

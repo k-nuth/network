@@ -23,8 +23,7 @@ using namespace std::placeholders;
 
 session_manual::session_manual(p2p& network, bool notify_on_connect)
     : session(network, notify_on_connect)
-    , CONSTRUCT_TRACK(session_manual)
-{}
+    , CONSTRUCT_TRACK(session_manual) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
@@ -60,7 +59,7 @@ void session_manual::connect(std::string const& hostname, uint16_t port, channel
 }
 
 // The first connect is a sequence, which then spawns a cycle.
-void session_manual::start_connect(const code&, std::string const& hostname, uint16_t port, uint32_t attempts, channel_handler handler) {
+void session_manual::start_connect(code const&, std::string const& hostname, uint16_t port, uint32_t attempts, channel_handler handler) {
     if (stopped()) {
         LOG_DEBUG(LOG_NETWORK, "Suspended manual connection.");
         handler(error::service_stopped, nullptr);
@@ -80,7 +79,7 @@ void session_manual::handle_connect(code const& ec, channel::ptr channel, std::s
 
     if (ec) {
         LOG_WARNING(LOG_NETWORK
-           , "Failure connecting [", config::endpoint(hostname, port)
+           , "Failure connecting [", infrastructure::config::endpoint(hostname, port)
            , "] manually: ", ec.message());
 
         // Retry forever if limit is zero.
@@ -94,7 +93,7 @@ void session_manual::handle_connect(code const& ec, channel::ptr channel, std::s
 
         LOG_WARNING(LOG_NETWORK
            , "Suspending manual connection to ["
-           , config::endpoint(hostname, port), "] after "
+           , infrastructure::config::endpoint(hostname, port), "] after "
            , settings_.manual_attempt_limit, " failed attempts.");
 
         // This is the failure end of the connect sequence.
@@ -118,7 +117,7 @@ void session_manual::handle_channel_start(code const& ec, std::string const& hos
     }
 
     LOG_INFO(LOG_NETWORK
-       , "Connected manual channel [", config::endpoint(hostname, port)
+       , "Connected manual channel [", infrastructure::config::endpoint(hostname, port)
        , "] as [", channel->authority(), "] ("
        , connection_count(), ")");
 
@@ -130,13 +129,13 @@ void session_manual::handle_channel_start(code const& ec, std::string const& hos
 void session_manual::attach_protocols(channel::ptr channel) {
     auto const version = channel->negotiated_version();
 
-    if (version >= message::version::level::bip31) {
+    if (version >= domain::message::version::level::bip31) {
         attach<protocol_ping_60001>(channel)->start();
     } else {
         attach<protocol_ping_31402>(channel)->start();
     }
 
-    if (version >= message::version::level::bip61) {
+    if (version >= domain::message::version::level::bip61) {
         attach<protocol_reject_70002>(channel)->start();
     }
 

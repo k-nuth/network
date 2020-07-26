@@ -17,22 +17,21 @@
 #include <kth/network/define.hpp>
 #include <kth/network/settings.hpp>
 
-namespace kth {
-namespace network {
+namespace kth::network {
 
 #define NAME "proxy"
 
 using namespace std::placeholders;
 using namespace boost::asio;
-using namespace bc::message;
+using namespace kd::message;
 
 // Dump up to 1k of payload as hex in order to diagnose failure.
-static const size_t invalid_payload_dump_size = 1024;
+static size_t const invalid_payload_dump_size = 1024;
 
 // payload_buffer_ sizing assumes monotonically increasing size by version.
 // Initialize to pre-witness max payload and let grow to witness as required.
 // The socket owns the single thread on which this channel reads and writes.
-proxy::proxy(threadpool& pool, socket::ptr socket, const settings& settings)
+proxy::proxy(threadpool& pool, socket::ptr socket, settings const& settings)
   : authority_(socket->authority()),
     heading_buffer_(heading::maximum_size()),
     payload_buffer_(heading::maximum_payload_size(settings.protocol_maximum, false)),
@@ -46,8 +45,7 @@ proxy::proxy(threadpool& pool, socket::ptr socket, const settings& settings)
     version_(settings.protocol_maximum),
     message_subscriber_(pool),
     stop_subscriber_(std::make_shared<stop_subscriber>(pool, NAME "_sub")),
-    dispatch_(pool, NAME "_dispatch")
-{
+    dispatch_(pool, NAME "_dispatch") {
     //LOG_INFO(LOG_NETWORK, "proxy::proxy");
 }
 
@@ -59,7 +57,7 @@ proxy::~proxy() {
 // Properties.
 // ----------------------------------------------------------------------------
 
-const config::authority& proxy::authority() const {
+const infrastructure::config::authority& proxy::authority() const {
     return authority_;
 }
 
@@ -115,8 +113,9 @@ void proxy::read_heading() {
 
 void proxy::handle_read_heading(const boost_code& ec, size_t) {
     // LOG_INFO(LOG_NETWORK, "proxy::handle_read_heading()");
-    if (stopped())
+    if (stopped()) {
         return;
+    }
 
     if (ec) {
         LOG_DEBUG(LOG_NETWORK
@@ -126,18 +125,15 @@ void proxy::handle_read_heading(const boost_code& ec, size_t) {
         return;
     }
 
-    auto const head = heading::factory_from_data(heading_buffer_);
+    auto const head = domain::create<heading>(heading_buffer_);
 
-    if (!head.is_valid())
-    {
-        LOG_WARNING(LOG_NETWORK
-           , "Invalid heading from [", authority(), "]");
+    if ( ! head.is_valid()) {
+        LOG_WARNING(LOG_NETWORK, "Invalid heading from [", authority(), "]");
         stop(error::bad_stream);
         return;
     }
 
-    if (head.magic() != protocol_magic_)
-    {
+    if (head.magic() != protocol_magic_) {
         // These are common, with magic 542393671 coming from http requests.
         LOG_DEBUG(LOG_NETWORK
            , "Invalid heading magic (", head.magic(), ") from ["
@@ -146,8 +142,7 @@ void proxy::handle_read_heading(const boost_code& ec, size_t) {
         return;
     }
 
-    if (head.payload_size() > maximum_payload_)
-    {
+    if (head.payload_size() > maximum_payload_) {
         LOG_DEBUG(LOG_NETWORK
            , "Oversized payload indicated by ", head.command()
            , " heading from [", authority(), "] ("
@@ -161,15 +156,14 @@ void proxy::handle_read_heading(const boost_code& ec, size_t) {
 
 void proxy::read_payload(const heading& head) {
     //LOG_INFO(LOG_NETWORK, "proxy::read_payload()");
-    if (stopped())
+    if (stopped()) {
         return;
+    }
 
     // This does not cause a reallocation.
     payload_buffer_.resize(head.payload_size());
 
-    async_read(socket_->get(), buffer(payload_buffer_),
-        std::bind(&proxy::handle_read_payload,
-            shared_from_this(), _1, _2, head));
+    async_read(socket_->get(), buffer(payload_buffer_), std::bind(&proxy::handle_read_payload, shared_from_this(), _1, _2, head));
 }
 
 void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const heading& head) {
@@ -220,7 +214,7 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
         return;
     }
 
-    if (!consumed) {
+    if ( ! consumed) {
         LOG_WARNING(LOG_NETWORK
            , "Invalid ", head.command(), " payload from [", authority()
            , "] trailing bytes.");
@@ -314,5 +308,4 @@ bool proxy::stopped() const {
     return stopped_;
 }
 
-} // namespace network
-} // namespace kth
+} // namespace kth::network

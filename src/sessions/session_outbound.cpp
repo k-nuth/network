@@ -23,8 +23,7 @@ using namespace std::placeholders;
 
 session_outbound::session_outbound(p2p& network, bool notify_on_connect)
     : session_batch(network, notify_on_connect)
-    , CONSTRUCT_TRACK(session_outbound)
-{}
+    , CONSTRUCT_TRACK(session_outbound) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
@@ -58,7 +57,7 @@ void session_outbound::handle_started(code const& ec, result_handler handler) {
 // Connnect cycle.
 // ----------------------------------------------------------------------------
 
-void session_outbound::new_connection(const code&) {
+void session_outbound::new_connection(code const&) {
     if (stopped()) {
         LOG_DEBUG(LOG_NETWORK, "Suspended outbound connection.");
         return;
@@ -103,13 +102,13 @@ void session_outbound::handle_channel_start(code const& ec, channel::ptr channel
 void session_outbound::attach_protocols(channel::ptr channel) {
     auto const version = channel->negotiated_version();
 
-    if (version >= message::version::level::bip31) {
+    if (version >= domain::message::version::level::bip31) {
         attach<protocol_ping_60001>(channel)->start();
     } else {
         attach<protocol_ping_31402>(channel)->start();
     }
 
-    if (version >= message::version::level::bip61) {
+    if (version >= domain::message::version::level::bip61) {
         attach<protocol_reject_70002>(channel)->start();
     }
 
@@ -117,7 +116,7 @@ void session_outbound::attach_protocols(channel::ptr channel) {
 }
 
 void session_outbound::attach_handshake_protocols(channel::ptr channel, result_handler handle_started) {
-    using serve = message::version::service;
+    using serve = domain::message::version::service;
     auto const relay = settings_.relay_transactions;
     auto const own_version = settings_.protocol_maximum;
     auto const own_services = settings_.services;
@@ -133,7 +132,7 @@ void session_outbound::attach_handshake_protocols(channel::ptr channel, result_h
 
     // Reject messages are not handled until bip61 (70002).
     // The negotiated_version is initialized to the configured maximum.
-    if (channel->negotiated_version() >= message::version::level::bip61) {
+    if (channel->negotiated_version() >= domain::message::version::level::bip61) {
         attach<protocol_version_70002>(channel, own_version, own_services,
             invalid_services, minimum_version, minimum_services, relay)
             ->start(handle_started);

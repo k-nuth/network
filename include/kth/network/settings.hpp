@@ -7,7 +7,10 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <kth/domain.hpp>
+#include <kth/infrastructure.hpp>
+
 #include <kth/network/define.hpp>
 
 namespace kth::network {
@@ -16,7 +19,7 @@ namespace kth::network {
 class BCT_API settings {
 public:
     settings();
-    settings(config::settings context);
+    settings(infrastructure::config::settings context);
 
     /// Properties.
     uint32_t threads;
@@ -40,10 +43,10 @@ public:
     uint32_t channel_germination_seconds;
     uint32_t host_pool_capacity;
     std::filesystem::path hosts_file;
-    config::authority self;
-    config::authority::list blacklists;
-    config::endpoint::list peers;
-    config::endpoint::list seeds;
+    infrastructure::config::authority self;
+    infrastructure::config::authority::list blacklists;
+    infrastructure::config::endpoint::list peers;
+    infrastructure::config::endpoint::list seeds;
     // bool bitcoin_cash;
 
     // [log]
@@ -54,7 +57,7 @@ public:
     size_t minimum_free_space;
     size_t maximum_archive_size;
     size_t maximum_archive_files;
-    config::authority statistics_server;
+    infrastructure::config::authority statistics_server;
     bool verbose;
     bool use_ipv6;
 
@@ -75,4 +78,4 @@ public:
 
 } // namespace kth::network
 
-#endif
+#endif // KTH_NETWORK_SETTINGS_HPP

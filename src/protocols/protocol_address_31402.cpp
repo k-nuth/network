@@ -11,29 +11,27 @@
 #include <kth/network/p2p.hpp>
 #include <kth/network/protocols/protocol.hpp>
 #include <kth/network/protocols/protocol_events.hpp>
-
 namespace kth::network {
 
 #define NAME "address"
 #define CLASS protocol_address_31402
 
-using namespace bc::message;
+using namespace kd::message;
 using namespace std::placeholders;
 
 static 
-message::address configured_self(const network::settings& settings) {
+domain::message::address configured_self(network::settings const& settings) {
     if (settings.self.port() == 0) {
-        return address{};
+        return {};
     }
-    return address{ { settings.self.to_network_address() } };
+    return address{{settings.self.to_network_address()}};
 }
 
 protocol_address_31402::protocol_address_31402(p2p& network, channel::ptr channel)
     : protocol_events(network, channel, NAME)
     , network_(network)
     , self_(configured_self(network_.network_settings()))
-    , CONSTRUCT_TRACK(protocol_address_31402)
-{}
+    , CONSTRUCT_TRACK(protocol_address_31402) {}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
@@ -82,7 +80,7 @@ bool protocol_address_31402::handle_receive_get_address(code const& ec, get_addr
         return false;
     }
 
-    bc::message::network_address::list addresses;
+    kd::message::network_address::list addresses;
     network_.fetch_addresses(addresses);
 
     if ( ! addresses.empty()) {
@@ -111,8 +109,8 @@ void protocol_address_31402::handle_store_addresses(code const& ec) {
     }
 }
 
-void protocol_address_31402::handle_stop(const code&) {
-    // None of the other bc::network protocols log their stop.
+void protocol_address_31402::handle_stop(code const&) {
+    // None of the other kth::network protocols log their stop.
     ////LOG_DEBUG(LOG_NETWORK
     ////   , "Stopped address protocol for [", authority(), "].");
 }
