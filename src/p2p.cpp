@@ -303,7 +303,7 @@ void p2p::subscribe_stop(result_handler handler) {
 // Manual connections.
 // ----------------------------------------------------------------------------
 
-void p2p::connect(const infrastructure::config::endpoint& peer) {
+void p2p::connect(infrastructure::config::endpoint const& peer) {
     connect(peer.host(), peer.port());
 }
 

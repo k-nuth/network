@@ -8,7 +8,7 @@
 #include <iostream>
 
 // #include <boost/filesystem.hpp>
-#include <boost/test/unit_test.hpp>
+#include <test_helpers.hpp>
 
 #include <kth/network.hpp>
 
@@ -20,7 +20,7 @@ using namespace kth::network;
     "p2p_tests"
 
 #define TEST_NAME \
-    boost::unit_test::framework::current_test_case().p_name
+    Catch::getResultCapture().getCurrentTestName()
 
 // TODO: build mock and/or use dedicated test service.
 #define SEED1 "testnet-seed.bitcoin.petertodd.org:18333"
@@ -82,7 +82,7 @@ int start_result(p2p& network) {
 }
 
 static 
-int connect_result(p2p& network, const infrastructure::config::endpoint& host) {
+int connect_result(p2p& network, infrastructure::config::endpoint const& host) {
     std::promise<code> promise;
     auto const handler = [&promise](code ec, channel::ptr) {
         promise.set_value(ec);
@@ -113,7 +113,7 @@ int subscribe_result(p2p& network) {
 }
 
 static
-int subscribe_connect1_result(p2p& network, const infrastructure::config::endpoint& host) {
+int subscribe_connect1_result(p2p& network, infrastructure::config::endpoint const& host) {
     std::promise<code> promise;
     auto const handler = [&promise](code ec, channel::ptr) {
         promise.set_value(ec);
@@ -125,7 +125,7 @@ int subscribe_connect1_result(p2p& network, const infrastructure::config::endpoi
 }
 
 static
-int subscribe_connect2_result(p2p& network, const infrastructure::config::endpoint& host) {
+int subscribe_connect2_result(p2p& network, infrastructure::config::endpoint const& host) {
     std::promise<code> promise;
     auto const handler = [&promise](code ec, channel::ptr) {
         promise.set_value(ec);
@@ -140,7 +140,7 @@ template<typename Message>
 static
 int send_result(Message const& message, p2p& network, int channels) {
     auto const channel_counter = [&channels](code ec, channel::ptr channel) {
-        BOOST_REQUIRE_EQUAL(ec, error::success);
+        REQUIRE(ec == error::success);
         --channels;
     };
 
@@ -152,41 +152,41 @@ int send_result(Message const& message, p2p& network, int channels) {
     network.broadcast(message, channel_counter, completion_handler);
     auto const result = promise.get_future().get().value();
 
-    BOOST_REQUIRE_EQUAL(channels, 0);
+    REQUIRE(channels == 0);
     return result;
 }
 
 // Trivial tests just validate static inits (required because p2p tests disabled in travis).
-BOOST_AUTO_TEST_SUITE(empty_tests)
+// Start Boost Suite: empty tests
 
-BOOST_AUTO_TEST_CASE(empty_test) {
-    BOOST_REQUIRE(true);
+TEST_CASE("empty test", "[empty tests]") {
+    REQUIRE(true);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+// End Boost Suite
 
-BOOST_AUTO_TEST_SUITE(p2p_tests)
+// Start Boost Suite: p2p tests
 
-BOOST_AUTO_TEST_CASE(p2p__top_block__default__zero_null_hash) {
+TEST_CASE("p2p  top block  default  zero null hash", "[p2p tests]") {
     print_headers(TEST_NAME);
     network::settings const configuration;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(network.top_block().height(), 0);
-    BOOST_REQUIRE(network.top_block().hash() == null_hash);
+    REQUIRE(network.top_block().height() == 0);
+    REQUIRE(network.top_block().hash() == null_hash);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__set_top_block1__values__expected) {
+TEST_CASE("p2p  set top block1  values  expected", "[p2p tests]") {
     print_headers(TEST_NAME);
     network::settings const configuration;
     p2p network(configuration);
     size_t const expected_height = 42;
     auto const expected_hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
     network.set_top_block({ expected_hash, expected_height });
-    BOOST_REQUIRE(network.top_block().hash() == expected_hash);
-    BOOST_REQUIRE_EQUAL(network.top_block().height(), expected_height);
+    REQUIRE(network.top_block().hash() == expected_hash);
+    REQUIRE(network.top_block().height() == expected_height);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__set_top_block2__values__expected) {
+TEST_CASE("p2p  set top block2  values  expected", "[p2p tests]") {
     print_headers(TEST_NAME);
     network::settings const configuration;
     p2p network(configuration);
@@ -194,44 +194,44 @@ BOOST_AUTO_TEST_CASE(p2p__set_top_block2__values__expected) {
     auto const hash = hash_literal("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
     infrastructure::config::checkpoint const expected{ hash, expected_height };
     network.set_top_block(expected);
-    BOOST_REQUIRE(network.top_block().hash() == expected.hash());
-    BOOST_REQUIRE_EQUAL(network.top_block().height(), expected.height());
+    REQUIRE(network.top_block().hash() == expected.hash());
+    REQUIRE(network.top_block().height() == expected.height());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success) {
+TEST_CASE("p2p  start  no sessions  start success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+    REQUIRE(start_result(network) == error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_connections__start_stop_success) {
+TEST_CASE("p2p  start  no connections  start stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__no_sessions__start_success_start_operation_fail) {
+TEST_CASE("p2p  start  no sessions  start success start operation fail", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::operation_failed);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(start_result(network) == error::operation_failed);
 }
 
-////BOOST_AUTO_TEST_CASE(p2p__start__seed_session__start_stop_start_success)
+////TEST_CASE("p2p  start  seed session  start stop start success", "[p2p tests]")
 ////{
 ////    print_headers(TEST_NAME);
 ////    SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
 ////    p2p network(configuration);
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-////    BOOST_REQUIRE(network.stop());
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+////    REQUIRE(start_result(network) == error::success);
+////    REQUIRE(network.stop());
+////    REQUIRE(start_result(network) == error::success);
 ////}
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_handshake_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session handshake timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.channel_handshake_seconds = 0;
@@ -240,51 +240,51 @@ BOOST_AUTO_TEST_CASE(p2p__start__seed_session_handshake_timeout__start_peer_thro
     // The (timeout) error on the individual connection is ignored.
     // The connection failure results in a failure to generate any addresses.
     // The failure to generate an increase of 100 addresses produces error::peer_throttling.
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
+    REQUIRE(start_result(network) == error::peer_throttling);
 
     // The service never started but stop will still succeed (and is optional).
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_connect_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session connect timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.connect_timeout_seconds = 0;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::peer_throttling);
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_germination_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session germination timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.channel_germination_seconds = 0;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::peer_throttling);
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_inactivity_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session inactivity timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.channel_inactivity_minutes = 0;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::peer_throttling);
+    REQUIRE(network.stop());
 }
 
-BOOST_AUTO_TEST_CASE(p2p__start__seed_session_expiration_timeout__start_peer_throttling_stop_success) {
+TEST_CASE("p2p  start  seed session expiration timeout  start peer throttling stop success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_ONE_SEED(configuration);
     configuration.channel_expiration_minutes = 0;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::peer_throttling);
-    BOOST_REQUIRE(network.stop());
+    REQUIRE(start_result(network) == error::peer_throttling);
+    REQUIRE(network.stop());
 }
 
 // Disabled for live test reliability.
 // This may fail due to missing blacklist entries for the specified host.
-////BOOST_AUTO_TEST_CASE(p2p__start__seed_session_blacklisted__start_operation_fail_stop_success)
+////TEST_CASE("p2p  start  seed session blacklisted  start operation fail stop success", "[p2p tests]")
 ////{
 ////    print_headers(TEST_NAME);
 ////    SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
@@ -293,69 +293,69 @@ BOOST_AUTO_TEST_CASE(p2p__start__seed_session_expiration_timeout__start_peer_thr
 ////    configuration.seeds = { { SEED1 } };
 ////    configuration.blacklists = SEED1_AUTHORITIES;
 ////    p2p network(configuration);
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::operation_failed);
-////    BOOST_REQUIRE(network.stop());
+////    REQUIRE(start_result(network) == error::operation_failed);
+////    REQUIRE(network.stop());
 ////}
 
-BOOST_AUTO_TEST_CASE(p2p__start__outbound_no_seeds__success) {
+TEST_CASE("p2p  start  outbound no seeds  success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     configuration.outbound_connections = 1;
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+    REQUIRE(start_result(network) == error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__connect__not_started__service_stopped) {
+TEST_CASE("p2p  connect  not started  service stopped", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host(SEED1);
-    BOOST_REQUIRE_EQUAL(connect_result(network, host), error::service_stopped);
+    infrastructure::config::endpoint const host(SEED1);
+    REQUIRE(connect_result(network, host) == error::service_stopped);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__connect__started__success) {
+TEST_CASE("p2p  connect  started  success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host(SEED1);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(run_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(connect_result(network, host), error::success);
+    infrastructure::config::endpoint const host(SEED1);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(run_result(network) == error::success);
+    REQUIRE(connect_result(network, host) == error::success);
 }
 
 // Disabled for live test reliability.
 // This may fail due to connecting to the same host on different addresses.
-////BOOST_AUTO_TEST_CASE(p2p__connect__twice__address_in_use)
+////TEST_CASE("p2p  connect  twice  address in use", "[p2p tests]")
 ////{
 ////    print_headers(TEST_NAME);
 ////    SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
 ////    p2p network(configuration);
-////    const infrastructure::config::endpoint host(SEED1);
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-////    BOOST_REQUIRE_EQUAL(run_result(network), error::success);
-////    BOOST_REQUIRE_EQUAL(connect_result(network, host), error::success);
-////    BOOST_REQUIRE_EQUAL(connect_result(network, host), error::address_in_use);
+////    infrastructure::config::endpoint const host(SEED1);
+////    REQUIRE(start_result(network) == error::success);
+////    REQUIRE(run_result(network) == error::success);
+////    REQUIRE(connect_result(network, host) == error::success);
+////    REQUIRE(connect_result(network, host) == error::address_in_use);
 ////}
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__stopped__service_stopped) {
+TEST_CASE("p2p  subscribe  stopped  service stopped", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
 
     // Expect immediate return because service is not started.
-    BOOST_REQUIRE_EQUAL(subscribe_result(network), error::service_stopped);
+    REQUIRE(subscribe_result(network) == error::service_stopped);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__started_stop__service_stopped) {
+TEST_CASE("p2p  subscribe  started stop  service stopped", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+    REQUIRE(start_result(network) == error::success);
 
     std::promise<code> promise;
     auto const handler = [](code ec, channel::ptr channel) {
-        BOOST_REQUIRE( ! channel);
-        BOOST_REQUIRE_EQUAL(ec, error::service_stopped);
+        REQUIRE( ! channel);
+        REQUIRE(ec == error::service_stopped);
         return false;
     };
 
@@ -363,43 +363,43 @@ BOOST_AUTO_TEST_CASE(p2p__subscribe__started_stop__service_stopped) {
     network.subscribe_connection(handler);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__started_connect1__success) {
+TEST_CASE("p2p  subscribe  started connect1  success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host(SEED1);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(subscribe_connect1_result(network, host), error::success);
+    infrastructure::config::endpoint const host(SEED1);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(subscribe_connect1_result(network, host) == error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__subscribe__started_connect2__success) {
+TEST_CASE("p2p  subscribe  started connect2  success", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host(SEED1);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(subscribe_connect2_result(network, host), error::success);
+    infrastructure::config::endpoint const host(SEED1);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(subscribe_connect2_result(network, host) == error::success);
 }
 
-BOOST_AUTO_TEST_CASE(p2p__broadcast__ping_two_distinct_hosts__two_sends_and_successful_completion) {
+TEST_CASE("p2p  broadcast  ping two distinct hosts  two sends and successful completion", "[p2p tests]") {
     print_headers(TEST_NAME);
     SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(configuration);
     p2p network(configuration);
-    const infrastructure::config::endpoint host1(SEED1);
-    const infrastructure::config::endpoint host2(SEED2);
-    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(run_result(network), error::success);
-    BOOST_REQUIRE_EQUAL(connect_result(network, host1), error::success);
-    BOOST_REQUIRE_EQUAL(connect_result(network, host2), error::success);
-    BOOST_REQUIRE_EQUAL(send_result(ping(0), network, 2), error::success);
+    infrastructure::config::endpoint const host1(SEED1);
+    infrastructure::config::endpoint const host2(SEED2);
+    REQUIRE(start_result(network) == error::success);
+    REQUIRE(run_result(network) == error::success);
+    REQUIRE(connect_result(network, host1) == error::success);
+    REQUIRE(connect_result(network, host2) == error::success);
+    REQUIRE(send_result(ping(0), network, 2) == error::success);
 }
 
-////BOOST_AUTO_TEST_CASE(p2p__subscribe__seed_outbound__success)
+////TEST_CASE("p2p  subscribe  seed outbound  success", "[p2p tests]")
 ////{
 ////    print_headers(TEST_NAME);
 ////    SETTINGS_TESTNET_THREE_THREADS_ONE_SEED_FIVE_OUTBOUND(configuration);
 ////    p2p network(configuration);
-////    BOOST_REQUIRE_EQUAL(start_result(network), error::success);
+////    REQUIRE(start_result(network) == error::success);
 ////
 ////    std::promise<code> subscribe;
 ////    auto const subscribe_handler = [&subscribe, &network](code ec, channel::ptr)
@@ -418,11 +418,11 @@ BOOST_AUTO_TEST_CASE(p2p__broadcast__ping_two_distinct_hosts__two_sends_and_succ
 ////    };
 ////    network.run(run_handler);
 ////
-////    BOOST_REQUIRE_EQUAL(run.get_future().get().value(), error::success);
-////    BOOST_REQUIRE_EQUAL(subscribe.get_future().get().value(), error::success);
+////    REQUIRE(run.get_future().get().value() == error::success);
+////    REQUIRE(subscribe.get_future().get().value() == error::success);
 ////
 ////    // ~network blocks on stopping all channels.
 ////    // during channel.stop each channel removes itself from the collection.
 ////}
 
-BOOST_AUTO_TEST_SUITE_END()
+// End Boost Suite

@@ -33,7 +33,7 @@ public:
     ~connector();
 
     /// Try to connect to the endpoint.
-    virtual void connect(const infrastructure::config::endpoint& endpoint,
+    virtual void connect(infrastructure::config::endpoint const& endpoint,
         connect_handler handler);
 
     /// Try to connect to the authority.

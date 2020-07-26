@@ -63,6 +63,9 @@ class KnuthNetworkConan(KnuthConanFile):
     def requirements(self):
         self.requires("domain/0.X@%s/%s" % (self.user, self.channel))
 
+        if self.options.tests:
+            self.requires("catch2/2.12.2@")
+
     def config_options(self):
         KnuthConanFile.config_options(self)
 
