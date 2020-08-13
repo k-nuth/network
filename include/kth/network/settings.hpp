@@ -62,7 +62,7 @@ public:
     bool use_ipv6;
 
     std::vector<std::string> user_agent_backlist
-#ifdef KTH_CURRENCY_BCH
+#if defined(KTH_CURRENCY_BCH)
         {"/Bitcoin SV:"}
 #endif
     ;

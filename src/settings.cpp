@@ -18,7 +18,7 @@ settings::settings()
     , protocol_maximum(version::level::maximum)
     , protocol_minimum(version::level::minimum)
     , services(version::service::none)
-#ifdef KTH_CURRENCY_BCH
+#if defined(KTH_CURRENCY_BCH)
     , invalid_services(0)
 #else
     , invalid_services(176)
@@ -74,7 +74,7 @@ settings::settings(infrastructure::config::settings context)
             // identifier = 3652501241;
             inbound_port = 8333;
 
-#ifdef KTH_CURRENCY_BCH
+#if defined(KTH_CURRENCY_BCH)
             identifier = netmagic::bch_mainnet; 
             seeds.reserve(5);
             seeds.push_back({ "seed.bitcoinabc.org", 8333 });
@@ -110,7 +110,7 @@ settings::settings(infrastructure::config::settings context)
 #else
             // identifier = 118034699;
             inbound_port = 18333;
-#ifdef KTH_CURRENCY_BCH
+#if defined(KTH_CURRENCY_BCH)
             identifier = netmagic::bch_testnet;
             seeds.reserve(5);
             seeds.push_back({ "testnet-seed.bitcoinabc.org", 18333 });

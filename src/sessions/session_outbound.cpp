@@ -123,7 +123,7 @@ void session_outbound::attach_handshake_protocols(channel::ptr channel, result_h
     auto const invalid_services = settings_.invalid_services;
     auto const minimum_version = settings_.protocol_minimum;
 
-#ifdef KTH_CURRENCY_BCH
+#if defined(KTH_CURRENCY_BCH)
     auto const minimum_services = serve::node_network;
 #else
     // Require peer to serve network (and witness if configured on self).
