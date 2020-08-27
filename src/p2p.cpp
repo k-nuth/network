@@ -57,8 +57,10 @@ p2p::p2p(settings const& settings)
     , pending_connect_(nominal_connecting(settings_))
     , pending_handshake_(nominal_connected(settings_))
     , pending_close_(nominal_connected(settings_))
+    , threadpool_("network")
     , stop_subscriber_(std::make_shared<stop_subscriber>(threadpool_, NAME "_stop_sub"))
-    , channel_subscriber_(std::make_shared<channel_subscriber>(threadpool_, NAME "_sub")) {}
+    , channel_subscriber_(std::make_shared<channel_subscriber>(threadpool_, NAME "_sub")) 
+{}
 
 // This allows for shutdown based on destruct without need to call stop.
 p2p::~p2p() {
@@ -217,38 +219,59 @@ session_outbound::ptr p2p::attach_outbound_session() {
 // taken around the entire section, which poses a deadlock risk. Instead this
 // is thread safe and idempotent, allowing it to be unguarded.
 bool p2p::stop() {
+    // LOG_INFO(LOG_NETWORK, "p2p::stop() 1");
+
     // This is the only stop operation that can fail.
     auto const result = (hosts_.stop() == error::success);
+    // LOG_INFO(LOG_NETWORK, "p2p::stop() 2");
 
     // Signal all current work to stop and free manual session.
     stopped_ = true;
     manual_.store({});
 
+    // LOG_INFO(LOG_NETWORK, "p2p::stop() 3");
+
     // Prevent subscription after stop.
     stop_subscriber_->stop();
     stop_subscriber_->invoke(error::service_stopped);
 
+    // LOG_INFO(LOG_NETWORK, "p2p::stop() 4");
+
     // Prevent subscription after stop.
     channel_subscriber_->stop();
     channel_subscriber_->invoke(error::service_stopped, {});
+
+    // LOG_INFO(LOG_NETWORK, "p2p::stop() 5");
 
     // Stop creating new channels and stop those that exist (self-clearing).
     pending_connect_.stop(error::service_stopped);
     pending_handshake_.stop(error::service_stopped);
     pending_close_.stop(error::service_stopped);
 
+    // LOG_INFO(LOG_NETWORK, "p2p::stop() 6");
+
     // Signal threadpool to stop accepting work now that subscribers are clear.
     threadpool_.shutdown();
+
+    // LOG_INFO(LOG_NETWORK, "p2p::stop() 7");
+
     return result;
 }
 
 // This must be called from the thread that constructed this class (see join).
 bool p2p::close() {
+    // LOG_INFO(LOG_NETWORK, "p2p::close() 1");
+
     // Signal current work to stop and threadpool to stop accepting new work.
     auto const result = p2p::stop();
 
+    // LOG_INFO(LOG_NETWORK, "p2p::close() 2");
+
     // Block on join of all threads in the threadpool.
     threadpool_.join();
+
+    // LOG_INFO(LOG_NETWORK, "p2p::close() 3");
+
     return result;
 }
 
