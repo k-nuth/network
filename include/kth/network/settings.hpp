@@ -61,7 +61,7 @@ public:
     bool verbose;
     bool use_ipv6;
 
-    std::vector<std::string> user_agent_backlist
+    std::vector<std::string> user_agent_blacklist
 #if defined(KTH_CURRENCY_BCH)
         {"/Bitcoin SV:"}
 #endif

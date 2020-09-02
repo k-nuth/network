@@ -103,14 +103,14 @@ bool protocol_version_31402::handle_receive_version(code const& ec, version_cons
 
     auto const& settings = network_.network_settings();
 
-    auto blacklisted = std::find_if(begin(settings.user_agent_backlist), end(settings.user_agent_backlist), [&message](auto const& x){
+    auto blacklisted = std::find_if(begin(settings.user_agent_blacklist), end(settings.user_agent_blacklist), [&message](auto const& x){
         if (x.size() <= message->user_agent().size()) {
             return std::equal(begin(x), end(x), begin(message->user_agent()));
         }
         return std::equal(begin(message->user_agent()), end(message->user_agent()), begin(x));
     });
 
-    if (blacklisted != end(settings.user_agent_backlist)) {
+    if (blacklisted != end(settings.user_agent_blacklist)) {
         LOG_DEBUG(LOG_NETWORK, "Invalid user agent (blacklisted) for peer [", authority(), "] user agent: ", message->user_agent());
         set_event(error::channel_stopped);
         return false;
