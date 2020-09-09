@@ -54,11 +54,11 @@ settings::settings()
 
 // Use push_back due to initializer_list bug:
 // stackoverflow.com/a/20168627/1172329
-settings::settings(infrastructure::config::settings context)
+settings::settings(domain::config::network context)
     : settings() {
     // Handle deviations from common defaults.
     switch (context) {
-        case infrastructure::config::settings::mainnet: {
+        case domain::config::network::mainnet: {
 // #ifdef LITECOIN
 #ifdef KTH_CURRENCY_LTC
             inbound_port = 9333;
@@ -97,7 +97,7 @@ settings::settings(infrastructure::config::settings context)
         }
 
         // Seeds based on satoshi client v0.14.0 plus voskuil.org.
-        case infrastructure::config::settings::testnet: {
+        case domain::config::network::testnet: {
 
 // #ifdef LITECOIN
 #ifdef KTH_CURRENCY_LTC
@@ -132,16 +132,13 @@ settings::settings(infrastructure::config::settings context)
             break;
         }
 
-        case infrastructure::config::settings::regtest: {
+        case domain::config::network::regtest: {
             identifier = 3669344250;
             inbound_port = 18444;
 
             // Regtest is private network only, so there is no seeding.
             break;
         }
-
-        default:
-        case infrastructure::config::settings::none: {}
     }
 }
 

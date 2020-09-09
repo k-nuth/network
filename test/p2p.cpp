@@ -40,7 +40,7 @@ using namespace kth::network;
     }
 
 #define SETTINGS_TESTNET_ONE_THREAD_NO_CONNECTIONS(name) \
-    auto name = network::settings(infrastructure::config::settings::testnet); \
+    auto name = network::settings(domain::config::network::testnet); \
     name.threads = 1; \
     name.outbound_connections = 0; \
     name.manual_attempt_limit = 2
@@ -52,7 +52,7 @@ using namespace kth::network;
     name.hosts_file = get_log_path(TEST_NAME, "hosts")
 
 #define SETTINGS_TESTNET_THREE_THREADS_ONE_SEED_FIVE_OUTBOUND(name) \
-    auto name = network::settings(infrastructure::config::settings::testnet); \
+    auto name = network::settings(domain::config::network::testnet); \
     name.threads = 3; \
     name.host_pool_capacity = 42; \
     name.outbound_connections = 5; \
