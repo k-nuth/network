@@ -23,7 +23,8 @@ hosts::hosts(settings const& settings)
     , buffer_(std::max(capacity_, static_cast<size_t>(1u)))
     , stopped_(true)
     , file_path_(settings.hosts_file)
-    , disabled_(capacity_ == 0) {}
+    , disabled_(capacity_ == 0) 
+{}
 
 // private
 hosts::iterator hosts::find(address const& host) {

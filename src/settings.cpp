@@ -50,7 +50,8 @@ settings::settings()
     , maximum_archive_files(0)
     , statistics_server(unspecified_network_address)
     , verbose(false)
-    , use_ipv6(true) {}
+    , use_ipv6(true) 
+{}
 
 // Use push_back due to initializer_list bug:
 // stackoverflow.com/a/20168627/1172329
@@ -65,11 +66,11 @@ settings::settings(domain::config::network context)
             // identifier = 0xdbb6c0fb; 
             identifier = netmagic::ltc_mainnet; 
             seeds.reserve(5);
-            seeds.push_back({ "seed-a.litecoin.loshan.co.uk", 9333 });
-            seeds.push_back({ "dnsseed.thrasher.io", 9333 });
-            seeds.push_back({ "dnsseed.litecointools.com", 9333 });
-            seeds.push_back({ "dnsseed.litecoinpool.org", 9333 });
-            seeds.push_back({ "dnsseed.koin-project.com", 9333 });        
+            seeds.emplace_back("seed-a.litecoin.loshan.co.uk", 9333);
+            seeds.emplace_back("dnsseed.thrasher.io", 9333);
+            seeds.emplace_back("dnsseed.litecointools.com", 9333);
+            seeds.emplace_back("dnsseed.litecoinpool.org", 9333);
+            seeds.emplace_back("dnsseed.koin-project.com", 9333);        
 #else
             // identifier = 3652501241;
             inbound_port = 8333;
@@ -77,68 +78,76 @@ settings::settings(domain::config::network context)
 #if defined(KTH_CURRENCY_BCH)
             identifier = netmagic::bch_mainnet; 
             seeds.reserve(5);
-            seeds.push_back({ "seed.bitcoinabc.org", 8333 });
-            seeds.push_back({ "seed-bch.bitcoinforks.org", 8333 });
-            seeds.push_back({ "btccash-seeder.bitcoinunlimited.info", 8333 });
-            seeds.push_back({ "seed.deadalnix.me", 8333 });
-            seeds.push_back({ "seed.bchd.cash", 8333 });
+            seeds.emplace_back("seed.bitcoinabc.org", 8333);
+            seeds.emplace_back("seed-bch.bitcoinforks.org", 8333);
+            seeds.emplace_back("btccash-seeder.bitcoinunlimited.info", 8333);
+            seeds.emplace_back("seed.deadalnix.me", 8333);
+            seeds.emplace_back("seed.bchd.cash", 8333);
 #else
             identifier = netmagic::btc_mainnet; 
             seeds.reserve(6);
-            seeds.push_back({ "seed.bitcoin.sipa.be", 8333 });
-            seeds.push_back({ "dnsseed.bluematt.me", 8333 });
-            seeds.push_back({ "dnsseed.bitcoin.dashjr.org", 8333 });
-            seeds.push_back({ "seed.bitcoinstats.com", 8333 });
-            seeds.push_back({ "seed.bitcoin.jonasschnelli.ch", 8333 });
-            seeds.push_back({ "seed.voskuil.org", 8333 });
+            seeds.emplace_back("seed.bitcoin.sipa.be", 8333);
+            seeds.emplace_back("dnsseed.bluematt.me", 8333);
+            seeds.emplace_back("dnsseed.bitcoin.dashjr.org", 8333);
+            seeds.emplace_back("seed.bitcoinstats.com", 8333);
+            seeds.emplace_back("seed.bitcoin.jonasschnelli.ch", 8333);
+            seeds.emplace_back("seed.voskuil.org", 8333);
 #endif // KTH_CURRENCY_BCH
 #endif //KTH_CURRENCY_LTC
             break;
         }
 
-        // Seeds based on satoshi client v0.14.0 plus voskuil.org.
         case domain::config::network::testnet: {
-
-// #ifdef LITECOIN
 #ifdef KTH_CURRENCY_LTC
             // identifier = 4056470269;
             identifier = netmagic::ltc_testnet;
             inbound_port = 19335;
             seeds.reserve(2);
-            seeds.push_back({ "testnet-seed.litecointools.com", 19335 });
-            seeds.push_back({ "seed-b.litecoin.loshan.co.uk", 19335 });
+            seeds.emplace_back("testnet-seed.litecointools.com", 19335);
+            seeds.emplace_back("seed-b.litecoin.loshan.co.uk", 19335);
 #else
             // identifier = 118034699;
             inbound_port = 18333;
 #if defined(KTH_CURRENCY_BCH)
             identifier = netmagic::bch_testnet;
             seeds.reserve(5);
-            seeds.push_back({ "testnet-seed.bitcoinabc.org", 18333 });
-            seeds.push_back({ "testnet-seed-bch.bitcoinforks.org", 18333 });
-            seeds.push_back({ "testnet-seed.bitcoinunlimited.info", 18333 });
-            seeds.push_back({ "testnet-seed.deadalnix.me", 18333 });
-            seeds.push_back({ "testnet-seed.bchd.cash", 18333 });
+            seeds.emplace_back("testnet-seed.bitcoinabc.org", 18333);
+            seeds.emplace_back("testnet-seed-bch.bitcoinforks.org", 18333);
+            seeds.emplace_back("testnet-seed.bitcoinunlimited.info", 18333);
+            seeds.emplace_back("testnet-seed.deadalnix.me", 18333);
+            seeds.emplace_back("testnet-seed.bchd.cash", 18333);
 #else
             identifier = netmagic::btc_testnet;
             // Seeds based on satoshi client v0.14.0 plus voskuil.org.
             seeds.reserve(5);
-            seeds.push_back({ "testnet-seed.bitcoin.jonasschnelli.ch", 18333 });
-            seeds.push_back({ "seed.tbtc.petertodd.org", 18333 });
-            seeds.push_back({ "testnet-seed.bluematt.me", 18333 });
-            seeds.push_back({ "testnet-seed.bitcoin.schildbach.de", 18333 });
-            seeds.push_back({ "testnet-seed.voskuil.org", 18333 });
+            seeds.emplace_back("testnet-seed.bitcoin.jonasschnelli.ch", 18333);
+            seeds.emplace_back("seed.tbtc.petertodd.org", 18333);
+            seeds.emplace_back("testnet-seed.bluematt.me", 18333);
+            seeds.emplace_back("testnet-seed.bitcoin.schildbach.de", 18333);
+            seeds.emplace_back("testnet-seed.voskuil.org", 18333);
 #endif //KTH_CURRENCY_BCH
 #endif //KTH_CURRENCY_LTC
             break;
         }
 
         case domain::config::network::regtest: {
-            identifier = 3669344250;
+            identifier = 3669344250;        //TODO(fernando): use appropiate constant
             inbound_port = 18444;
 
             // Regtest is private network only, so there is no seeding.
             break;
         }
+
+#if defined(KTH_CURRENCY_BCH)
+        case domain::config::network::testnet4: {
+            inbound_port = 28333;
+            identifier = netmagic::bch_testnet4;
+            seeds.reserve(1);
+            //TODO(fernando): tesnet4 seeders
+            // seeds.emplace_back("testnet4-seed-bch.bitcoinforks.org", 28333);
+            break;
+        }
+#endif //KTH_CURRENCY_BCH
     }
 }
 
