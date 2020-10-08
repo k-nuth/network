@@ -12,7 +12,6 @@
 #include <kth/network/p2p.hpp>
 #include <kth/network/protocols/protocol_timer.hpp>
 #include <kth/network/settings.hpp>
-#include <kth/network/user_agent.hpp>
 
 namespace kth::network {
 
