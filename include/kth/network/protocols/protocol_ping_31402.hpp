@@ -21,10 +21,10 @@ class p2p;
  * Attach this to a channel immediately following handshake completion.
  */
 class BCT_API protocol_ping_31402
-  : public protocol_timer, track<protocol_ping_31402>
+    : public protocol_timer, track<protocol_ping_31402>
 {
 public:
-    typedef std::shared_ptr<protocol_ping_31402> ptr;
+    using ptr = std::shared_ptr<protocol_ping_31402>;
 
     /**
      * Construct a ping protocol instance.
