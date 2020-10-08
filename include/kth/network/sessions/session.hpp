@@ -73,13 +73,15 @@ protected:
 
     /// Bind a method in the derived class.
     template <typename Session, typename Handler, typename... Args>
-    auto bind(Handler&& handler, Args&&... args) const {
+    auto bind(Handler&& handler, Args&&... args) -> 
+        decltype(BOUND_SESSION_TYPE(handler, args)) const {
         return BOUND_SESSION(handler, args);
     }
 
     /// Bind a concurrent delegate to a method in the derived class.
     template <typename Session, typename Handler, typename... Args>
-    auto concurrent_delegate(Handler&& handler, Args&&... args) const {
+    auto concurrent_delegate(Handler&& handler, Args&&... args) ->
+        delegates::concurrent<decltype(BOUND_SESSION_TYPE(handler, args))> const {
         return dispatch_.concurrent_delegate(SESSION_ARGS(handler, args));
     }
 
