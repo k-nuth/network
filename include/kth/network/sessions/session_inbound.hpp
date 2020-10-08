@@ -20,11 +20,9 @@ namespace kth::network {
 class p2p;
 
 /// Inbound connections session, thread safe.
-class BCT_API session_inbound
-  : public session, track<session_inbound>
-{
+class BCT_API session_inbound : public session, track<session_inbound> {
 public:
-    typedef std::shared_ptr<session_inbound> ptr;
+    using ptr = std::shared_ptr<session_inbound>;
 
     /// Construct an instance.
     session_inbound(p2p& network, bool notify_on_connect);

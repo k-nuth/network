@@ -21,12 +21,12 @@ namespace kth::network {
 
 /// Manages all socket communication, thread safe.
 class BCT_API proxy
-  : public enable_shared_from_base<proxy>, noncopyable
+    : public enable_shared_from_base<proxy>, noncopyable
 {
 public:
-    typedef std::shared_ptr<proxy> ptr;
-    typedef std::function<void(code const&)> result_handler;
-    typedef subscriber<code> stop_subscriber;
+    using ptr = std::shared_ptr<proxy>;
+    using result_handler = std::function<void(code const&)>;
+    using stop_subscriber = subscriber<code>;
 
     /// Construct an instance.
     proxy(threadpool& pool, socket::ptr socket, settings const& settings);
@@ -79,10 +79,10 @@ protected:
     virtual void handle_stopping() = 0;
 
 private:
-    typedef byte_source<data_chunk> payload_source;
-    typedef boost::iostreams::stream<payload_source> payload_stream;
-    typedef std::shared_ptr<std::string> command_ptr;
-    typedef std::shared_ptr<data_chunk> payload_ptr;
+    using payload_source = byte_source<data_chunk>;
+    using payload_stream = boost::iostreams::stream<payload_source>;
+    using command_ptr = std::shared_ptr<std::string>;
+    using payload_ptr = std::shared_ptr<data_chunk>;
 
     static infrastructure::config::authority authority_factory(socket::ptr socket);
 

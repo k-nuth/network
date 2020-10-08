@@ -20,10 +20,10 @@ class p2p;
  * Attach this to a channel immediately following seed handshake completion.
  */
 class BCT_API protocol_seed_31402
-  : public protocol_timer, track<protocol_seed_31402>
+    : public protocol_timer, track<protocol_seed_31402>
 {
 public:
-    typedef std::shared_ptr<protocol_seed_31402> ptr;
+    using ptr = std::shared_ptr<protocol_seed_31402>;
 
     /**
      * Construct a seed protocol instance.
@@ -46,10 +46,8 @@ protected:
     virtual void handle_store_addresses(code const& ec);
     virtual void handle_seeding_complete(code const& ec, event_handler handler);
 
-    virtual bool handle_receive_address(code const& ec,
-        address_const_ptr address);
-    ////virtual bool handle_receive_get_address(code const& ec,
-    ////    get_address_const_ptr message);
+    virtual bool handle_receive_address(code const& ec, address_const_ptr address);
+    //virtual bool handle_receive_get_address(code const& ec, get_address_const_ptr message);
 
     p2p& network_;
     const infrastructure::config::authority self_;

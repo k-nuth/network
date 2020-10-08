@@ -24,7 +24,7 @@ class BCT_API channel
   : public proxy, track<channel>
 {
 public:
-    typedef std::shared_ptr<channel> ptr;
+    using ptr = std::shared_ptr<channel>;
 
     /// Construct an instance.
     channel(threadpool& pool, socket::ptr socket, settings const& settings);

@@ -16,10 +16,10 @@ namespace kth::network {
 class p2p;
 
 class BCT_API protocol_reject_70002
-  : public protocol_events, track<protocol_reject_70002>
+    : public protocol_events, track<protocol_reject_70002>
 {
 public:
-    typedef std::shared_ptr<protocol_reject_70002> ptr;
+    using ptr = std::shared_ptr<protocol_reject_70002>;
 
     /**
      * Construct a reject protocol for logging reject payloads.
@@ -34,8 +34,7 @@ public:
     virtual void start();
 
 protected:
-    virtual bool handle_receive_reject(code const& ec,
-        reject_const_ptr reject);
+    virtual bool handle_receive_reject(code const& ec, reject_const_ptr reject);
 };
 
 } // namespace kth::network

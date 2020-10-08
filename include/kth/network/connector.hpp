@@ -23,8 +23,8 @@ class BCT_API connector
   : public enable_shared_from_base<connector>, noncopyable, track<connector>
 {
 public:
-    typedef std::shared_ptr<connector> ptr;
-    typedef std::function<void(code const& ec, channel::ptr)> connect_handler;
+    using ptr = std::shared_ptr<connector>;
+    using connect_handler = std::function<void(code const& ec, channel::ptr)>;
 
     /// Construct an instance.
     connector(threadpool& pool, settings const& settings);
@@ -48,16 +48,13 @@ public:
     void stop(code const& ec);
 
 private:
-    typedef std::shared_ptr<asio::query> query_ptr;
+    using query_ptr = std::shared_ptr<asio::query>;
 
     bool stopped() const;
 
-    void handle_resolve(const boost_code& ec, asio::iterator iterator,
-        connect_handler handler);
-    void handle_connect(const boost_code& ec, asio::iterator iterator,
-        socket::ptr socket, connect_handler handler);
-    void handle_timer(code const& ec, socket::ptr socket,
-        connect_handler handler);
+    void handle_resolve(const boost_code& ec, asio::iterator iterator, connect_handler handler);
+    void handle_connect(const boost_code& ec, asio::iterator iterator, socket::ptr socket, connect_handler handler);
+    void handle_timer(code const& ec, socket::ptr socket, connect_handler handler);
 
     // These are thread safe
     std::atomic<bool> stopped_;

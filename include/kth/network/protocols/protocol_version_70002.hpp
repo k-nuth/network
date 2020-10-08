@@ -19,10 +19,10 @@ namespace kth::network {
 class p2p;
 
 class BCT_API protocol_version_70002
-  : public protocol_version_31402, track<protocol_version_70002>
+    : public protocol_version_31402, track<protocol_version_70002>
 {
 public:
-    typedef std::shared_ptr<protocol_version_70002> ptr;
+    using ptr = std::shared_ptr<protocol_version_70002>;
 
     /**
      * Construct a version protocol instance using configured minimums.

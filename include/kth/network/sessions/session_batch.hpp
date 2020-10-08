@@ -17,11 +17,8 @@ namespace kth::network {
 class p2p;
 
 /// Intermediate base class for adding batch connect sequence.
-class BCT_API session_batch
-  : public session
-{
+class BCT_API session_batch : public session {
 protected:
-
     /// Construct an instance.
     session_batch(p2p& network, bool notify_on_connect);
 
@@ -31,10 +28,8 @@ protected:
 private:
     // Connect sequence
     void new_connect(channel_handler handler);
-    void start_connect(code const& ec, authority const& host,
-        channel_handler handler);
-    void handle_connect(code const& ec, channel::ptr channel,
-        connector::ptr connector, channel_handler handler);
+    void start_connect(code const& ec, authority const& host, channel_handler handler);
+    void handle_connect(code const& ec, channel::ptr channel, connector::ptr connector, channel_handler handler);
 
     size_t const batch_size_;
 };

@@ -23,8 +23,8 @@ class BCT_API acceptor
   : public enable_shared_from_base<acceptor>, noncopyable, track<acceptor>
 {
 public:
-    typedef std::shared_ptr<acceptor> ptr;
-    typedef std::function<void(code const&, channel::ptr)> accept_handler;
+    using ptr = std::shared_ptr<acceptor>;
+    using accept_handler = std::function<void(code const&, channel::ptr)>;
 
     /// Construct an instance.
     acceptor(threadpool& pool, settings const& settings);
@@ -44,8 +44,7 @@ public:
 private:
     virtual bool stopped() const;
 
-    void handle_accept(const boost_code& ec, socket::ptr socket,
-        accept_handler handler);
+    void handle_accept(const boost_code& ec, socket::ptr socket, accept_handler handler);
 
     // These are thread safe.
     std::atomic<bool> stopped_;

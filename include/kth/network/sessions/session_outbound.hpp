@@ -18,11 +18,9 @@ namespace kth::network {
 class p2p;
 
 /// Outbound connections session, thread safe.
-class BCT_API session_outbound
-  : public session_batch, track<session_outbound>
-{
+class BCT_API session_outbound : public session_batch, track<session_outbound> {
 public:
-    typedef std::shared_ptr<session_outbound> ptr;
+    using ptr = std::shared_ptr<session_outbound>;
 
     /// Construct an instance.
     session_outbound(p2p& network, bool notify_on_connect);
@@ -36,8 +34,7 @@ protected:
         result_handler handle_started) override;
 
     /// Overridden to attach minimum service level for witness support.
-    void attach_handshake_protocols(channel::ptr channel,
-        result_handler handle_started) override;
+    void attach_handshake_protocols(channel::ptr channel, result_handler handle_started) override;
 
     /// Override to attach specialized protocols upon channel start.
     virtual void attach_protocols(channel::ptr channel);
@@ -47,10 +44,7 @@ private:
 
     void handle_started(code const& ec, result_handler handler);
     void handle_connect(code const& ec, channel::ptr channel);
-
-    void do_unpend(code const& ec, channel::ptr channel,
-        result_handler handle_started);
-
+    void do_unpend(code const& ec, channel::ptr channel, result_handler handle_started);
     void handle_channel_stop(code const& ec, channel::ptr channel);
     void handle_channel_start(code const& ec, channel::ptr channel);
 };

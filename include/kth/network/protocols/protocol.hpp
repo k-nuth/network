@@ -32,22 +32,18 @@ namespace kth::network {
 class p2p;
 
 /// Virtual base class for protocol implementation, mostly thread safe.
-class BCT_API protocol
-  : public enable_shared_from_base<protocol>, noncopyable
-{
+class BCT_API protocol : public enable_shared_from_base<protocol>, noncopyable {
 protected:
-    typedef std::function<void()> completion_handler;
-    typedef std::function<void(code const&)> event_handler;
-    typedef std::function<void(code const&, size_t)> count_handler;
+    using completion_handler = std::function<void()>;
+    using event_handler = std::function<void(code const&)>;
+    using count_handler = std::function<void(code const&, size_t)>;
 
     /// Construct an instance.
     protocol(p2p& network, channel::ptr channel, std::string const& name);
 
     /// Bind a method in the derived class.
     template <typename Protocol, typename Handler, typename... Args>
-    auto bind(Handler&& handler, Args&&... args) ->
-        decltype(BOUND_PROTOCOL_TYPE(handler, args)) const
-    {
+    auto bind(Handler&& handler, Args&&... args) const {
         return BOUND_PROTOCOL(handler, args);
     }
 

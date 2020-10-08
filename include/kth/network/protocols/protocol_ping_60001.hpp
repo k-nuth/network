@@ -27,7 +27,7 @@ class BCT_API protocol_ping_60001
   : public protocol_ping_31402, track<protocol_ping_60001>
 {
 public:
-    typedef std::shared_ptr<protocol_ping_60001> ptr;
+    using ptr = std::shared_ptr<protocol_ping_60001>;
 
     /**
      * Construct a ping protocol instance.
@@ -41,8 +41,7 @@ protected:
 
     void handle_send_ping(code const& ec, std::string const& command);
     bool handle_receive_ping(code const& ec, ping_const_ptr message) override;
-    virtual bool handle_receive_pong(code const& ec, pong_const_ptr message,
-        uint64_t nonce);
+    virtual bool handle_receive_pong(code const& ec, pong_const_ptr message, uint64_t nonce);
 
 private:
     std::atomic<bool> pending_;
