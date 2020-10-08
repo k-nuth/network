@@ -33,17 +33,20 @@ protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channe
         , network.network_settings().services
         , network.network_settings().invalid_services
         , network.network_settings().protocol_minimum
-        , version::service::none) {}
+        , version::service::none) 
+{}
 
 protocol_version_31402::protocol_version_31402(p2p& network, channel::ptr channel, uint32_t own_version, uint64_t own_services, uint64_t invalid_services, uint32_t minimum_version, uint64_t minimum_services)
     : protocol_timer(network, channel, false, NAME)
     , network_(network)
+    , user_agent_(network.network_settings().user_agent)
     , own_version_(own_version)
     , own_services_(own_services)
     , invalid_services_(invalid_services)
     , minimum_version_(minimum_version)
     , minimum_services_(minimum_services)
-    , CONSTRUCT_TRACK(protocol_version_31402) {}
+    , CONSTRUCT_TRACK(protocol_version_31402) 
+{}
 
 // Start sequence.
 // ----------------------------------------------------------------------------
@@ -73,7 +76,8 @@ domain::message::version protocol_version_31402::version_factory() const {
     version.set_address_receiver(authority().to_network_address());
     version.set_address_sender(settings.self.to_network_address());
     version.set_nonce(nonce());
-    version.set_user_agent(get_user_agent());
+    // version.set_user_agent(get_user_agent());
+    version.set_user_agent(user_agent_);
     version.set_start_height(static_cast<uint32_t>(height));
 
     // The peer's services cannot be reflected, so zero it.

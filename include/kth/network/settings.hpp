@@ -47,7 +47,7 @@ public:
     infrastructure::config::authority::list blacklists;
     infrastructure::config::endpoint::list peers;
     infrastructure::config::endpoint::list seeds;
-    // bool bitcoin_cash;
+    std::string user_agent;
 
     // [log]
     std::filesystem::path debug_file;

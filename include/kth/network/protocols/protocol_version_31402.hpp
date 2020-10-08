@@ -19,10 +19,10 @@ namespace kth::network {
 class p2p;
 
 class BCT_API protocol_version_31402
-  : public protocol_timer, track<protocol_version_31402>
+    : public protocol_timer, track<protocol_version_31402>
 {
 public:
-    typedef std::shared_ptr<protocol_version_31402> ptr;
+    using ptr = std::shared_ptr<protocol_version_31402>;
 
     /**
      * Construct a version protocol instance using configured minimums.
@@ -59,6 +59,7 @@ protected:
     virtual bool handle_receive_verack(code const& ec, verack_const_ptr);
 
     p2p& network_;
+    std::string const user_agent_;
     const uint32_t own_version_;
     const uint64_t own_services_;
     const uint64_t invalid_services_;
