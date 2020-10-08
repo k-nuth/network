@@ -73,8 +73,6 @@ message( STATUS "Knuth: Compiling version ${KTH_PROJECT_VERSION}")
 
 set(MICROARCHITECTURE "x86_64" CACHE STRING "Specify the Microarchitecture (x86_64|...).")
 message( STATUS "Knuth: Compiling for ${MICROARCHITECTURE}")
-# add_definitions(-DKTH_MICROARCHITECTURE=${MICROARCHITECTURE})
-# add_definitions(-DKTH_MICROARCHITECTURE_STR="${MICROARCHITECTURE}")
 
 set(MARCH_ID "" CACHE STRING "Specify the Microarchitecture ID (x86_64|...).")
 message( STATUS "Knuth: Compiling for Microarchitecture ID ${MARCH_ID}")
@@ -312,7 +310,8 @@ if (WITH_TESTS)
     add_executable(kth_network_test
           test/main.cpp
           test/p2p.cpp
-          test/user_agent_dummy.cpp)
+        #   test/user_agent_dummy.cpp
+    )
 
 
     target_include_directories(kth_network_test PUBLIC
