@@ -112,10 +112,9 @@ settings::settings(domain::config::network context)
 #if defined(KTH_CURRENCY_BCH)
             identifier = netmagic::bch_testnet;
             seeds.reserve(5);
-            seeds.emplace_back("testnet-seed.bitcoinabc.org", 18333);
             seeds.emplace_back("testnet-seed-bch.bitcoinforks.org", 18333);
+            seeds.emplace_back("seed.tbch.loping.net", 18333);
             seeds.emplace_back("testnet-seed.bitcoinunlimited.info", 18333);
-            seeds.emplace_back("testnet-seed.deadalnix.me", 18333);
             seeds.emplace_back("testnet-seed.bchd.cash", 18333);
 #else
             identifier = netmagic::btc_testnet;
