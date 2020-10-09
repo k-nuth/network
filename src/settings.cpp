@@ -111,7 +111,7 @@ settings::settings(domain::config::network context)
             inbound_port = 18333;
 #if defined(KTH_CURRENCY_BCH)
             identifier = netmagic::bch_testnet;
-            seeds.reserve(5);
+            seeds.reserve(4);
             seeds.emplace_back("testnet-seed-bch.bitcoinforks.org", 18333);
             seeds.emplace_back("seed.tbch.loping.net", 18333);
             seeds.emplace_back("testnet-seed.bitcoinunlimited.info", 18333);
