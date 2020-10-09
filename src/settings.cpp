@@ -142,9 +142,10 @@ settings::settings(domain::config::network context)
         case domain::config::network::testnet4: {
             inbound_port = 28333;
             identifier = netmagic::bch_testnet4;
-            seeds.reserve(1);
-            //TODO(fernando): tesnet4 seeders
-            // seeds.emplace_back("testnet4-seed-bch.bitcoinforks.org", 28333);
+            seeds.reserve(3);
+            seeds.emplace_back("testnet4-seed-bch.bitcoinforks.org", 28333);
+            seeds.emplace_back("testnet4-seed-bch.toom.im", 28333);
+            seeds.emplace_back("seed.tbch4.loping.net", 28333);
             break;
         }
 #endif //KTH_CURRENCY_BCH
