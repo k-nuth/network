@@ -77,12 +77,13 @@ settings::settings(domain::config::network context)
 
 #if defined(KTH_CURRENCY_BCH)
             identifier = netmagic::bch_mainnet; 
-            seeds.reserve(5);
-            seeds.emplace_back("seed.bitcoinabc.org", 8333);
+            seeds.reserve(6);
+            seeds.emplace_back("seed.flowee.cash", 8333);
             seeds.emplace_back("seed-bch.bitcoinforks.org", 8333);
             seeds.emplace_back("btccash-seeder.bitcoinunlimited.info", 8333);
-            seeds.emplace_back("seed.deadalnix.me", 8333);
             seeds.emplace_back("seed.bchd.cash", 8333);
+            seeds.emplace_back("seed.bch.loping.net", 8333);
+            seeds.emplace_back("dnsseed.electroncash.de", 8333);
 #else
             identifier = netmagic::btc_mainnet; 
             seeds.reserve(6);
