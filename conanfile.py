@@ -50,7 +50,7 @@ class KnuthNetworkConan(KnuthConanFile):
         "cflags": "_DUMMY_",
         "glibcxx_supports_cxx11_abi": "_DUMMY_",
         "cmake_export_compile_commands": False,
-        "log": "boost",
+        "log": "spdlog",
     }
 
     generators = "cmake"
