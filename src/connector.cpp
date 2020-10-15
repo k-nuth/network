@@ -97,8 +97,8 @@ void connector::connect(std::string const& hostname, uint16_t port, connect_hand
     ///////////////////////////////////////////////////////////////////////////
 }
 
-void connector::handle_resolve(const boost_code& ec, asio::iterator iterator, connect_handler handler) {
-    using namespace boost::asio;
+void connector::handle_resolve(boost_code const& ec, asio::iterator iterator, connect_handler handler) {
+    using namespace ::asio;
 
     // Critical Section
     ///////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ void connector::handle_resolve(const boost_code& ec, asio::iterator iterator, co
 }
 
 // private:
-void connector::handle_connect(const boost_code& ec, asio::iterator,
+void connector::handle_connect(boost_code const& ec, asio::iterator,
     socket::ptr socket, connect_handler handler) {
     if (ec) {
         handler(error::boost_to_error_code(ec), nullptr);
