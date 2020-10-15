@@ -22,7 +22,7 @@ namespace kth::network {
 #define NAME "proxy"
 
 using namespace std::placeholders;
-using namespace boost::asio;
+using namespace ::asio;
 using namespace kd::message;
 
 // Dump up to 1k of payload as hex in order to diagnose failure.
@@ -111,8 +111,7 @@ void proxy::read_heading() {
             shared_from_this(), _1, _2));
 }
 
-void proxy::handle_read_heading(const boost_code& ec, size_t) {
-    // LOG_INFO(LOG_NETWORK, "proxy::handle_read_heading()");
+void proxy::handle_read_heading(boost_code const& ec, size_t) {
     if (stopped()) {
         return;
     }
@@ -166,7 +165,7 @@ void proxy::read_payload(const heading& head) {
     async_read(socket_->get(), buffer(payload_buffer_), std::bind(&proxy::handle_read_payload, shared_from_this(), _1, _2, head));
 }
 
-void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const heading& head) {
+void proxy::handle_read_payload(boost_code const& ec, size_t payload_size, const heading& head) {
     //LOG_INFO(LOG_NETWORK, "proxy::handle_read_payload()");
     if (stopped()) return;
 
@@ -234,16 +233,12 @@ void proxy::handle_read_payload(const boost_code& ec, size_t payload_size, const
 // ----------------------------------------------------------------------------
 
 void proxy::do_send(command_ptr command, payload_ptr payload, result_handler handler) {
-    // LOG_INFO(LOG_NETWORK, "proxy::do_send()");
-
     async_write(socket_->get(), buffer(*payload),
         std::bind(&proxy::handle_send,
             shared_from_this(), _1, _2, command, payload, handler));
 }
 
-void proxy::handle_send(const boost_code& ec, size_t, command_ptr command, payload_ptr payload, result_handler handler) {
-    // LOG_INFO(LOG_NETWORK, "proxy::handle_send()");
-
+void proxy::handle_send(boost_code const& ec, size_t, command_ptr command, payload_ptr payload, result_handler handler) {
     dispatch_.unlock();
     auto const size = payload->size();
     auto const error = code(error::boost_to_error_code(ec));
@@ -277,8 +272,6 @@ void proxy::handle_send(const boost_code& ec, size_t, command_ptr command, paylo
 // lock be taken around the entire section, which poses a deadlock risk.
 // Instead this is thread safe and idempotent, allowing it to be unguarded.
 void proxy::stop(code const& ec) {
-    // LOG_INFO(LOG_NETWORK, "proxy::stop()");
-
     KTH_ASSERT_MSG(ec, "The stop code must be an error code.");
 
     stopped_ = true;
@@ -298,13 +291,13 @@ void proxy::stop(code const& ec) {
     socket_->stop();
 }
 
-void proxy::stop(const boost_code& ec) {
-    // LOG_INFO(LOG_NETWORK, "proxy::stop() - 1");
+#if ! defined(ASIO_STANDALONE)
+void proxy::stop(boost_code const& ec) {
     stop(error::boost_to_error_code(ec));
 }
+#endif
 
 bool proxy::stopped() const {
-    // LOG_INFO(LOG_NETWORK, "proxy::stopped()");
     return stopped_;
 }
 
