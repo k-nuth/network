@@ -43,40 +43,48 @@ public:
 
         // Sequential dispatch is required because write may occur in multiple
         // asynchronous steps invoked on different threads, causing deadlocks.
-        dispatch_.lock(&proxy::do_send,
-            shared_from_this(), command, payload, handler);
+        dispatch_.lock(&proxy::do_send, shared_from_this(), command, payload, handler);
     }
 
     /// Subscribe to messages of the specified type on the socket.
     template <typename Message>
     void subscribe(message_handler<Message>&& handler) {
-        message_subscriber_.subscribe<Message>(
-            std::forward<message_handler<Message>>(handler));
+        message_subscriber_.subscribe<Message>(std::forward<message_handler<Message>>(handler));
     }
 
     /// Subscribe to the stop event.
-    virtual void subscribe_stop(result_handler handler);
+    virtual 
+    void subscribe_stop(result_handler handler);
 
     /// Get the authority of the far end of this socket.
-    virtual const infrastructure::config::authority& authority() const;
+    virtual 
+    const infrastructure::config::authority& authority() const;
 
     /// Get the negotiated protocol version of this socket.
     /// The value should be the lesser of own max and peer min.
     uint32_t negotiated_version() const;
 
     /// Save the negotiated protocol version.
-    virtual void set_negotiated_version(uint32_t value);
+    virtual 
+    void set_negotiated_version(uint32_t value);
 
     /// Read messages from this socket.
-    virtual void start(result_handler handler);
+    virtual 
+    void start(result_handler handler);
 
     /// Stop reading or sending messages on this socket.
-    virtual void stop(code const& ec);
+    virtual 
+    void stop(code const& ec);
 
 protected:
-    virtual bool stopped() const;
-    virtual void signal_activity() = 0;
-    virtual void handle_stopping() = 0;
+    virtual 
+    bool stopped() const;
+    
+    virtual 
+    void signal_activity() = 0;
+    
+    virtual 
+    void handle_stopping() = 0;
 
 private:
     using payload_source = byte_source<data_chunk>;
@@ -87,21 +95,21 @@ private:
     static infrastructure::config::authority authority_factory(socket::ptr socket);
 
     void do_close();
-    void stop(const boost_code& ec);
+
+#if ! defined(ASIO_STANDALONE)
+    void stop(boost_code const& ec);
+#endif
 
     void read_heading();
-    void handle_read_heading(const boost_code& ec, size_t payload_size);
+    void handle_read_heading(boost_code const& ec, size_t payload_size);
 
     void read_payload(const domain::message::heading& head);
-    void handle_read_payload(const boost_code& ec, size_t,
-        const domain::message::heading& head);
+    void handle_read_payload(boost_code const& ec, size_t, const domain::message::heading& head);
 
-    void do_send(command_ptr command, payload_ptr payload,
-        result_handler handler);
-    void handle_send(const boost_code& ec, size_t bytes, command_ptr command,
-        payload_ptr payload, result_handler handler);
+    void do_send(command_ptr command, payload_ptr payload, result_handler handler);
+    void handle_send(boost_code const& ec, size_t bytes, command_ptr command, payload_ptr payload, result_handler handler);
 
-    const infrastructure::config::authority authority_;
+    infrastructure::config::authority const authority_;
 
     // These are protected by read header/payload ordering.
     data_chunk heading_buffer_;
@@ -110,7 +118,7 @@ private:
 
     // These are thread safe.
     std::atomic<bool> stopped_;
-    const uint32_t protocol_magic_;
+    uint32_t const protocol_magic_;
     size_t const maximum_payload_;
     bool const validate_checksum_;
     bool const verbose_;

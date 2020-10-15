@@ -30,9 +30,9 @@
 #define BOOST_BIND_NO_PLACEHOLDERS
 
 // Include boost only here, so placeholders exclusion works.
-#include <boost/asio.hpp>
+#include <kth/infrastructure/utility/asio_helper.hpp>
+
 #include <boost/circular_buffer.hpp>
-// #include <boost/filesystem.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/thread.hpp>
 
