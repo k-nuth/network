@@ -129,9 +129,7 @@ void session_inbound::handle_channel_start(code const& ec, channel::ptr channel)
     }
 
     // Relegate to debug due to typical frequency.
-    LOG_INFO(LOG_NETWORK
-       , "Connected inbound channel [", channel->authority(), "] ("
-       , connection_count(), ")");
+    LOG_DEBUG(LOG_NETWORK, "Connected inbound channel [", channel->authority(), "] (", connection_count(), ")");
 
     attach_protocols(channel);
 };
