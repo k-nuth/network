@@ -128,7 +128,7 @@ void acceptor::accept(accept_handler handler) {
 }
 
 // private:
-void acceptor::handle_accept(const boost_code& ec, socket::ptr socket, accept_handler handler) {
+void acceptor::handle_accept(boost_code const& ec, socket::ptr socket, accept_handler handler) {
     if (ec) {
         handler(error::boost_to_error_code(ec), nullptr);
         return;
