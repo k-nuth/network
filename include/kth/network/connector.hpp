@@ -52,8 +52,8 @@ private:
 
     bool stopped() const;
 
-    void handle_resolve(const boost_code& ec, asio::iterator iterator, connect_handler handler);
-    void handle_connect(const boost_code& ec, asio::iterator iterator, socket::ptr socket, connect_handler handler);
+    void handle_resolve(boost_code const& ec, asio::iterator iterator, connect_handler handler);
+    void handle_connect(boost_code const& ec, asio::iterator iterator, socket::ptr socket, connect_handler handler);
     void handle_timer(code const& ec, socket::ptr socket, connect_handler handler);
 
     // These are thread safe

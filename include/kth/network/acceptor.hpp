@@ -44,7 +44,7 @@ public:
 private:
     virtual bool stopped() const;
 
-    void handle_accept(const boost_code& ec, socket::ptr socket, accept_handler handler);
+    void handle_accept(boost_code const& ec, socket::ptr socket, accept_handler handler);
 
     // These are thread safe.
     std::atomic<bool> stopped_;
