@@ -58,7 +58,7 @@ private:
 
     // HACK: we use this because the buffer capacity cannot be set to zero.
     bool const disabled_;
-    std::filesystem::path const file_path_;
+    kth::path const file_path_;
 };
 
 } // namespace kth::network
