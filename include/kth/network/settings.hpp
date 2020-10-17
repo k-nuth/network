@@ -42,7 +42,7 @@ public:
     uint32_t channel_expiration_minutes;
     uint32_t channel_germination_seconds;
     uint32_t host_pool_capacity;
-    std::filesystem::path hosts_file;
+    kth::path hosts_file;
     infrastructure::config::authority self;
     infrastructure::config::authority::list blacklists;
     infrastructure::config::endpoint::list peers;
@@ -50,9 +50,9 @@ public:
     std::string user_agent;
 
     // [log]
-    std::filesystem::path debug_file;
-    std::filesystem::path error_file;
-    std::filesystem::path archive_directory;
+    kth::path debug_file;
+    kth::path error_file;
+    kth::path archive_directory;
     size_t rotation_size;
     size_t minimum_free_space;
     size_t maximum_archive_size;

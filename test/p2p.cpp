@@ -7,7 +7,6 @@
 #include <future>
 #include <iostream>
 
-// #include <boost/filesystem.hpp>
 #include <test_helpers.hpp>
 
 #include <kth/network.hpp>
