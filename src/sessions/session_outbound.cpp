@@ -88,10 +88,7 @@ void session_outbound::handle_channel_start(code const& ec, channel::ptr channel
         return;
     }
 
-    LOG_INFO(LOG_NETWORK
-       , "Connected outbound channel [", channel->authority(), "] ("
-       , connection_count(), ")");
-
+    LOG_DEBUG(LOG_NETWORK, "Connected outbound channel [", channel->authority(), "] (", connection_count(), ")");
     attach_protocols(channel);
 }
 

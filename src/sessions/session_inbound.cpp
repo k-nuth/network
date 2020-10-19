@@ -122,9 +122,7 @@ void session_inbound::handle_accept(code const& ec, channel::ptr channel) {
 
 void session_inbound::handle_channel_start(code const& ec, channel::ptr channel) {
     if (ec) {
-        LOG_DEBUG(LOG_NETWORK
-           , "Inbound channel failed to start [", channel->authority()
-           , "] ", ec.message());
+        LOG_DEBUG(LOG_NETWORK, "Inbound channel failed to start [", channel->authority(), "] ", ec.message());
         return;
     }
 
