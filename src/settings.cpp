@@ -148,6 +148,16 @@ settings::settings(domain::config::network context)
             seeds.emplace_back("seed.tbch4.loping.net", 28333);
             break;
         }
+
+        case domain::config::network::scalenet: {
+            inbound_port = 38333;
+            identifier = netmagic::bch_scalenet;
+            seeds.reserve(3);
+            seeds.emplace_back("scalenet-seed-bch.bitcoinforks.org", 38333);
+            seeds.emplace_back("scalenet-seed-bch.toom.im", 38333);
+            seeds.emplace_back("seed.sbch.loping.net", 38333);
+            break;
+        }
 #endif //KTH_CURRENCY_BCH
     }
 }
