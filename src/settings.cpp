@@ -17,7 +17,7 @@ settings::settings()
     : threads(0)
     , protocol_maximum(version::level::maximum)
     , protocol_minimum(version::level::minimum)
-    , services(version::service::none)
+    , services(version::service::node_network)
 #if defined(KTH_CURRENCY_BCH)
     , invalid_services(0)
 #else
@@ -30,12 +30,12 @@ settings::settings()
     , manual_attempt_limit(0)
     , connect_batch_size(5)
     , connect_timeout_seconds(5)
-    , channel_handshake_seconds(30)
+    , channel_handshake_seconds(6000)
     , channel_heartbeat_minutes(5)
     , channel_inactivity_minutes(10)
     , channel_expiration_minutes(60)
     , channel_germination_seconds(30)
-    , host_pool_capacity(0)
+    , host_pool_capacity(1000)
     , hosts_file("hosts.cache")
     , self(unspecified_network_address)
     // , bitcoin_cash(false)
@@ -146,6 +146,16 @@ settings::settings(domain::config::network context)
             seeds.emplace_back("testnet4-seed-bch.bitcoinforks.org", 28333);
             seeds.emplace_back("testnet4-seed-bch.toom.im", 28333);
             seeds.emplace_back("seed.tbch4.loping.net", 28333);
+            break;
+        }
+
+        case domain::config::network::scalenet: {
+            inbound_port = 38333;
+            identifier = netmagic::bch_scalenet;
+            seeds.reserve(3);
+            seeds.emplace_back("scalenet-seed-bch.bitcoinforks.org", 38333);
+            seeds.emplace_back("scalenet-seed-bch.toom.im", 38333);
+            seeds.emplace_back("seed.sbch.loping.net", 38333);
             break;
         }
 #endif //KTH_CURRENCY_BCH

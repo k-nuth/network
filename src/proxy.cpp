@@ -34,9 +34,8 @@ static size_t const invalid_payload_dump_size = 1024;
 proxy::proxy(threadpool& pool, socket::ptr socket, settings const& settings)
   : authority_(socket->authority()),
     heading_buffer_(heading::maximum_size()),
-    payload_buffer_(heading::maximum_payload_size(settings.protocol_maximum, false)),
-    maximum_payload_(heading::maximum_payload_size(settings.protocol_maximum,
-        (settings.services & version::service::node_witness) != 0)),
+    payload_buffer_(heading::maximum_payload_size(settings.protocol_maximum, false, settings.identifier)),
+    maximum_payload_(heading::maximum_payload_size(settings.protocol_maximum, (settings.services & version::service::node_witness) != 0, settings.identifier)),
     socket_(socket),
     stopped_(true),
     protocol_magic_(settings.identifier),
@@ -139,6 +138,13 @@ void proxy::handle_read_heading(boost_code const& ec, size_t) {
            , authority(), "]");
         stop(error::bad_stream);
         return;
+    }
+
+    if (head.payload_size() > max_payload_size) {
+        LOG_DEBUG(LOG_NETWORK
+           , "Huge payload indicated by ", head.command()
+           , " heading from [", authority(), "] ("
+           , head.payload_size(), " bytes)");
     }
 
     if (head.payload_size() > maximum_payload_) {
