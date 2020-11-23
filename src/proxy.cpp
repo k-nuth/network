@@ -179,9 +179,7 @@ void proxy::handle_read_payload(boost_code const& ec, size_t payload_size, const
 
     // This is a pointless test but we allow it as an option for completeness.
     if (validate_checksum_ && head.checksum() != bitcoin_checksum(payload_buffer_)) {
-        LOG_WARNING(LOG_NETWORK
-           , "Invalid ", head.command(), " payload from [", authority()
-           , "] bad checksum.");
+        LOG_WARNING(LOG_NETWORK, "Invalid ", head.command(), " payload from [", authority(), "] bad checksum.");
         stop(error::bad_stream);
         return;
     }
@@ -198,25 +196,19 @@ void proxy::handle_read_payload(boost_code const& ec, size_t payload_size, const
         auto const size = std::min(payload_size, invalid_payload_dump_size);
         auto const begin = payload_buffer_.begin();
 
-        LOG_VERBOSE(LOG_NETWORK
-           , "Invalid payload from [", authority(), "] "
-           , encode_base16(data_chunk{ begin, begin + size }));
+        LOG_VERBOSE(LOG_NETWORK, "Invalid payload from [", authority(), "] ", encode_base16(data_chunk{ begin, begin + size }));
         stop(code);
         return;
     }
 
     if (code) {
-        LOG_WARNING(LOG_NETWORK
-           , "Invalid ", head.command(), " payload from [", authority()
-           , "] ", code.message());
+        LOG_WARNING(LOG_NETWORK, "Invalid ", head.command(), " payload from [", authority(), "] ", code.message());
         stop(code);
         return;
     }
 
     if ( ! consumed) {
-        LOG_WARNING(LOG_NETWORK
-           , "Invalid ", head.command(), " payload from [", authority()
-           , "] trailing bytes.");
+        LOG_WARNING(LOG_NETWORK, "Invalid ", head.command(), " payload from [", authority(), "] trailing bytes.");
         stop(error::bad_stream);
         return;
     }
