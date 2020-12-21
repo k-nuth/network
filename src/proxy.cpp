@@ -190,6 +190,10 @@ void proxy::handle_read_payload(boost_code const& ec, size_t payload_size, const
         return;
     }
 
+    LOG_DEBUG(LOG_NETWORK
+       , "Read ", head.command(), " from [", authority()
+       , "] (", payload_size, " bytes). Now parsing ...");
+
     // Notify subscribers of the new message.
     payload_source source(payload_buffer_);
     payload_stream istream(source);
@@ -219,7 +223,7 @@ void proxy::handle_read_payload(boost_code const& ec, size_t payload_size, const
         return;
     }
 
-    LOG_VERBOSE(LOG_NETWORK
+    LOG_DEBUG(LOG_NETWORK
        , "Received ", head.command(), " from [", authority()
        , "] (", payload_size, " bytes)");
 
