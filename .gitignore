@@ -33,3 +33,4 @@ CMakeSettings.json
 
 .vscode/
 CMakeFiles/
+.DS_Store
