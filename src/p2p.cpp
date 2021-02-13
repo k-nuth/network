@@ -78,8 +78,8 @@ void p2p::start(result_handler handler) {
 
     threadpool_.join();
     threadpool_.spawn(thread_default(settings_.threads), thread_priority::normal);
-
     stopped_ = false;
+
     stop_subscriber_->start();
     channel_subscriber_->start();
 
@@ -87,7 +87,19 @@ void p2p::start(result_handler handler) {
     manual_.store(attach_manual_session());
 
     // This is invoked on a new thread.
-    manual_.load()->start(std::bind(&p2p::handle_manual_started, this, _1, handler));
+    manual_.load()->start([this, handler](code const& ec){
+        handle_manual_started(ec, handler);
+    });
+}
+
+void p2p::start_fake(result_handler handler) {
+    if ( ! stopped()) {
+        handler(error::operation_failed);
+        return;
+    }
+
+    stopped_ = false;
+    handler(error::success);
 }
 
 void p2p::handle_manual_started(code const& ec, result_handler handler) {
@@ -121,7 +133,9 @@ void p2p::handle_hosts_loaded(code const& ec, result_handler handler) {
     auto const seed = attach_seed_session();
 
     // This is invoked on a new thread.
-    seed->start(std::bind(&p2p::handle_started, this, _1, handler));
+    seed->start([this, handler](code const& ec){
+        handle_started(ec, handler);
+    });
 }
 
 void p2p::handle_started(code const& ec, result_handler handler) {
@@ -157,9 +171,9 @@ void p2p::run(result_handler handler) {
     auto const inbound = attach_inbound_session();
 
     // This is invoked on a new thread.
-    inbound->start(
-        std::bind(&p2p::handle_inbound_started,
-            this, _1, handler));
+    inbound->start([this, handler](code const& ec){
+        handle_inbound_started(ec, handler);
+    });
 }
 
 void p2p::handle_inbound_started(code const& ec, result_handler handler) {
@@ -173,9 +187,9 @@ void p2p::handle_inbound_started(code const& ec, result_handler handler) {
     auto const outbound = attach_outbound_session();
 
     // This is invoked on a new thread.
-    outbound->start(
-        std::bind(&p2p::handle_running,
-            this, _1, handler));
+    outbound->start([this, handler](code const& ec){
+        handle_running(ec, handler);
+    });
 }
 
 void p2p::handle_running(code const& ec, result_handler handler) {

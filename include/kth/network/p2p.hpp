@@ -68,35 +68,44 @@ public:
     p2p(settings const& settings);
 
     /// Ensure all threads are coalesced.
-    virtual ~p2p();
+    virtual 
+    ~p2p();
 
     // Start/Run sequences.
     // ------------------------------------------------------------------------
 
     /// Invoke startup and seeding sequence, call from constructing thread.
-    virtual void start(result_handler handler);
+    virtual
+    void start(result_handler handler);
+
+    virtual
+    void start_fake(result_handler handler);
 
     /// Synchronize the blockchain and then begin long running sessions,
     /// call from start result handler. Call base method to skip sync.
-    virtual void run(result_handler handler);
+    virtual
+    void run(result_handler handler);
 
     // Shutdown.
     // ------------------------------------------------------------------------
 
     /// Idempotent call to signal work stop, start may be reinvoked after.
     /// Returns the result of file save operation.
-    virtual bool stop();
+    virtual
+    bool stop();
 
     /// Blocking call to coalesce all work and then terminate all threads.
     /// Call from thread that constructed this class, or don't call at all.
     /// This calls stop, and start may be reinvoked after calling this.
-    virtual bool close();
+    virtual
+    bool close();
 
     // Properties.
     // ------------------------------------------------------------------------
 
     /// Network configuration settings.
-    virtual settings const& network_settings() const;
+    virtual 
+    settings const& network_settings() const;
 
     /// Return the current top block identity.
     infrastructure::config::checkpoint top_block() const;
@@ -108,89 +117,111 @@ public:
     void set_top_block(infrastructure::config::checkpoint const& top);
 
     /// Determine if the network is stopped.
-    virtual bool stopped() const;
+    virtual
+    bool stopped() const;
 
     /// Return a reference to the network threadpool.
-    virtual threadpool& thread_pool();
+    virtual
+    threadpool& thread_pool();
 
     // Subscriptions.
     // ------------------------------------------------------------------------
 
     /// Subscribe to connection creation events.
-    virtual void subscribe_connection(connect_handler handler);
+    virtual
+    void subscribe_connection(connect_handler handler);
 
     /// Subscribe to service stop event.
-    virtual void subscribe_stop(result_handler handler);
+    virtual
+    void subscribe_stop(result_handler handler);
 
     // Manual connections.
     // ----------------------------------------------------------------------------
 
     /// Maintain a connection to hostname:port.
-    virtual void connect(infrastructure::config::endpoint const& peer);
+    virtual
+    void connect(infrastructure::config::endpoint const& peer);
 
     /// Maintain a connection to hostname:port.
-    virtual void connect(std::string const& hostname, uint16_t port);
+    virtual
+    void connect(std::string const& hostname, uint16_t port);
 
     /// Maintain a connection to hostname:port.
     /// The callback is invoked by the first connection creation only.
-    virtual void connect(std::string const& hostname, uint16_t port, channel_handler handler);
+    virtual
+    void connect(std::string const& hostname, uint16_t port, channel_handler handler);
 
     // Hosts collection.
     // ------------------------------------------------------------------------
 
     /// Get the number of addresses.
-    virtual size_t address_count() const;
+    virtual
+    size_t address_count() const;
 
     /// Store an address.
-    virtual code store(address const& address);
+    virtual
+    code store(address const& address);
 
     /// Store a collection of addresses (asynchronous).
-    virtual void store(address::list const& addresses, result_handler handler);
+    virtual
+    void store(address::list const& addresses, result_handler handler);
 
     /// Get a randomly-selected address.
-    virtual code fetch_address(address& out_address) const;
+    virtual
+    code fetch_address(address& out_address) const;
 
     /// Get a list of stored hosts
-    virtual code fetch_addresses(address::list& out_addresses) const;
+    virtual
+    code fetch_addresses(address::list& out_addresses) const;
 
     /// Remove an address.
-    virtual code remove(address const& address);
+    virtual
+    code remove(address const& address);
 
     // Pending connect collection.
     // ------------------------------------------------------------------------
 
     /// Store a pending connection reference.
-    virtual code pend(connector::ptr connector);
+    virtual
+    code pend(connector::ptr connector);
 
     /// Free a pending connection reference.
-    virtual void unpend(connector::ptr connector);
+    virtual
+    void unpend(connector::ptr connector);
 
     // Pending handshake collection.
     // ------------------------------------------------------------------------
 
     /// Store a pending connection reference.
-    virtual code pend(channel::ptr channel);
+    virtual
+    code pend(channel::ptr channel);
 
     /// Test for a pending connection reference.
-    virtual bool pending(uint64_t version_nonce) const;
+    virtual
+    bool pending(uint64_t version_nonce) const;
 
     /// Free a pending connection reference.
-    virtual void unpend(channel::ptr channel);
+    virtual
+    void unpend(channel::ptr channel);
 
     // Pending close collection (open connections).
     // ------------------------------------------------------------------------
 
     /// Get the number of connections.
-    virtual size_t connection_count() const;
+    virtual
+    size_t connection_count() const;
 
     /// Store a connection.
-    virtual code store(channel::ptr channel);
+    virtual
+    code store(channel::ptr channel);
 
     /// Determine if there exists a connection to the address.
-    virtual bool connected(address const& address) const;
+    virtual
+    bool connected(address const& address) const;
 
     /// Remove a connection.
-    virtual void remove(channel::ptr channel);
+    virtual
+    void remove(channel::ptr channel);
 
 protected:
 
@@ -201,10 +232,17 @@ protected:
     }
 
     /// Override to attach specialized sessions.
-    virtual session_seed::ptr attach_seed_session();
-    virtual session_manual::ptr attach_manual_session();
-    virtual session_inbound::ptr attach_inbound_session();
-    virtual session_outbound::ptr attach_outbound_session();
+    virtual 
+    session_seed::ptr attach_seed_session();
+    
+    virtual
+    session_manual::ptr attach_manual_session();
+    
+    virtual
+    session_inbound::ptr attach_inbound_session();
+    
+    virtual
+    session_outbound::ptr attach_outbound_session();
 
 private:
     using pending_channels = kth::pending<channel>;
