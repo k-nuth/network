@@ -66,8 +66,8 @@ public:
     DEFINE_SUBSCRIBER_TYPE(transaction);
     DEFINE_SUBSCRIBER_TYPE(verack);
     DEFINE_SUBSCRIBER_TYPE(version);
+    DEFINE_SUBSCRIBER_TYPE(xversion);
     // DEFINE_SUBSCRIBER_TYPE(xverack);
-    // DEFINE_SUBSCRIBER_TYPE(xversion);
 
     /**
      * Create an instance of this class.
@@ -183,8 +183,8 @@ private:
     DEFINE_SUBSCRIBER_OVERLOAD(transaction);
     DEFINE_SUBSCRIBER_OVERLOAD(verack);
     DEFINE_SUBSCRIBER_OVERLOAD(version);
+    DEFINE_SUBSCRIBER_OVERLOAD(xversion);
     // DEFINE_SUBSCRIBER_OVERLOAD(xverack);
-    // DEFINE_SUBSCRIBER_OVERLOAD(xversion);
 
     DECLARE_SUBSCRIBER(address);
     DECLARE_SUBSCRIBER(alert);
@@ -213,8 +213,8 @@ private:
     DECLARE_SUBSCRIBER(transaction);
     DECLARE_SUBSCRIBER(verack);
     DECLARE_SUBSCRIBER(version);
+    DECLARE_SUBSCRIBER(xversion);
     // DECLARE_SUBSCRIBER(xverack);
-    // DECLARE_SUBSCRIBER(xversion);
 };
 
 #undef DEFINE_SUBSCRIBER_TYPE

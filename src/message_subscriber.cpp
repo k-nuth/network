@@ -57,8 +57,8 @@ message_subscriber::message_subscriber(threadpool& pool)
     , INITIALIZE_SUBSCRIBER(pool, transaction)
     , INITIALIZE_SUBSCRIBER(pool, verack)
     , INITIALIZE_SUBSCRIBER(pool, version)
+    , INITIALIZE_SUBSCRIBER(pool, xversion)
     // , INITIALIZE_SUBSCRIBER(pool, xverack)
-    // , INITIALIZE_SUBSCRIBER(pool, xversion) 
 {}
 
 void message_subscriber::broadcast(code const& ec) {
@@ -89,8 +89,8 @@ void message_subscriber::broadcast(code const& ec) {
     RELAY_CODE(ec, transaction);
     RELAY_CODE(ec, verack);
     RELAY_CODE(ec, version);
+    RELAY_CODE(ec, xversion);
     // RELAY_CODE(ec, xverack);
-    // RELAY_CODE(ec, xversion);
 }
 
 code message_subscriber::load(message_type type, uint32_t version, std::istream& stream) const {
@@ -122,8 +122,8 @@ code message_subscriber::load(message_type type, uint32_t version, std::istream&
         CASE_HANDLE_MESSAGE(stream, version, transaction);
         CASE_HANDLE_MESSAGE(stream, version, verack);
         CASE_HANDLE_MESSAGE(stream, version, version);
+        CASE_HANDLE_MESSAGE(stream, version, xversion);
         // CASE_HANDLE_MESSAGE(stream, version, xverack);
-        // CASE_HANDLE_MESSAGE(stream, version, xversion);
         case message_type::unknown:
         default:
             return error::not_found;
@@ -158,8 +158,8 @@ void message_subscriber::start() {
     START_SUBSCRIBER(transaction);
     START_SUBSCRIBER(verack);
     START_SUBSCRIBER(version);
+    START_SUBSCRIBER(xversion);
     // START_SUBSCRIBER(xverack);
-    // START_SUBSCRIBER(xversion);
 }
 
 void message_subscriber::stop() {
@@ -190,8 +190,8 @@ void message_subscriber::stop() {
     STOP_SUBSCRIBER(transaction);
     STOP_SUBSCRIBER(verack);
     STOP_SUBSCRIBER(version);
+    STOP_SUBSCRIBER(xversion);
     // STOP_SUBSCRIBER(xverack);
-    // STOP_SUBSCRIBER(xversion);
 }
 
 } // namespace kth::network
