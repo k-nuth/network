@@ -86,6 +86,9 @@ public:
     virtual
     void run(result_handler handler);
 
+    virtual
+    void run_chain(result_handler handler);
+
     // Shutdown.
     // ------------------------------------------------------------------------
 

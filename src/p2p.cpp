@@ -176,6 +176,10 @@ void p2p::run(result_handler handler) {
     });
 }
 
+void p2p::run_chain(result_handler handler) {
+    // do nothing
+}
+
 void p2p::handle_inbound_started(code const& ec, result_handler handler) {
     if (ec) {
         LOG_ERROR(LOG_NETWORK, "Error starting inbound session: ", ec.message());
