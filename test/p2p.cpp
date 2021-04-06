@@ -290,7 +290,7 @@ TEST_CASE("p2p  start  seed session expiration timeout  start peer throttling st
 ////    configuration.host_pool_capacity = 42;
 ////    configuration.hosts_file = get_log_path(TEST_NAME, "hosts");
 ////    configuration.seeds = { { SEED1 } };
-////    configuration.blacklists = SEED1_AUTHORITIES;
+////    configuration.blacklist = SEED1_AUTHORITIES;
 ////    p2p network(configuration);
 ////    REQUIRE(start_result(network) == error::operation_failed);
 ////    REQUIRE(network.stop());
