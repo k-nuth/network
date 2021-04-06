@@ -38,13 +38,13 @@ using namespace kth::config;
 using namespace std::placeholders;
 
 // This can be exceeded due to manual connection calls and race conditions.
-inline 
+inline
 size_t nominal_connecting(settings const& settings) {
     return settings.peers.size() + settings.connect_batch_size * settings.outbound_connections;
 }
 
 // This can be exceeded due to manual connection calls and race conditions.
-inline 
+inline
 size_t nominal_connected(settings const& settings) {
     return settings.peers.size() + settings.outbound_connections + settings.inbound_connections;
 }
@@ -59,7 +59,7 @@ p2p::p2p(settings const& settings)
     , pending_close_(nominal_connected(settings_))
     , threadpool_("network")
     , stop_subscriber_(std::make_shared<stop_subscriber>(threadpool_, NAME "_stop_sub"))
-    , channel_subscriber_(std::make_shared<channel_subscriber>(threadpool_, NAME "_sub")) 
+    , channel_subscriber_(std::make_shared<channel_subscriber>(threadpool_, NAME "_sub"))
 {}
 
 // This allows for shutdown based on destruct without need to call stop.
@@ -99,6 +99,7 @@ void p2p::start_fake(result_handler handler) {
     }
 
     stopped_ = false;
+    fake_ = true;
     handler(error::success);
 }
 
@@ -237,6 +238,8 @@ session_outbound::ptr p2p::attach_outbound_session() {
 // taken around the entire section, which poses a deadlock risk. Instead this
 // is thread safe and idempotent, allowing it to be unguarded.
 bool p2p::stop() {
+    if (fake_) return true;
+
     // LOG_INFO(LOG_NETWORK, "p2p::stop() 1");
 
     // This is the only stop operation that can fail.
@@ -278,6 +281,7 @@ bool p2p::stop() {
 
 // This must be called from the thread that constructed this class (see join).
 bool p2p::close() {
+    if (fake_) return true;
     // LOG_INFO(LOG_NETWORK, "p2p::close() 1");
 
     // Signal current work to stop and threadpool to stop accepting new work.
