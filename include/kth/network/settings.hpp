@@ -44,7 +44,7 @@ public:
     uint32_t host_pool_capacity;
     kth::path hosts_file;
     infrastructure::config::authority self;
-    infrastructure::config::authority::list blacklists;
+    infrastructure::config::authority::list blacklist;
     infrastructure::config::endpoint::list peers;
     infrastructure::config::endpoint::list seeds;
     std::string user_agent;

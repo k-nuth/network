@@ -59,7 +59,7 @@ bool session::blacklisted(authority const& authority) const {
         return authority.ip() == blocked.ip();
     };
 
-    auto const& list = settings_.blacklists;
+    auto const& list = settings_.blacklist;
     return std::any_of(list.begin(), list.end(), ip_compare);
 }
 
