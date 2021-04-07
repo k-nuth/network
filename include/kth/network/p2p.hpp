@@ -68,7 +68,7 @@ public:
     p2p(settings const& settings);
 
     /// Ensure all threads are coalesced.
-    virtual 
+    virtual
     ~p2p();
 
     // Start/Run sequences.
@@ -107,7 +107,7 @@ public:
     // ------------------------------------------------------------------------
 
     /// Network configuration settings.
-    virtual 
+    virtual
     settings const& network_settings() const;
 
     /// Return the current top block identity.
@@ -235,15 +235,15 @@ protected:
     }
 
     /// Override to attach specialized sessions.
-    virtual 
+    virtual
     session_seed::ptr attach_seed_session();
-    
+
     virtual
     session_manual::ptr attach_manual_session();
-    
+
     virtual
     session_inbound::ptr attach_inbound_session();
-    
+
     virtual
     session_outbound::ptr attach_outbound_session();
 
@@ -263,6 +263,7 @@ private:
     // These are thread safe.
     settings const& settings_;
     std::atomic<bool> stopped_;
+    std::atomic<bool> fake_ = false;
     kth::atomic<infrastructure::config::checkpoint> top_block_;
     kth::atomic<session_manual::ptr> manual_;
     threadpool threadpool_;
