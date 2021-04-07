@@ -263,7 +263,6 @@ private:
     // These are thread safe.
     settings const& settings_;
     std::atomic<bool> stopped_;
-    std::atomic<bool> fake_ = false;
     kth::atomic<infrastructure::config::checkpoint> top_block_;
     kth::atomic<session_manual::ptr> manual_;
     threadpool threadpool_;
