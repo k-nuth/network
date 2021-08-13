@@ -16,7 +16,6 @@
 #include <kth/infrastructure.hpp>
 
 #include <kth/network/define.hpp>
-
 namespace kth::network {
 
 #define DEFINE_SUBSCRIBER_TYPE(value) \
@@ -44,6 +43,7 @@ public:
     DEFINE_SUBSCRIBER_TYPE(block);
     DEFINE_SUBSCRIBER_TYPE(block_transactions);
     DEFINE_SUBSCRIBER_TYPE(compact_block);
+    DEFINE_SUBSCRIBER_TYPE(double_spend_proofs);
     DEFINE_SUBSCRIBER_TYPE(fee_filter);
     DEFINE_SUBSCRIBER_TYPE(filter_add);
     DEFINE_SUBSCRIBER_TYPE(filter_clear);
@@ -161,6 +161,7 @@ private:
     DEFINE_SUBSCRIBER_OVERLOAD(block);
     DEFINE_SUBSCRIBER_OVERLOAD(block_transactions);
     DEFINE_SUBSCRIBER_OVERLOAD(compact_block);
+    DEFINE_SUBSCRIBER_OVERLOAD(double_spend_proofs);
     DEFINE_SUBSCRIBER_OVERLOAD(fee_filter);
     DEFINE_SUBSCRIBER_OVERLOAD(filter_add);
     DEFINE_SUBSCRIBER_OVERLOAD(filter_clear);
@@ -191,6 +192,7 @@ private:
     DECLARE_SUBSCRIBER(block);
     DECLARE_SUBSCRIBER(block_transactions);
     DECLARE_SUBSCRIBER(compact_block);
+    DECLARE_SUBSCRIBER(double_spend_proofs);
     DECLARE_SUBSCRIBER(fee_filter);
     DECLARE_SUBSCRIBER(filter_add);
     DECLARE_SUBSCRIBER(filter_clear);
