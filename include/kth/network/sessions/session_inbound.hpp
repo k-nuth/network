@@ -32,8 +32,7 @@ public:
 
 protected:
     /// Overridden to implement pending test for inbound channels.
-    void handshake_complete(channel::ptr channel,
-        result_handler handle_started) override;
+    void handshake_complete(channel::ptr channel, result_handler handle_started) override;
 
     /// Override to attach specialized protocols upon channel start.
     virtual void attach_protocols(channel::ptr channel);
