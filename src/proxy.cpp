@@ -293,12 +293,6 @@ void proxy::stop(code const& ec) {
     socket_->stop();
 }
 
-#if ! defined(ASIO_STANDALONE)
-void proxy::stop(boost_code const& ec) {
-    stop(error::boost_to_error_code(ec));
-}
-#endif
-
 bool proxy::stopped() const {
     return stopped_;
 }

@@ -96,10 +96,6 @@ private:
 
     void do_close();
 
-#if ! defined(ASIO_STANDALONE)
-    void stop(boost_code const& ec);
-#endif
-
     void read_heading();
     void handle_read_heading(boost_code const& ec, size_t payload_size);
 
