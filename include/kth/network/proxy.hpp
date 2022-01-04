@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Knuth Project developers.
+// Copyright (c) 2016-2022 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -95,10 +95,6 @@ private:
     static infrastructure::config::authority authority_factory(socket::ptr socket);
 
     void do_close();
-
-#if ! defined(ASIO_STANDALONE)
-    void stop(boost_code const& ec);
-#endif
 
     void read_heading();
     void handle_read_heading(boost_code const& ec, size_t payload_size);

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Knuth Project developers.
+// Copyright (c) 2016-2022 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -292,12 +292,6 @@ void proxy::stop(code const& ec) {
     // Signal socket to stop reading and accepting new work.
     socket_->stop();
 }
-
-#if ! defined(ASIO_STANDALONE)
-void proxy::stop(boost_code const& ec) {
-    stop(error::boost_to_error_code(ec));
-}
-#endif
 
 bool proxy::stopped() const {
     return stopped_;
