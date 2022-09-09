@@ -8,6 +8,10 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+
+#define FMT_HEADER_ONLY 1
+#include <fmt/format.h>
+
 #include <kth/domain.hpp>
 #include <kth/network/settings.hpp>
 
@@ -23,7 +27,7 @@ hosts::hosts(settings const& settings)
     , buffer_(std::max(capacity_, static_cast<size_t>(1u)))
     , stopped_(true)
     , file_path_(settings.hosts_file)
-    , disabled_(capacity_ == 0) 
+    , disabled_(capacity_ == 0)
 {}
 
 // private
@@ -177,7 +181,8 @@ code hosts::stop() {
         for (auto const& entry: buffer_) {
             // TODO: create full space-delimited network_address serialization.
             // Use to/from string format as opposed to wire serialization.
-            file << infrastructure::config::authority(entry) << std::endl;
+            // file << infrastructure::config::authority(entry) << std::endl;
+            fmt::print(file, "{}\n", infrastructure::config::authority(entry));
         }
 
         buffer_.clear();
