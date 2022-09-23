@@ -114,3 +114,5 @@ class KnuthNetworkConan(KnuthConanFile):
         self.cpp_info.includedirs = ['include']
         self.cpp_info.libs = ["kth-network"]
 
+        if self.settings.arch == "armv7":
+            self.cpp_info.libs.append("atomic")
