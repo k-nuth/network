@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -53,11 +53,11 @@ public:
     }
 
     /// Subscribe to the stop event.
-    virtual 
+    virtual
     void subscribe_stop(result_handler handler);
 
     /// Get the authority of the far end of this socket.
-    virtual 
+    virtual
     const infrastructure::config::authority& authority() const;
 
     /// Get the negotiated protocol version of this socket.
@@ -65,25 +65,25 @@ public:
     uint32_t negotiated_version() const;
 
     /// Save the negotiated protocol version.
-    virtual 
+    virtual
     void set_negotiated_version(uint32_t value);
 
     /// Read messages from this socket.
-    virtual 
+    virtual
     void start(result_handler handler);
 
     /// Stop reading or sending messages on this socket.
-    virtual 
+    virtual
     void stop(code const& ec);
 
 protected:
-    virtual 
+    virtual
     bool stopped() const;
-    
-    virtual 
+
+    virtual
     void signal_activity() = 0;
-    
-    virtual 
+
+    virtual
     void handle_stopping() = 0;
 
 private:

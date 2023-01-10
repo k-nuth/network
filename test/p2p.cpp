@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -64,13 +64,13 @@ std::string get_log_path(std::string const& test, std::string const& file) {
     return path;
 }
 
-static 
+static
 void print_headers(std::string const& test) {
     auto const header = "=========== " + test + " ==========";
     LOG_INFO(TEST_SET_NAME, header);
 }
 
-static 
+static
 int start_result(p2p& network) {
     std::promise<code> promise;
     auto const handler = [&promise](code ec) {
@@ -80,7 +80,7 @@ int start_result(p2p& network) {
     return promise.get_future().get().value();
 }
 
-static 
+static
 int connect_result(p2p& network, infrastructure::config::endpoint const& host) {
     std::promise<code> promise;
     auto const handler = [&promise](code ec, channel::ptr) {

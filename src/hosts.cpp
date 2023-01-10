@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -23,7 +23,7 @@ hosts::hosts(settings const& settings)
     , buffer_(std::max(capacity_, static_cast<size_t>(1u)))
     , stopped_(true)
     , file_path_(settings.hosts_file)
-    , disabled_(capacity_ == 0) 
+    , disabled_(capacity_ == 0)
 {}
 
 // private

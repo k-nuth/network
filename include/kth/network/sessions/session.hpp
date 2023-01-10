@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -73,7 +73,7 @@ protected:
 
     /// Bind a method in the derived class.
     template <typename Session, typename Handler, typename... Args>
-    auto bind(Handler&& handler, Args&&... args) -> 
+    auto bind(Handler&& handler, Args&&... args) ->
         decltype(BOUND_SESSION_TYPE(handler, args)) const {
         return BOUND_SESSION(handler, args);
     }
@@ -86,13 +86,13 @@ protected:
     }
 
     /// Invoke a method in the derived class after the specified delay.
-    inline 
+    inline
     void dispatch_delayed(const asio::duration& delay, dispatcher::delay_handler handler) const {
         dispatch_.delayed(delay, handler);
     }
 
     /// Delay timing for a tight failure loop, based on configured timeout.
-    inline 
+    inline
     asio::duration cycle_delay(code const& ec) {
         return (ec == error::channel_timeout || ec == error::service_stopped ||
             ec == error::success) ? asio::seconds(0) :
