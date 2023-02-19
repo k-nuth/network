@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -23,7 +23,7 @@ using namespace std::placeholders;
 
 session_outbound::session_outbound(p2p& network, bool notify_on_connect)
     : session_batch(network, notify_on_connect)
-    , CONSTRUCT_TRACK(session_outbound) 
+    , CONSTRUCT_TRACK(session_outbound)
 {}
 
 // Start sequence.

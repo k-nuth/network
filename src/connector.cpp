@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -27,7 +27,7 @@ connector::connector(threadpool& pool, settings const& settings)
     , settings_(settings)
     , dispatch_(pool, NAME)
     , resolver_(pool.service())
-    , CONSTRUCT_TRACK(connector) 
+    , CONSTRUCT_TRACK(connector)
 {}
 
 connector::~connector() {

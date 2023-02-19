@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,7 +19,7 @@ namespace kth::network {
 using namespace kd::message;
 using namespace std::placeholders;
 
-static 
+static
 domain::message::address configured_self(network::settings const& settings) {
     if (settings.self.port() == 0) {
         return {};
