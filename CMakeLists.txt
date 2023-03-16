@@ -63,9 +63,9 @@ message(STATUS "Knuth: Logging Library: ${LOG_LIBRARY}")
 #------------------------------------------------------------------------------
 # option(WITH_LITECOIN "Compile with Litecoin support." OFF)
 
-set(KTH_PROJECT_VERSION "-" CACHE STRING "Specify the Knuth Project Version.")
-# message(${KTH_PROJECT_VERSION})
-message( STATUS "Knuth: Compiling version ${KTH_PROJECT_VERSION}")
+# set(KTH_PROJECT_VERSION "-" CACHE STRING "Specify the Knuth Project Version.")
+# # message(${KTH_PROJECT_VERSION})
+# message( STATUS "Knuth: Compiling version ${KTH_PROJECT_VERSION}")
 
 set(MARCH_ID "" CACHE STRING "Specify the Microarchitecture ID (x86_64|...).")
 message( STATUS "Knuth: Compiling for Microarchitecture ID ${MARCH_ID}")
@@ -248,7 +248,7 @@ add_library(kth-network ${MODE}
         src/p2p.cpp
         src/proxy.cpp
         src/settings.cpp
-        # src/version.cpp
+        src/version.cpp
 )
 
 
@@ -262,7 +262,7 @@ target_include_directories(kth-network PUBLIC
 
 
 # target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="\\"${KTH_PROJECT_VERSION}\\"") #TODO(fernando): manage with Conan????
-target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="${KTH_PROJECT_VERSION}") #TODO(fernando): manage with Conan????
+# target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="${KTH_PROJECT_VERSION}") #TODO(fernando): manage with Conan????
 
 if (NOT ENABLE_SHARED)
     target_compile_definitions(kth-network PUBLIC -DBCT_STATIC -DBC_STATIC)
