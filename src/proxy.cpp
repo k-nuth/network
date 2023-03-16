@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -32,24 +32,22 @@ static size_t const invalid_payload_dump_size = 1024;
 // Initialize to pre-witness max payload and let grow to witness as required.
 // The socket owns the single thread on which this channel reads and writes.
 proxy::proxy(threadpool& pool, socket::ptr socket, settings const& settings)
-  : authority_(socket->authority()),
-    heading_buffer_(heading::maximum_size()),
-    payload_buffer_(heading::maximum_payload_size(settings.protocol_maximum, false, settings.identifier)),
-    maximum_payload_(heading::maximum_payload_size(settings.protocol_maximum, (settings.services & version::service::node_witness) != 0, settings.identifier)),
-    socket_(socket),
-    stopped_(true),
-    protocol_magic_(settings.identifier),
-    validate_checksum_(settings.validate_checksum),
-    verbose_(settings.verbose),
-    version_(settings.protocol_maximum),
-    message_subscriber_(pool),
-    stop_subscriber_(std::make_shared<stop_subscriber>(pool, NAME "_sub")),
-    dispatch_(pool, NAME "_dispatch") {
-    //LOG_INFO(LOG_NETWORK, "proxy::proxy");
-}
+    : authority_(socket->authority())
+    , heading_buffer_(heading::maximum_size())
+    , payload_buffer_(heading::maximum_payload_size(settings.protocol_maximum, false, settings.identifier, settings.inbound_port == 48333))
+    , maximum_payload_(heading::maximum_payload_size(settings.protocol_maximum, (settings.services & version::service::node_witness) != 0, settings.identifier, settings.inbound_port == 48333))
+    , socket_(socket)
+    , stopped_(true)
+    , protocol_magic_(settings.identifier)
+    , validate_checksum_(settings.validate_checksum)
+    , verbose_(settings.verbose)
+    , version_(settings.protocol_maximum)
+    , message_subscriber_(pool)
+    , stop_subscriber_(std::make_shared<stop_subscriber>(pool, NAME "_sub"))
+    , dispatch_(pool, NAME "_dispatch")
+{}
 
 proxy::~proxy() {
-    //LOG_INFO(LOG_NETWORK, "proxy::~proxy");
     KTH_ASSERT_MSG(stopped(), "The channel was not stopped.");
 }
 
@@ -72,7 +70,6 @@ void proxy::set_negotiated_version(uint32_t value) {
 // ----------------------------------------------------------------------------
 
 void proxy::start(result_handler handler) {
-    //LOG_INFO(LOG_NETWORK, "proxy::start()");
     if ( ! stopped()) {
         handler(error::operation_failed);
         return;
@@ -93,7 +90,6 @@ void proxy::start(result_handler handler) {
 // ----------------------------------------------------------------------------
 
 void proxy::subscribe_stop(result_handler handler) {
-    //LOG_INFO(LOG_NETWORK, "proxy::subscribe_stop()");
     stop_subscriber_->subscribe(handler, error::channel_stopped);
 }
 
@@ -101,7 +97,6 @@ void proxy::subscribe_stop(result_handler handler) {
 // ----------------------------------------------------------------------------
 
 void proxy::read_heading() {
-    //LOG_INFO(LOG_NETWORK, "proxy::read_heading()");
     if (stopped())
         return;
 
@@ -160,7 +155,6 @@ void proxy::handle_read_heading(boost_code const& ec, size_t) {
 }
 
 void proxy::read_payload(const heading& head) {
-    //LOG_INFO(LOG_NETWORK, "proxy::read_payload()");
     if (stopped()) {
         return;
     }

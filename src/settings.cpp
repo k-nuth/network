@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -22,7 +22,7 @@ settings::settings()
     , invalid_services(0)
 #else
     , invalid_services(176)
-#endif    
+#endif
     , relay_transactions(true)
     , validate_checksum(false)
     , inbound_connections(0)
@@ -50,7 +50,7 @@ settings::settings()
     , maximum_archive_files(0)
     , statistics_server(unspecified_network_address)
     , verbose(false)
-    , use_ipv6(true) 
+    , use_ipv6(true)
 {}
 
 // Use push_back due to initializer_list bug:
@@ -63,20 +63,20 @@ settings::settings(domain::config::network context)
 // #ifdef LITECOIN
 #ifdef KTH_CURRENCY_LTC
             inbound_port = 9333;
-            // identifier = 0xdbb6c0fb; 
-            identifier = netmagic::ltc_mainnet; 
+            // identifier = 0xdbb6c0fb;
+            identifier = netmagic::ltc_mainnet;
             seeds.reserve(5);
             seeds.emplace_back("seed-a.litecoin.loshan.co.uk", 9333);
             seeds.emplace_back("dnsseed.thrasher.io", 9333);
             seeds.emplace_back("dnsseed.litecointools.com", 9333);
             seeds.emplace_back("dnsseed.litecoinpool.org", 9333);
-            seeds.emplace_back("dnsseed.koin-project.com", 9333);        
+            seeds.emplace_back("dnsseed.koin-project.com", 9333);
 #else
             // identifier = 3652501241;
             inbound_port = 8333;
 
 #if defined(KTH_CURRENCY_BCH)
-            identifier = netmagic::bch_mainnet; 
+            identifier = netmagic::bch_mainnet;
             seeds.reserve(6);
             seeds.emplace_back("seed.flowee.cash", 8333);
             seeds.emplace_back("seed-bch.bitcoinforks.org", 8333);
@@ -85,7 +85,7 @@ settings::settings(domain::config::network context)
             seeds.emplace_back("seed.bch.loping.net", 8333);
             seeds.emplace_back("dnsseed.electroncash.de", 8333);
 #else
-            identifier = netmagic::btc_mainnet; 
+            identifier = netmagic::btc_mainnet;
             seeds.reserve(6);
             seeds.emplace_back("seed.bitcoin.sipa.be", 8333);
             seeds.emplace_back("dnsseed.bluematt.me", 8333);
@@ -156,6 +156,14 @@ settings::settings(domain::config::network context)
             seeds.emplace_back("scalenet-seed-bch.bitcoinforks.org", 38333);
             seeds.emplace_back("scalenet-seed-bch.toom.im", 38333);
             seeds.emplace_back("seed.sbch.loping.net", 38333);
+            break;
+        }
+
+        case domain::config::network::chipnet: {
+            inbound_port = 48333;
+            identifier = netmagic::bch_chipnet;
+            seeds.reserve(1);
+            seeds.emplace_back("chipnet.bitjson.com", 48333);
             break;
         }
 #endif //KTH_CURRENCY_BCH

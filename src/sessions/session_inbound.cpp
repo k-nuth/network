@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -35,7 +35,7 @@ void session_inbound::start(result_handler handler) {
     }
 
     LOG_INFO(LOG_NETWORK
-       , "Starting inbound session on port (", settings_.inbound_port 
+       , "Starting inbound session on port (", settings_.inbound_port
        , ").");
 
     session::start(CONCURRENT_DELEGATE2(handle_started, _1, handler));

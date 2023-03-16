@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -20,7 +20,7 @@ using namespace kd::message;
 using namespace std::placeholders;
 
 // Factory for deadline timer pointer construction.
-static 
+static
 deadline::ptr alarm(threadpool& pool, const asio::duration& duration) {
     return std::make_shared<deadline>(pool, pseudo_random::duration(duration));
 }

@@ -1,52 +1,19 @@
-# Copyright (c) 2016-2022 Knuth Project developers.
+# Copyright (c) 2016-2023 Knuth Project developers.
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.15)
 
-# kth-network
-#==============================================================================
-project(kth-network
-        VERSION 0
-        LANGUAGES CXX C)
+project(network VERSION 0 LANGUAGES CXX C)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# Check for baseline language coverage in the compiler for the C++14 standard.
-#------------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Process options.
-#==============================================================================
-
-# Implement --use-conan
-#------------------------------------------------------------------------------
-option(USE_CONAN "Use Conan Build Tool." OFF)
-option(NO_CONAN_AT_ALL "Conan totally disabled." OFF)
-
-if (NO_CONAN_AT_ALL)
-  set(USE_CONAN OFF)
-endif()
-
-# Inherit --enable-shared and define BOOST_TEST_DYN_LINK.
-#------------------------------------------------------------------------------
 option(ENABLE_SHARED "" OFF)
-
-# Implement POSITION_INDEPENDENT_CODE
-#------------------------------------------------------------------------------
 option(ENABLE_POSITION_INDEPENDENT_CODE "Enable POSITION_INDEPENDENT_CODE property" ON)
-
-# Implement --with-tests and declare WITH_TESTS.
-#------------------------------------------------------------------------------
 option(WITH_TESTS "Compile with unit tests." ON)
-
-# # Implement --binlog.
-# #------------------------------------------------------------------------------
-# option(BINLOG "Uses BinLog logging library." OFF)
-# if (BINLOG)
-#   add_definitions(-DKTH_USE_BINLOG)
-# endif()
 
 set(LOG_LIBRARY "boost" CACHE STRING "Setting for the logging library (boost|spdlog|binlog).")
 
@@ -62,21 +29,11 @@ endif()
 
 message(STATUS "Knuth: Logging Library: ${LOG_LIBRARY}")
 
-
-# Implement --with-litecoin.
-#------------------------------------------------------------------------------
-# option(WITH_LITECOIN "Compile with Litecoin support." OFF)
-
-set(KTH_PROJECT_VERSION "-" CACHE STRING "Specify the Knuth Project Version.")
-# message(${KTH_PROJECT_VERSION})
-message( STATUS "Knuth: Compiling version ${KTH_PROJECT_VERSION}")
-
 set(MARCH_ID "" CACHE STRING "Specify the Microarchitecture ID (x86_64|...).")
 message( STATUS "Knuth: Compiling for Microarchitecture ID ${MARCH_ID}")
 
 message( STATUS "Knuth: CONAN_CXX_FLAGS ${CONAN_CXX_FLAGS}")
 message( STATUS "Knuth: CONAN_C_FLAGS ${CONAN_C_FLAGS}")
-
 
 set(CURRENCY "BCH" CACHE STRING "Specify the Cryptocurrency (BCH|BTC|LTC).")
 
@@ -92,74 +49,23 @@ endif()
 
 message(STATUS "Knuth: Cryptocurrency: ${CURRENCY}")
 
+find_package(infrastructure REQUIRED)
+find_package(domain REQUIRED)
 
-# Conan infrastructure
-#==============================================================================
-if(EXISTS ${CMAKE_SOURCE_DIR}/ci_utils/cmake/knuthbuildinfo.cmake)
-    include(${CMAKE_SOURCE_DIR}/ci_utils/cmake/knuthbuildinfo.cmake)
-else()
-    message( STATUS "knuthbuildinfo doent exists")
-endif()
+find_package(fmt 9.1.0 REQUIRED)
+find_package(spdlog 1.10.0 REQUIRED)
+find_package(Boost 1.81.0 COMPONENTS boost REQUIRED)
 
-
-
-# Check dependencies.
-#==============================================================================
-#------------------------------------------------------------------------------
-if (NO_CONAN_AT_ALL)
-  # Require Boost of at least version 1.56.0 and output ${boost_CPPFLAGS/LDFLAGS}.
-  #------------------------------------------------------------------------------
-  if (NOT ENABLE_SHARED)
-    set(Boost_USE_STATIC_LIBS ON)
-  endif()
-
-  if (MSVC)
-    find_package(
-      Boost 1.56.0 REQUIRED
-      COMPONENTS atomic chrono date_time filesystem iostreams locale log log_setup program_options regex system thread unit_test_framework
-    )
-  else()
-    find_package(
-      Boost 1.56.0 REQUIRED
-      COMPONENTS chrono date_time filesystem iostreams locale log program_options regex system thread unit_test_framework
-    )
-  endif()
-endif()
-
-if (NOT USE_CONAN)
-    # Require kth-domain of at least version 0 and output ${kth_domain_CPPFLAGS/LIBS/PKG}.
-    #------------------------------------------------------------------------------
-    if (NOT TARGET kth-domain)
-            find_package(kth-domain 0 REQUIRED)
-    endif()
-endif()
-
-
-# Set flags.
-#==============================================================================
 include(CheckCXXCompilerFlag)
-
-# Including common functions
-#------------------------------------------------------------------------------
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/ci_utils/cmake)
-
 include(KnuthTools)
 
 
-# Warn on all stuff.
-#------------------------------------------------------------------------------
-# message("CMAKE_CXX_COMPILER_VERSION")
-# message(CMAKE_CXX_COMPILER_VERSION)
-
 if (MINGW)
-  # if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.9")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
-  # endif()
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
 endif()
 
-# Warn on all stuff.
-#------------------------------------------------------------------------------
 if (NOT MSVC)
   _add_c_compile_flag(-Wall _has_all_warning_flag)
 else()
@@ -168,154 +74,142 @@ else()
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-# Warn on extra stuff.
-#------------------------------------------------------------------------------
 if (NOT MSVC)
   _add_c_compile_flag(-Wextra _has_extra_warning_flag)
 endif()
 
-# Be really annoying.
-#------------------------------------------------------------------------------
 _add_c_compile_flag(-Wpedantic _has_pedantic_warning_flag)
 if (_has_pedantic_warning_flag)
   _add_c_compile_flag(-pedantic _has_pedantic_flag)
 endif()
 
-# Conform to style.
-#------------------------------------------------------------------------------
 _add_cxx_compile_flag(-Wno-missing-braces _has_no_missing_braces_warning_flag)
-
-# Conflict in stdlib under clang. Enabled in clang only.
-#------------------------------------------------------------------------------
 _add_cxx_compile_flag(-Wno-mismatched-tags _has_no_mismatched_tags_warning_flag)
-
-# Clean up boost 1.55 headers. Enabled in gcc only.
-#------------------------------------------------------------------------------
 _add_c_compile_flag(-Wno-deprecated-declarations _has_no_deprecated_declarations_warning_flag)
-
-# Protect stack.
-#------------------------------------------------------------------------------
 _add_link_flag(-fstack-protector _has_stack_protector_flag)
-
-# Protect stack comprehensively.
-#------------------------------------------------------------------------------
 _add_link_flag(-fstack-protector-all _has_stack_protector_all_flag)
-
-# Hide internal functions from external libs. Enabled in gcc only.
-#------------------------------------------------------------------------------
 _add_cxx_compile_flag(-fvisibility-hidden _has_visibility_hidden_flag)
-
-# Hide inlines from external libs. Enabled in gcc only.
-#------------------------------------------------------------------------------
 _add_cxx_compile_flag(-fvisibility-inlines-hidden _has_visibility_inlines_hidden_flag)
 
-# Target Windows Vista. Enabled in msvc only.
-#------------------------------------------------------------------------------
-if (MSVC) # OR MINGW)
+if (MSVC)
   add_definitions(-D_WIN32_WINNT=0x0600)
 endif()
 
 # Build
-#==============================================================================
+# ------------------------------------------------------------------------------
 
-# src/kth-network.la => ${libdir}
-#------------------------------------------------------------------------------
 set(MODE STATIC)
 if (ENABLE_SHARED)
   set(MODE SHARED)
 endif()
 
-add_library(kth-network ${MODE}
-        src/protocols/protocol.cpp
-        src/protocols/protocol_address_31402.cpp
-        src/protocols/protocol_events.cpp
-        src/protocols/protocol_ping_31402.cpp
-        src/protocols/protocol_ping_60001.cpp
-        src/protocols/protocol_reject_70002.cpp
-        src/protocols/protocol_seed_31402.cpp
-        src/protocols/protocol_timer.cpp
-        src/protocols/protocol_version_31402.cpp
-        src/protocols/protocol_version_70002.cpp
 
-        src/sessions/session.cpp
-        src/sessions/session_batch.cpp
-        src/sessions/session_inbound.cpp
-        src/sessions/session_manual.cpp
-        src/sessions/session_outbound.cpp
-        src/sessions/session_seed.cpp
-
-        src/acceptor.cpp
-        src/channel.cpp
-        src/connector.cpp
-        src/hosts.cpp
-        src/message_subscriber.cpp
-        src/p2p.cpp
-        src/proxy.cpp
-        src/settings.cpp
-        # src/version.cpp
+set(kth_headers
+  include/kth/network/acceptor.hpp
+  include/kth/network/define.hpp
+  include/kth/network/proxy.hpp
+  include/kth/network/channel.hpp
+  include/kth/network/hosts.hpp
+  include/kth/network/p2p.hpp
+  include/kth/network/sessions/session_outbound.hpp
+  include/kth/network/sessions/session_seed.hpp
+  include/kth/network/sessions/session_inbound.hpp
+  include/kth/network/sessions/session_manual.hpp
+  include/kth/network/sessions/session_batch.hpp
+  include/kth/network/sessions/session.hpp
+  include/kth/network/connector.hpp
+  include/kth/network/message_subscriber.hpp
+  include/kth/network/protocols/protocol_version_70002.hpp
+  include/kth/network/protocols/protocol_seed_31402.hpp
+  include/kth/network/protocols/protocol_timer.hpp
+  include/kth/network/protocols/protocol_version_31402.hpp
+  include/kth/network/protocols/protocol_address_31402.hpp
+  include/kth/network/protocols/protocol_ping_31402.hpp
+  include/kth/network/protocols/protocol_events.hpp
+  include/kth/network/protocols/protocol.hpp
+  include/kth/network/protocols/protocol_ping_60001.hpp
+  include/kth/network/protocols/protocol_reject_70002.hpp
+  include/kth/network/settings.hpp
+  include/kth/network/version.hpp
+  include/kth/network.hpp
 )
+
+set(kth_sources
+  src/protocols/protocol.cpp
+  src/protocols/protocol_address_31402.cpp
+  src/protocols/protocol_events.cpp
+  src/protocols/protocol_ping_31402.cpp
+  src/protocols/protocol_ping_60001.cpp
+  src/protocols/protocol_reject_70002.cpp
+  src/protocols/protocol_seed_31402.cpp
+  src/protocols/protocol_timer.cpp
+  src/protocols/protocol_version_31402.cpp
+  src/protocols/protocol_version_70002.cpp
+  src/sessions/session.cpp
+  src/sessions/session_batch.cpp
+  src/sessions/session_inbound.cpp
+  src/sessions/session_manual.cpp
+  src/sessions/session_outbound.cpp
+  src/sessions/session_seed.cpp
+  src/acceptor.cpp
+  src/channel.cpp
+  src/connector.cpp
+  src/hosts.cpp
+  src/message_subscriber.cpp
+  src/p2p.cpp
+  src/proxy.cpp
+  src/settings.cpp
+  src/version.cpp
+)
+
+add_library(${PROJECT_NAME} ${MODE} ${kth_sources} ${kth_headers})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX CXX_STANDARD 20 CXX_STANDARD_REQUIRED TRUE)
 
 
 if (ENABLE_POSITION_INDEPENDENT_CODE)
-  set_property(TARGET kth-network PROPERTY POSITION_INDEPENDENT_CODE ON)
+  set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif(ENABLE_POSITION_INDEPENDENT_CODE)
 
-target_include_directories(kth-network PUBLIC
+target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-
-# target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="\\"${KTH_PROJECT_VERSION}\\"") #TODO(fernando): manage with Conan????
-target_compile_definitions(kth-network PUBLIC -DKTH_PROJECT_VERSION="${KTH_PROJECT_VERSION}") #TODO(fernando): manage with Conan????
-
 if (NOT ENABLE_SHARED)
-    target_compile_definitions(kth-network PUBLIC -DBCT_STATIC -DBC_STATIC)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC -DBCT_STATIC -DBC_STATIC)
 endif()
 
-if (NOT USE_CONAN)
-  target_link_libraries(kth-network PUBLIC kth-domain)
+target_link_libraries(${PROJECT_NAME} PUBLIC infrastructure::infrastructure)
+target_link_libraries(${PROJECT_NAME} PUBLIC domain::domain)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
+
+if (MINGW)
+  target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32 wsock32)
 endif()
 
-if (NOT NO_CONAN_AT_ALL)
-  target_link_libraries(kth-network PUBLIC ${CONAN_LIBS})
-endif()
-
-# if (NOT NO_CONAN_AT_ALL)
-#   target_link_libraries(kth-network PUBLIC ${CONAN_LIBS})
-# else()
-#   target_link_libraries(kth-network kth-domain)
-# endif()
-
-if (USE_CONAN)
-  if (MINGW)
-    target_link_libraries(kth-network PUBLIC ws2_32 wsock32) #TODO(fernando): manage with Conan
-  endif()
-endif()
-
-
-_group_sources(kth-network "${CMAKE_CURRENT_LIST_DIR}")
+_group_sources(${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}")
 
 # Tests
-#==============================================================================
+# ------------------------------------------------------------------------------
 if (WITH_TESTS)
-  enable_testing()
-endif()
+    enable_testing()
+    find_package(Catch2 3 REQUIRED)
 
-# local: test/kth_network_test
-#------------------------------------------------------------------------------
-if (WITH_TESTS)
+
     add_executable(kth_network_test
           test/main.cpp
           test/p2p.cpp
         #   test/user_agent_dummy.cpp
     )
 
+    target_include_directories(kth_network_test PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test>)
 
-    target_include_directories(kth_network_test PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test>)
+    target_link_libraries(kth_network_test PUBLIC ${PROJECT_NAME})
+    target_link_libraries(kth_network_test PRIVATE Catch2::Catch2WithMain)
 
-
-    target_link_libraries(kth_network_test PUBLIC kth-network)
     _group_sources(kth_network_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
     include(CTest)
@@ -329,82 +223,23 @@ if (WITH_TESTS)
 endif()
 
 
-
-
-
-
-
 # Install
-#==============================================================================
-install(TARGETS kth-network
-        EXPORT kth-network
-        ARCHIVE DESTINATION lib)
+# ------------------------------------------------------------------------------
 
-set(_kth_headers
-        kth/network/protocols/protocol.hpp
-        kth/network/protocols/protocol_address_31402.hpp
-        kth/network/protocols/protocol_events.hpp
-        kth/network/protocols/protocol_ping_31402.hpp
-        kth/network/protocols/protocol_ping_60001.hpp
-        kth/network/protocols/protocol_reject_70002.hpp
-        kth/network/protocols/protocol_seed_31402.hpp
-        kth/network/protocols/protocol_timer.hpp
-        kth/network/protocols/protocol_version_31402.hpp
-        kth/network/protocols/protocol_version_70002.hpp
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}-targets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-        kth/network/sessions/session.hpp
-        kth/network/sessions/session_batch.hpp
-        kth/network/sessions/session_inbound.hpp
-        kth/network/sessions/session_manual.hpp
-        kth/network/sessions/session_outbound.hpp
-        kth/network/sessions/session_seed.hpp
+# Generate and install a CMake package configuration file
+install(EXPORT ${PROJECT_NAME}-targets
+    FILE ${PROJECT_NAME}-config.cmake
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
 
-        kth/network/acceptor.hpp
-        kth/network/channel.hpp
-        kth/network/connector.hpp
-        kth/network/define.hpp
-        kth/network/hosts.hpp
-        kth/network/message_subscriber.hpp
-        kth/network/p2p.hpp
-        kth/network/proxy.hpp
-        kth/network/settings.hpp
-        kth/network/version.hpp
-        kth/network.hpp)
-
-foreach (_header ${_kth_headers})
-  get_filename_component(_directory "${_header}" DIRECTORY)
-  install(FILES "include/${_header}" DESTINATION "include/${_directory}")
-endforeach()
-
-# Export
-#==============================================================================
-include(CMakePackageConfigHelpers)
-
-export(EXPORT kth-network
-        FILE "${CMAKE_CURRENT_BINARY_DIR}/kth-networkTargets.cmake")
-export(PACKAGE kth-network)
-
-if (UNIX)
-  set(_config_package_location "lib/cmake")
-elseif (WIN32)
-  set(_config_package_location "cmake")
-endif()
-
-install(EXPORT kth-network
-        FILE kth-networkTargets.cmake
-        DESTINATION ${_config_package_location})
-
-configure_file(kth-networkConfig.cmake.in
-        "${CMAKE_CURRENT_BINARY_DIR}/kth-networkConfig.cmake"
-        @ONLY)
-
-write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/kth-networkConfigVersion.cmake"
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY AnyNewerVersion)
-
-install(
-        FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/kth-networkConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/kth-networkConfigVersion.cmake"
-        DESTINATION ${_config_package_location})

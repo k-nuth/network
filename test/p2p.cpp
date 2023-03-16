@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Knuth Project developers.
+// Copyright (c) 2016-2023 Knuth Project developers.
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -64,13 +64,13 @@ std::string get_log_path(std::string const& test, std::string const& file) {
     return path;
 }
 
-static 
+static
 void print_headers(std::string const& test) {
     auto const header = "=========== " + test + " ==========";
     LOG_INFO(TEST_SET_NAME, header);
 }
 
-static 
+static
 int start_result(p2p& network) {
     std::promise<code> promise;
     auto const handler = [&promise](code ec) {
@@ -80,7 +80,7 @@ int start_result(p2p& network) {
     return promise.get_future().get().value();
 }
 
-static 
+static
 int connect_result(p2p& network, infrastructure::config::endpoint const& host) {
     std::promise<code> promise;
     auto const handler = [&promise](code ec, channel::ptr) {
@@ -156,15 +156,15 @@ int send_result(Message const& message, p2p& network, int channels) {
 }
 
 // Trivial tests just validate static inits (required because p2p tests disabled in travis).
-// Start Boost Suite: empty tests
+// Start Test Suite: empty tests
 
 TEST_CASE("empty test", "[empty tests]") {
     REQUIRE(true);
 }
 
-// End Boost Suite
+// End Test Suite
 
-// Start Boost Suite: p2p tests
+// Start Test Suite: p2p tests
 
 TEST_CASE("p2p  top block  default  zero null hash", "[p2p tests]") {
     print_headers(TEST_NAME);
@@ -424,4 +424,4 @@ TEST_CASE("p2p  broadcast  ping two distinct hosts  two sends and successful com
 ////    // during channel.stop each channel removes itself from the collection.
 ////}
 
-// End Boost Suite
+// End Test Suite
