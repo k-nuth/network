@@ -158,6 +158,14 @@ settings::settings(domain::config::network context)
             seeds.emplace_back("seed.sbch.loping.net", 38333);
             break;
         }
+
+        case domain::config::network::chipnet: {
+            inbound_port = 48333;
+            identifier = netmagic::bch_chipnet;
+            seeds.reserve(1);
+            seeds.emplace_back("chipnet.bitjson.com", 48333);
+            break;
+        }
 #endif //KTH_CURRENCY_BCH
     }
 }

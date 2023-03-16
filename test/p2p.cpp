@@ -156,15 +156,15 @@ int send_result(Message const& message, p2p& network, int channels) {
 }
 
 // Trivial tests just validate static inits (required because p2p tests disabled in travis).
-// Start Boost Suite: empty tests
+// Start Test Suite: empty tests
 
 TEST_CASE("empty test", "[empty tests]") {
     REQUIRE(true);
 }
 
-// End Boost Suite
+// End Test Suite
 
-// Start Boost Suite: p2p tests
+// Start Test Suite: p2p tests
 
 TEST_CASE("p2p  top block  default  zero null hash", "[p2p tests]") {
     print_headers(TEST_NAME);
@@ -424,4 +424,4 @@ TEST_CASE("p2p  broadcast  ping two distinct hosts  two sends and successful com
 ////    // during channel.stop each channel removes itself from the collection.
 ////}
 
-// End Boost Suite
+// End Test Suite
