@@ -3,16 +3,11 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 import os
-<<<<<<< Updated upstream
-from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-=======
 from conan import ConanFile
 from conan.tools.build.cppstd import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import copy #, apply_conandata_patches, export_conandata_patches, get, rm, rmdir
->>>>>>> Stashed changes
-from kthbuild import option_on_off, march_conan_manip, pass_march_to_compiler
-from kthbuild import KnuthConanFileV2
+from conan.tools.files import copy
+from kthbuild import KnuthConanFileV2, option_on_off
 
 required_conan_version = ">=2.0"
 class KnuthNetworkConan(KnuthConanFileV2):
@@ -51,34 +46,24 @@ class KnuthNetworkConan(KnuthConanFileV2):
         "log": "spdlog",
     }
 
-    # generators = "cmake"
-<<<<<<< Updated upstream
-    exports = "conan_*", "ci_utils/*"
-    exports_sources = "src/*", "CMakeLists.txt", "cmake/*", "kth-networkConfig.cmake.in", "knuthbuildinfo.cmake", "include/*", "test/*"
-    package_files = "build/lkth-network.a"
-    # build_policy = "missing"
+    exports_sources = "src/*", "CMakeLists.txt", "ci_utils/cmake/*", "cmake/*", "knuthbuildinfo.cmake", "include/*", "test/*"
 
     def build_requirements(self):
         if self.options.tests:
             self.test_requires("catch2/3.3.1")
-=======
-    # exports = "conan_*", "ci_utils/*"
-    exports_sources = "src/*", "CMakeLists.txt", "ci_utils/cmake/*", "cmake/*", "kth-networkConfig.cmake.in", "knuthbuildinfo.cmake", "include/*", "test/*"
-    # package_files = "build/lkth-network.a"
-    # build_policy = "missing"
->>>>>>> Stashed changes
 
     def requirements(self):
-        self.requires("domain/0.X@%s/%s" % (self.user, self.channel))
+        self.requires("infrastructure/0.24.0")
+        self.requires("domain/0.29.0")
+
+        self.requires("boost/1.81.0")
+        self.requires("fmt/9.1.0")
+        self.requires("spdlog/1.11.0")
 
     def validate(self):
-<<<<<<< Updated upstream
-        KnuthConanFile.validate(self)
+        KnuthConanFileV2.validate(self)
         if self.info.settings.compiler.cppstd:
             check_min_cppstd(self, "20")
-=======
-        KnuthConanFileV2.validate(self)
->>>>>>> Stashed changes
 
     def config_options(self):
         KnuthConanFileV2.config_options(self)
@@ -107,29 +92,10 @@ class KnuthNetworkConan(KnuthConanFileV2):
         tc = CMakeDeps(self)
         tc.generate()
 
-<<<<<<< Updated upstream
-    def layout(self):
-        cmake_layout(self)
-
-    def generate(self):
-        tc = self.cmake_toolchain_basis()
-        # tc.variables["CMAKE_VERBOSE_MAKEFILE"] = True
-        #TODO(fernando): move to kthbuild
-        tc.variables["LOG_LIBRARY"] = self.options.log
-        tc.variables["CONAN_DISABLE_CHECK_COMPILER"] = option_on_off(True)
-        tc.generate()
-        tc = CMakeDeps(self)
-        tc.generate()
-
-    def build(self):
-        cmake = CMake(self)
-        cmake.configure()
-=======
     def build(self):
         cmake = CMake(self)
         cmake.configure()
 
->>>>>>> Stashed changes
         if not self.options.cmake_export_compile_commands:
             cmake.build()
             if self.options.tests:
@@ -148,7 +114,7 @@ class KnuthNetworkConan(KnuthConanFileV2):
 
     def package_info(self):
         self.cpp_info.includedirs = ['include']
-        self.cpp_info.libs = ["kth-network"]
+        self.cpp_info.libs = ["network"]
 
         if self.settings.arch == "armv7":
-            self.cpp_info.libs.append("atomic")
+            self.cpp_info.system_libs.append("atomic")
