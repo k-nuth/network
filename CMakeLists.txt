@@ -49,12 +49,12 @@ endif()
 
 message(STATUS "Knuth: Cryptocurrency: ${CURRENCY}")
 
-find_package(infrastructure REQUIRED)
+# find_package(infrastructure REQUIRED)
 find_package(domain REQUIRED)
 
-find_package(fmt 9.1.0 REQUIRED)
-find_package(spdlog 1.10.0 REQUIRED)
-find_package(Boost 1.81.0 COMPONENTS boost REQUIRED)
+# find_package(fmt 9.1.0 REQUIRED)
+# find_package(spdlog 1.10.0 REQUIRED)
+# find_package(Boost 1.81.0 COMPONENTS boost REQUIRED)
 
 include(CheckCXXCompilerFlag)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/ci_utils/cmake)
