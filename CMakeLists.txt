@@ -179,12 +179,12 @@ if (NOT ENABLE_SHARED)
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DBCT_STATIC -DBC_STATIC)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC infrastructure::infrastructure)
+# target_link_libraries(${PROJECT_NAME} PUBLIC infrastructure::infrastructure)
 target_link_libraries(${PROJECT_NAME} PUBLIC domain::domain)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
-target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
+# target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
+# target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+# target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
 
 if (MINGW)
   target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32 wsock32)
