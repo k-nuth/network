@@ -49,12 +49,7 @@ endif()
 
 message(STATUS "Knuth: Cryptocurrency: ${CURRENCY}")
 
-find_package(infrastructure REQUIRED)
 find_package(domain REQUIRED)
-
-find_package(fmt 9.1.0 REQUIRED)
-find_package(spdlog 1.10.0 REQUIRED)
-find_package(Boost 1.81.0 COMPONENTS boost REQUIRED)
 
 include(CheckCXXCompilerFlag)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/ci_utils/cmake)
@@ -179,12 +174,7 @@ if (NOT ENABLE_SHARED)
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DBCT_STATIC -DBC_STATIC)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC infrastructure::infrastructure)
 target_link_libraries(${PROJECT_NAME} PUBLIC domain::domain)
-
-target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
-target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
 
 if (MINGW)
   target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32 wsock32)
