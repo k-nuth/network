@@ -15,6 +15,10 @@ option(ENABLE_SHARED "" OFF)
 option(ENABLE_POSITION_INDEPENDENT_CODE "Enable POSITION_INDEPENDENT_CODE property" ON)
 option(WITH_TESTS "Compile with unit tests." ON)
 
+
+option(GLOBAL_BUILD "" OFF)
+
+
 set(LOG_LIBRARY "boost" CACHE STRING "Setting for the logging library (boost|spdlog|binlog).")
 
 if (${LOG_LIBRARY} STREQUAL "boost")
@@ -49,7 +53,10 @@ endif()
 
 message(STATUS "Knuth: Cryptocurrency: ${CURRENCY}")
 
-find_package(domain REQUIRED)
+if (NOT GLOBAL_BUILD)
+  find_package(domain REQUIRED)
+endif()
+
 
 include(CheckCXXCompilerFlag)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/ci_utils/cmake)
