@@ -50,7 +50,7 @@ class KnuthNetworkConan(KnuthConanFileV2):
 
     def build_requirements(self):
         if self.options.tests:
-            self.test_requires("catch2/3.3.1")
+            self.test_requires("catch2/3.3.2")
 
     def requirements(self):
         self.requires("domain/0.28.0", transitive_headers=True, transitive_libs=True)
