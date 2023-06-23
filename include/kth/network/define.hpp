@@ -24,7 +24,7 @@
 #endif
 
 // Log name.
-#define LOG_NETWORK "[network]"
+#define LOG_NETWORK "[network] "
 
 // Avoid namespace conflict between boost::placeholders and std::placeholders.
 #define BOOST_BIND_NO_PLACEHOLDERS
