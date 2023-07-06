@@ -122,13 +122,13 @@ bool protocol_version_31402::handle_receive_version(code const& ec, version_cons
     //-------------------------------------------------------------------------
 
     if (settings.protocol_minimum < version::level::minimum) {
-        LOG_ERROR(LOG_NETWORK, "Invalid protocol version configuration, minimum below (", version::level::minimum, ").");
+        LOG_ERROR(LOG_NETWORK, "Invalid protocol version configuration, minimum below (", uint32_t(version::level::minimum), ").");
         set_event(error::channel_stopped);
         return false;
     }
 
     if (settings.protocol_maximum > version::level::maximum) {
-        LOG_ERROR(LOG_NETWORK, "Invalid protocol version configuration, maximum above (", version::level::maximum, ").");
+        LOG_ERROR(LOG_NETWORK, "Invalid protocol version configuration, maximum above (", uint32_t(version::level::maximum), ").");
         set_event(error::channel_stopped);
         return false;
     }
