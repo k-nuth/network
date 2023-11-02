@@ -48,7 +48,7 @@ void protocol_ping_60001::send_ping(code const& ec) {
     }
 
     pending_ = true;
-    auto const nonce = pseudo_random::next();
+    auto const nonce = pseudo_random_broken_do_not_use::next();
     SUBSCRIBE3(pong, handle_receive_pong, _1, _2, nonce);
     SEND2(ping{ nonce }, handle_send_ping, _1, ping::command);
 }

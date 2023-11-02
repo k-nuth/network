@@ -22,7 +22,7 @@ using namespace std::placeholders;
 // Factory for deadline timer pointer construction.
 static
 deadline::ptr alarm(threadpool& pool, const asio::duration& duration) {
-    return std::make_shared<deadline>(pool, pseudo_random::duration(duration));
+    return std::make_shared<deadline>(pool, pseudo_random_broken_do_not_use::duration(duration));
 }
 
 channel::channel(threadpool& pool, socket::ptr socket, settings const& settings)

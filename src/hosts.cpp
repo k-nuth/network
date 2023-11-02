@@ -62,7 +62,7 @@ code hosts::fetch(address& out) const {
     }
 
     // Randomly select an address from the buffer.
-    auto const random = pseudo_random::next(0, buffer_.size() - 1);
+    auto const random = pseudo_random_broken_do_not_use::next(0, buffer_.size() - 1);
     auto const index = static_cast<size_t>(random);
     out = buffer_[index];
     return error::success;
@@ -87,7 +87,7 @@ code hosts::fetch(address::list& out) const {
             return error::not_found;
         }
 
-        auto const out_count = std::min(buffer_.size(), capacity_) / static_cast<size_t>(pseudo_random::next(1, 20));
+        auto const out_count = std::min(buffer_.size(), capacity_) / static_cast<size_t>(pseudo_random_broken_do_not_use::next(1, 20));
 
         if (out_count == 0) {
             return error::success;
@@ -100,7 +100,7 @@ code hosts::fetch(address::list& out) const {
     }
     ///////////////////////////////////////////////////////////////////////////
 
-    pseudo_random::shuffle(out);
+    pseudo_random_broken_do_not_use::shuffle(out);
     return error::success;
 }
 
@@ -288,7 +288,7 @@ void hosts::store(address::list const& hosts, result_handler handler) {
     // Accept between 1 and all of this peer's addresses up to capacity.
     auto const capacity = buffer_.capacity();
     auto const usable = std::min(hosts.size(), capacity);
-    auto const random = static_cast<size_t>(pseudo_random::next(1, usable));
+    auto const random = static_cast<size_t>(pseudo_random_broken_do_not_use::next(1, usable));
 
     // But always accept at least the amount we are short if available.
     auto const gap = capacity - buffer_.size();

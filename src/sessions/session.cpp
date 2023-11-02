@@ -154,7 +154,7 @@ void session::register_channel(channel::ptr channel, result_handler handle_start
 
 void session::start_channel(channel::ptr channel, result_handler handle_started) {
     channel->set_notify(notify_on_connect_);
-    channel->set_nonce(pseudo_random::next(1, max_uint64));
+    channel->set_nonce(pseudo_random_broken_do_not_use::next(1, max_uint64));
 
     // The channel starts, invokes the handler, then starts the read cycle.
     channel->start(BIND3(handle_starting, _1, channel, handle_started));
