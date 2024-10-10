@@ -53,7 +53,7 @@ class KnuthNetworkConan(KnuthConanFileV2):
             self.test_requires("catch2/3.6.0")
 
     def requirements(self):
-        self.requires("domain/0.36.0", transitive_headers=True, transitive_libs=True)
+        self.requires("domain/0.37.0", transitive_headers=True, transitive_libs=True)
 
     def validate(self):
         KnuthConanFileV2.validate(self)
