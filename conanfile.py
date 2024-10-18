@@ -16,6 +16,7 @@ class KnuthNetworkConan(KnuthConanFileV2):
     url = "https://github.com/k-nuth/network"
     description = "Crypto P2P Network Library"
     settings = "os", "compiler", "build_type", "arch"
+    package_type = "library"
 
     options = {
         "shared": [True, False],
