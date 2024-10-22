@@ -93,17 +93,45 @@ public:
      * @param[in]  subscriber  The subscriber for the message type.
      * @return                 Returns error::bad_stream if failed.
      */
-    template <typename Message, typename Subscriber>
-    code relay(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
-        auto const message = std::make_shared<Message>();
+    // template <typename Message, typename Subscriber>
+    // code relay(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
+    //     // auto const message = std::make_shared<Message>();
 
-        // Subscribers are invoked only with stop and success codes.
-        if ( ! domain::entity_from_data(*message, stream, version)) {
+    //     // // Subscribers are invoked only with stop and success codes.
+    //     // if ( ! domain::entity_from_data(*message, stream, version)) {
+    //     //     return error::bad_stream;
+    //     // }
+
+    //     auto msg = Message::from_data(stream, version);
+    //     if ( ! msg) {
+    //         return error::bad_stream;
+    //     }
+    //     auto const msg_ptr = std::make_shared<Message>(std::move(*msg));
+
+    //     ////auto const const_ptr = std::const_pointer_cast<const Message>(msg_ptr);
+    //     subscriber->relay(error::success, msg_ptr);
+    //     return error::success;
+    // }
+
+    template <typename Message, typename Subscriber>
+    code relay(byte_reader& reader, uint32_t version, Subscriber& subscriber) const {
+        // LOG_INFO(LOG_NETWORK, "message_subscriber::relay()");
+
+        // auto const message = std::make_shared<Message>();
+
+        // // Subscribers are invoked only with stop and success codes.
+        // if ( ! domain::entity_from_data(*message, stream, version)) {
+        //     return error::bad_stream;
+        // }
+
+        auto msg = Message::from_data(reader, version);
+        if ( ! msg) {
             return error::bad_stream;
         }
+        auto const msg_ptr = std::make_shared<Message>(std::move(*msg));
 
-        ////auto const const_ptr = std::const_pointer_cast<const Message>(message);
-        subscriber->relay(error::success, message);
+        ////auto const const_ptr = std::const_pointer_cast<const Message>(msg_ptr);
+        subscriber->relay(error::success, msg_ptr);
         return error::success;
     }
 
@@ -114,19 +142,47 @@ public:
      * @param[in]  subscriber  The subscriber for the message type.
      * @return                 Returns error::bad_stream if failed.
      */
-    template <typename Message, typename Subscriber>
-    code handle(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
-        auto const message = std::make_shared<Message>();
+    // template <typename Message, typename Subscriber>
+    // code handle(std::istream& stream, uint32_t version, Subscriber& subscriber) const {
+    //     // auto const message = std::make_shared<Message>();
 
-        // Subscribers are invoked only with stop and success codes.
-        if ( ! domain::entity_from_data(*message, stream, version)) {
+    //     // // Subscribers are invoked only with stop and success codes.
+    //     // if ( ! domain::entity_from_data(*message, stream, version)) {
+    //     //     return error::bad_stream;
+    //     // }
+
+    //     auto msg = Message::from_data(stream, version);
+    //     if ( ! msg) {
+    //         return error::bad_stream;
+    //     }
+    //     auto const msg_ptr = std::make_shared<Message>(std::move(*msg));
+
+    //     ////auto const const_ptr = std::const_pointer_cast<const Message>(msg_ptr);
+    //     subscriber->invoke(error::success, msg_ptr);
+    //     return error::success;
+    // }
+
+    template <typename Message, typename Subscriber>
+    code handle(byte_reader& reader, uint32_t version, Subscriber& subscriber) const {
+        // LOG_INFO(LOG_NETWORK, "message_subscriber::handle()");
+        // auto const message = std::make_shared<Message>();
+
+        // // Subscribers are invoked only with stop and success codes.
+        // if ( ! domain::entity_from_data(*message, stream, version)) {
+        //     return error::bad_stream;
+        // }
+
+        auto msg = Message::from_data(reader, version);
+        if ( ! msg) {
             return error::bad_stream;
         }
+        auto const msg_ptr = std::make_shared<Message>(std::move(*msg));
 
-        ////auto const const_ptr = std::const_pointer_cast<const Message>(message);
-        subscriber->invoke(error::success, message);
+        ////auto const const_ptr = std::const_pointer_cast<const Message>(msg_ptr);
+        subscriber->invoke(error::success, msg_ptr);
         return error::success;
     }
+
 
     /**
      * Broadcast a default message instance with the specified error code.
@@ -143,7 +199,9 @@ public:
      * @param[in]  stream   The stream from which to load the message.
      * @return              Returns error::bad_stream if failed.
      */
-    virtual code load(domain::message::message_type type, uint32_t version, std::istream& stream) const;
+    // virtual code load(domain::message::message_type type, uint32_t version, std::istream& stream) const;
+    virtual code load(domain::message::message_type type, uint32_t version, byte_reader& reader) const;
+
 
     /**
      * Start all subscribers so that they accept subscription.
