@@ -77,13 +77,15 @@ settings::settings(domain::config::network context)
 
 #if defined(KTH_CURRENCY_BCH)
             identifier = netmagic::bch_mainnet;
-            seeds.reserve(6);
-            seeds.emplace_back("seed.flowee.cash", 8333);
-            seeds.emplace_back("seed-bch.bitcoinforks.org", 8333);
-            seeds.emplace_back("btccash-seeder.bitcoinunlimited.info", 8333);
-            seeds.emplace_back("seed.bchd.cash", 8333);
-            seeds.emplace_back("seed.bch.loping.net", 8333);
-            seeds.emplace_back("dnsseed.electroncash.de", 8333);
+            seeds.reserve(8);
+            seeds.emplace_back("seed.flowee.cash", 8333);                     // Flowee
+            seeds.emplace_back("seed-bch.bitcoinforks.org", 8333);            // BitcoinForks
+            seeds.emplace_back("btccash-seeder.bitcoinunlimited.info", 8333); // Bitcoin Unlimited
+            seeds.emplace_back("seed.bchd.cash", 8333);                       // BCHD
+            seeds.emplace_back("seed.bch.loping.net", 8333);                  // Loping.net
+            seeds.emplace_back("dnsseed.electroncash.de", 8333);              // Electroncash.de
+            seeds.emplace_back("bchseed.c3-soft.com", 8333);                  // C3 Soft (NilacTheGrim)
+            seeds.emplace_back("bch.bitjson.com", 8333);                      // Jason Dreyzehner
 #else
             identifier = netmagic::btc_mainnet;
             seeds.reserve(6);
