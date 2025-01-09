@@ -164,8 +164,10 @@ settings::settings(domain::config::network context)
         case domain::config::network::chipnet: {
             inbound_port = 48333;
             identifier = netmagic::bch_chipnet;
-            seeds.reserve(1);
+            seeds.reserve(3);
             seeds.emplace_back("chipnet.bitjson.com", 48333);
+            seeds.emplace_back("chipnet.imaginary.cash", 48333);
+            seeds.emplace_back("chipnet.bch.ninja", 48333);
             break;
         }
 #endif //KTH_CURRENCY_BCH
