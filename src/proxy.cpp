@@ -118,6 +118,8 @@ void proxy::handle_read_heading(boost_code const& ec, size_t) {
         return;
     }
 
+    // Using domain::create_old instead of domain::create because the 'old' variant
+    // supports an additional parameter for offset initialization, which is required here.
     auto const head = domain::create_old<heading>(heading_buffer_, 0);
 
     if ( ! head.is_valid()) {
