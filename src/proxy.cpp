@@ -206,13 +206,13 @@ void proxy::handle_read_payload(boost_code const& ec, size_t payload_size, headi
     }
 
     if (code) {
-        LOG_WARNING(LOG_NETWORK, "Invalid ", head.command(), " payload from [", authority(), "] ", code.message());
+        LOG_VERBOSE(LOG_NETWORK, "Invalid ", head.command(), " payload from [", authority(), "] ", code.message());
         stop(code);
         return;
     }
 
     if ( ! consumed) {
-        LOG_WARNING(LOG_NETWORK, "Invalid ", head.command(), " payload from [", authority(), "] trailing bytes.");
+        LOG_VERBOSE(LOG_NETWORK, "Invalid ", head.command(), " payload from [", authority(), "] trailing bytes.");
         stop(error::bad_stream);
         return;
     }
